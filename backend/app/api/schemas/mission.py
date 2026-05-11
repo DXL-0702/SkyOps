@@ -5,8 +5,10 @@ from app.core.models import (
     DroneState,
     EnvironmentState,
     Explanation,
+    IncidentEvent,
     MissionPlan,
     MissionTask,
+    ReplanDecision,
     RiskItem,
 )
 
@@ -25,3 +27,11 @@ class MissionPlanResponse(BaseModel):
     mission_plan: MissionPlan
     human_explanation: Explanation
 
+
+class MissionReplanRequest(BaseModel):
+    scenario_id: str = "shenzhen_nanshan_highrise_demo"
+    incident_event: IncidentEvent
+
+
+class MissionReplanResponse(BaseModel):
+    replan_decision: ReplanDecision
