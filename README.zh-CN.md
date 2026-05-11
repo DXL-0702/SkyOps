@@ -175,6 +175,19 @@ uv run uvicorn app.main:app --reload
 curl http://127.0.0.1:8000/health
 ```
 
+检查 Phase 1 mock 任务规划合约：
+
+```bash
+curl -X POST http://127.0.0.1:8000/missions/plan \
+  -H "Content-Type: application/json" \
+  -d '{
+    "raw_user_input": "明天上午巡检南山区一栋180米高办公楼外立面。",
+    "scenario_id": "shenzhen_nanshan_highrise_demo"
+  }'
+```
+
+`/missions/plan` 当前返回深圳高层建筑 Demo 的 mock contract response，还不是完整规划器。响应中的环境、空域和设备状态均为 simulated/mock 数据。
+
 运行测试和 lint：
 
 ```bash

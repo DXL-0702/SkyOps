@@ -175,6 +175,21 @@ Check the health endpoint:
 curl http://127.0.0.1:8000/health
 ```
 
+Check the Phase 1 mock mission planning contract:
+
+```bash
+curl -X POST http://127.0.0.1:8000/missions/plan \
+  -H "Content-Type: application/json" \
+  -d '{
+    "raw_user_input": "Inspect a 180-meter office building facade in Nanshan tomorrow morning.",
+    "scenario_id": "shenzhen_nanshan_highrise_demo"
+  }'
+```
+
+`/missions/plan` currently returns a mock contract response for the Shenzhen high-rise demo. It is
+not a complete planner yet, and all environment, airspace, and drone state data in this response is
+simulated.
+
 Run tests and lint:
 
 ```bash
