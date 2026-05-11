@@ -196,6 +196,9 @@ Build the frontend:
 npm run build
 ```
 
+The repository CI runs backend tests, backend Ruff checks, and the frontend production build on
+pushes and pull requests targeting `main`.
+
 ## MVP Scenario
 
 > Autonomous mission planning and risk simulation for a high-rise building facade inspection in Shenzhen.

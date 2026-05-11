@@ -196,6 +196,8 @@ npm run dev
 npm run build
 ```
 
+仓库 CI 会在推送到 `main` 或向 `main` 发起 PR 时运行后端测试、后端 Ruff 检查和前端生产构建。
+
 ## MVP 场景
 
 > 深圳某高层建筑外立面巡检任务自治与风险推演。
