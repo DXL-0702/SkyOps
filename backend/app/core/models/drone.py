@@ -12,5 +12,5 @@ class DroneState(BaseModel):
     return_to_home_battery_threshold: int = Field(ge=0, le=100)
     payloads: list[str] = Field(default_factory=list)
     link_quality: RiskLevel
+    video_latency_ms: int = Field(ge=0)
     available_for_mission: bool
-
