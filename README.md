@@ -146,6 +146,42 @@ docs/
 .github/
 ```
 
+## Getting Started
+
+The project is currently in Phase 0. The backend baseline uses Python 3.12 and `uv`.
+
+Install the required local tools:
+
+```bash
+brew install uv python@3.12
+```
+
+Install backend dependencies:
+
+```bash
+cd backend
+uv sync
+```
+
+Run the backend API:
+
+```bash
+uv run uvicorn app.main:app --reload
+```
+
+Check the health endpoint:
+
+```bash
+curl http://127.0.0.1:8000/health
+```
+
+Run tests and lint:
+
+```bash
+uv run pytest
+uv run ruff check .
+```
+
 ## MVP Scenario
 
 > Autonomous mission planning and risk simulation for a high-rise building facade inspection in Shenzhen.

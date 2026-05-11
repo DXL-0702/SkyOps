@@ -146,6 +146,42 @@ docs/
 .github/
 ```
 
+## 快速开始
+
+项目当前处于 Phase 0。后端工程基线使用 Python 3.12 和 `uv`。
+
+安装本地工具：
+
+```bash
+brew install uv python@3.12
+```
+
+安装后端依赖：
+
+```bash
+cd backend
+uv sync
+```
+
+启动后端 API：
+
+```bash
+uv run uvicorn app.main:app --reload
+```
+
+检查健康接口：
+
+```bash
+curl http://127.0.0.1:8000/health
+```
+
+运行测试和 lint：
+
+```bash
+uv run pytest
+uv run ruff check .
+```
+
 ## MVP 场景
 
 > 深圳某高层建筑外立面巡检任务自治与风险推演。

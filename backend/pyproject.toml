@@ -1,0 +1,33 @@
+[project]
+name = "skyops-agent-backend"
+version = "0.1.0"
+description = "FastAPI backend for SkyOps Agent task autonomy and risk simulation."
+readme = "../README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "fastapi>=0.124.0",
+    "pydantic>=2.12.0",
+    "pydantic-settings>=2.12.0",
+    "python-dotenv>=1.2.0",
+    "pyyaml>=6.0.0",
+    "uvicorn[standard]>=0.38.0",
+]
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.0",
+    "pytest>=9.0.0",
+    "ruff>=0.14.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
