@@ -148,7 +148,8 @@ docs/
 
 ## Getting Started
 
-The project is currently in Phase 0. The backend baseline uses Python 3.12 and `uv`.
+The project has completed the Phase 1 backend simulation loop. The backend baseline uses Python
+3.12 and `uv`.
 
 Install the required local tools:
 
@@ -186,8 +187,51 @@ curl -X POST http://127.0.0.1:8000/missions/plan \
   }'
 ```
 
-`/missions/plan` currently returns a mock contract response for the Shenzhen high-rise demo. It is
-not a complete planner yet, and all environment, airspace, and drone state data in this response is
+Check the mock incident replan contract:
+
+```bash
+curl -X POST http://127.0.0.1:8000/missions/replan \
+  -H "Content-Type: application/json" \
+  -d '{
+    "scenario_id": "shenzhen_nanshan_highrise_demo",
+    "incident_event": {
+      "id": "incident-wind-001",
+      "mission_id": "mission-shenzhen-nanshan-highrise-demo",
+      "event_type": "wind_speed_spike",
+      "observed_value": "9.4 m/s",
+      "threshold": "8.0 m/s",
+      "severity": "high",
+      "source_type": "mock",
+      "description": "Simulated sudden wind increase near the upper facade."
+    }
+  }'
+```
+
+Check the mock mission review contract:
+
+```bash
+curl -X POST http://127.0.0.1:8000/missions/review \
+  -H "Content-Type: application/json" \
+  -d '{
+    "scenario_id": "shenzhen_nanshan_highrise_demo",
+    "incident_events": [
+      {
+        "id": "incident-gps-001",
+        "mission_id": "mission-shenzhen-nanshan-highrise-demo",
+        "event_type": "gps_confidence_drop",
+        "observed_value": "0.41",
+        "threshold": "0.65",
+        "severity": "high",
+        "source_type": "mock",
+        "description": "Simulated GPS confidence drop near the facade."
+      }
+    ]
+  }'
+```
+
+These Phase 1 endpoints form a deterministic mock backend loop for planning, incident replanning,
+and mission review. They are not connected to real drones, real airspace systems, real weather APIs,
+or real flight control. All environment, airspace, drone state, incident, and review data is mock or
 simulated.
 
 Run tests and lint:
@@ -275,7 +319,9 @@ All safety rules must be explicit, configurable, and testable. Mock data must ne
 
 ## Current Status
 
-The repository is currently in the planning and scaffold stage. The immediate priority is to build the Phase 0 baseline and then implement the Phase 1 simulation MVP.
+The Phase 1 backend simulation loop is complete: mock mission planning, deterministic incident
+replanning, mission review, explicit safety rules, and backend tests are in place. The next priority
+is Phase 2: a visual low-altitude operations demo that calls these backend contracts.
 
 ## License
 
