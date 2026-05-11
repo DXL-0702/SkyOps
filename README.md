@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./skyops_readme_header_1.png" alt="SkyOps Agent" width="100%" />
+  <img src="./frontend/src/public/skyops_readme_header_1.png" alt="SkyOps Agent" width="100%" />
 </p>
 
 <h1 align="center">SkyOps Agent</h1>
