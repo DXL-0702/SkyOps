@@ -26,6 +26,8 @@ def test_create_mission_plan_returns_mock_contract() -> None:
     assert payload["mission_plan"]["safety_thresholds"]["min_battery_percent"] == 35
     assert len(payload["risks"]) >= 2
     assert any(risk["requires_human_confirmation"] for risk in payload["risks"])
+    assert "Hard constraint evaluation passed: true." in payload["human_explanation"]["facts"]
+    assert "Wind speed is below threshold." in payload["human_explanation"]["inferences"]
     assert "Airspace approval" in payload["human_explanation"]["human_confirmation_required"]
 
 
