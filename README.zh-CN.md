@@ -182,6 +182,20 @@ uv run pytest
 uv run ruff check .
 ```
 
+启动前端 scaffold：
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+构建前端：
+
+```bash
+npm run build
+```
+
 ## MVP 场景
 
 > 深圳某高层建筑外立面巡检任务自治与风险推演。

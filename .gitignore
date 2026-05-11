@@ -25,6 +25,7 @@ node_modules/
 dist/
 build/
 .vite/
+.npm-cache/
 
 # OS / IDE
 .DS_Store

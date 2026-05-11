@@ -182,6 +182,20 @@ uv run pytest
 uv run ruff check .
 ```
 
+Run the frontend scaffold:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Build the frontend:
+
+```bash
+npm run build
+```
+
 ## MVP Scenario
 
 > Autonomous mission planning and risk simulation for a high-rise building facade inspection in Shenzhen.
