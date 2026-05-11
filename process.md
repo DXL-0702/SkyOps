@@ -64,37 +64,90 @@ Role: Write
 在 GitHub 仓库页面中：
 
 ```text
-Settings -> Branches -> Branch protection rules -> Add rule
+Settings -> Rules -> Rulesets -> New branch ruleset
 ```
 
-规则名称：
+Ruleset 名称建议：
 
 ```text
-main
+Protect main
+```
+
+Enforcement status 选择：
+
+```text
+Active
+```
+
+Target branches 选择：
+
+```text
+Default branch
+```
+
+如果仓库默认分支就是 `main`，选择 `Default branch` 即可。如果想显式锁定 `main`，也可以选择：
+
+```text
+Include by pattern -> main
 ```
 
 开启：
 
 ```text
+Restrict deletions
 Require a pull request before merging
-Require approvals: 1
+Required approvals: 1
 Dismiss stale pull request approvals when new commits are pushed
 Require conversation resolution before merging
-Do not allow force pushes
-Do not allow deletions
-Restrict who can push to matching branches
+Block force pushes
+Require review from Code Owners
 ```
 
-如果项目已经配置自动测试（这个DXL-0702会配置），再开启：
+可选开启：
+
+```text
+Require approval of the most recent reviewable push
+```
+
+这个选项可以避免 PR 在最后一次 push 后没有被别人重新确认就合并。对本项目是推荐项，但不是必须项。
+
+暂时不要开启：
+
+```text
+Restrict updates
+```
+
+新版 GitHub Rulesets 里，旧版 `Restrict who can push to matching branches` 的对应能力主要变成了 `Restrict updates` 加 bypass 权限配置。`Restrict updates` 的含义是：只有拥有 bypass 权限的人才能更新匹配分支。
+
+本项目当前建议先不勾选 `Restrict updates`，因为：
+
+```text
+Require a pull request before merging
+Require review from Code Owners
+```
+
+已经能阻止成员直接 push 到 `main`，并要求通过 PR 和维护者审查来修改 `main`。如果误开 `Restrict updates` 且没有正确配置 bypass，可能导致 PR 合并也被卡住。
+
+如果后续需要更严格地做到“只有组长能合并 main”，再开启：
+
+```text
+Restrict updates
+```
+
+并在 bypass list 中只添加组长本人。这个设置要谨慎配置。
+
+如果项目已经配置自动测试（这个 DXL-0702 会配置），再开启：
 
 ```text
 Require status checks to pass before merging
 Require branches to be up to date before merging
 ```
 
-### 2.3 可选：添加 CODEOWNERS
+如果还没有配置 CI，不要开启 `Require status checks to pass before merging`，否则可能找不到可选择的检查项，或者导致 PR 无法合并。
 
-所有 PR 自动请求维护者审查，添加文件：
+### 2.3 添加 CODEOWNERS
+
+为了确保所有 PR 都必须经过维护者审查，添加文件：
 
 ```text
 .github/CODEOWNERS
@@ -105,6 +158,14 @@ Require branches to be up to date before merging
 ```text
 * @DXL-0702
 ```
+
+添加后，回到 Ruleset 中开启：
+
+```text
+Require review from Code Owners
+```
+
+这样任何修改都会要求 Code Owner 审查。否则，仅设置 `Required approvals: 1` 时，理论上其他 collaborator 之间也可能互相批准 PR。
 
 ## 3. 成员第一次准备环境
 
