@@ -117,3 +117,53 @@ def test_create_replan_decision_returns_404_for_unknown_scenario() -> None:
 
     assert response.status_code == 404
     assert response.json()["detail"] == "Mission scenario not found: unknown_scenario"
+
+
+def test_create_mission_review_returns_mock_contract() -> None:
+    client = TestClient(app)
+
+    response = client.post(
+        "/missions/review",
+        json={
+            "scenario_id": "shenzhen_nanshan_highrise_demo",
+            "incident_events": [
+                {
+                    "id": "incident-gps-001",
+                    "mission_id": "mission-shenzhen-nanshan-highrise-demo",
+                    "event_type": "gps_confidence_drop",
+                    "observed_value": "0.41",
+                    "threshold": "0.65",
+                    "severity": "high",
+                    "source_type": "mock",
+                    "description": "Simulated GPS confidence drop near the facade.",
+                }
+            ],
+        },
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    review = payload["mission_review"]
+
+    assert review["mission_id"] == "mission-shenzhen-nanshan-highrise-demo"
+    assert review["completion_rate"] == 70
+    assert review["data_quality_score"] == 82
+    assert any("gps_confidence_drop" in item for item in review["risk_trigger_log"])
+    assert "south facade lower segment" in review["uncovered_areas"]
+    assert any("Schedule makeup flight" in item for item in review["makeup_flight_plan"])
+    assert any("human takeover requirement" in item for item in review["human_review_checklist"])
+
+
+def test_create_mission_review_returns_404_for_unknown_scenario() -> None:
+    client = TestClient(app)
+
+    response = client.post(
+        "/missions/review",
+        json={
+            "scenario_id": "unknown_scenario",
+            "incident_events": [],
+        },
+    )
+
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Mission scenario not found: unknown_scenario"

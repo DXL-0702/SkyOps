@@ -7,6 +7,7 @@ from app.core.models import (
     Explanation,
     IncidentEvent,
     MissionPlan,
+    MissionReview,
     MissionTask,
     ReplanDecision,
     RiskItem,
@@ -35,3 +36,12 @@ class MissionReplanRequest(BaseModel):
 
 class MissionReplanResponse(BaseModel):
     replan_decision: ReplanDecision
+
+
+class MissionReviewRequest(BaseModel):
+    scenario_id: str = "shenzhen_nanshan_highrise_demo"
+    incident_events: list[IncidentEvent] = Field(default_factory=list)
+
+
+class MissionReviewResponse(BaseModel):
+    mission_review: MissionReview

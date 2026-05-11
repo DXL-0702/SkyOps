@@ -3,6 +3,8 @@ from app.api.schemas.mission import (
     MissionPlanResponse,
     MissionReplanRequest,
     MissionReplanResponse,
+    MissionReviewRequest,
+    MissionReviewResponse,
 )
 
 __all__ = [
@@ -10,4 +12,6 @@ __all__ = [
     "MissionPlanResponse",
     "MissionReplanRequest",
     "MissionReplanResponse",
+    "MissionReviewRequest",
+    "MissionReviewResponse",
 ]

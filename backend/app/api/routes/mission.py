@@ -5,8 +5,10 @@ from app.api.schemas import (
     MissionPlanResponse,
     MissionReplanRequest,
     MissionReplanResponse,
+    MissionReviewRequest,
+    MissionReviewResponse,
 )
-from app.core.orchestration import plan_mission, replan_mission
+from app.core.orchestration import plan_mission, replan_mission, review_mission
 from app.data.scenarios import ScenarioNotFoundError
 
 router = APIRouter(prefix="/missions", tags=["missions"])
@@ -36,3 +38,16 @@ def create_replan_decision(request: MissionReplanRequest) -> MissionReplanRespon
         raise HTTPException(status_code=404, detail=str(exc)) from exc
 
     return MissionReplanResponse(replan_decision=replan_decision)
+
+
+@router.post("/review")
+def create_mission_review(request: MissionReviewRequest) -> MissionReviewResponse:
+    try:
+        mission_review = review_mission(
+            scenario_id=request.scenario_id,
+            incident_events=request.incident_events,
+        )
+    except ScenarioNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+    return MissionReviewResponse(mission_review=mission_review)
