@@ -42,3 +42,17 @@ def test_create_mission_plan_rejects_empty_task() -> None:
 
     assert response.status_code == 422
 
+
+def test_create_mission_plan_returns_404_for_unknown_scenario() -> None:
+    client = TestClient(app)
+
+    response = client.post(
+        "/missions/plan",
+        json={
+            "raw_user_input": "明天上午巡检南山区一栋180米高办公楼外立面。",
+            "scenario_id": "unknown_scenario",
+        },
+    )
+
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Mission scenario not found: unknown_scenario"
