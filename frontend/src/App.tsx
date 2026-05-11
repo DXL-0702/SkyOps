@@ -2,11 +2,32 @@ import { Activity, AlertTriangle, CheckCircle2, GitBranch, Radar, Route } from "
 import { useEffect, useState } from "react";
 
 import { type BackendHealth, fetchBackendHealth } from "./api/health";
+import {
+  DEFAULT_INCIDENT_EVENT,
+  DEFAULT_SCENARIO_ID,
+  DEFAULT_TASK_INPUT,
+  type MissionPlanResponse,
+  type MissionReplanResponse,
+  type MissionReviewResponse,
+  createMissionPlan,
+  createMissionReview,
+  createReplanDecision,
+} from "./api/mission";
 
 type HealthState =
   | { status: "loading" }
   | { status: "online"; data: BackendHealth }
   | { status: "offline"; message: string };
+
+type MissionContractState =
+  | { status: "loading" }
+  | {
+      status: "ready";
+      plan: MissionPlanResponse;
+      replan: MissionReplanResponse;
+      review: MissionReviewResponse;
+    }
+  | { status: "failed"; message: string };
 
 const capabilityCards = [
   {
@@ -33,6 +54,9 @@ const capabilityCards = [
 
 export function App() {
   const [health, setHealth] = useState<HealthState>({ status: "loading" });
+  const [missionContract, setMissionContract] = useState<MissionContractState>({
+    status: "loading",
+  });
 
   useEffect(() => {
     let isMounted = true;
@@ -51,6 +75,42 @@ export function App() {
           });
         }
       });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadMissionContracts() {
+      const plan = await createMissionPlan({
+        raw_user_input: DEFAULT_TASK_INPUT,
+        scenario_id: DEFAULT_SCENARIO_ID,
+      });
+      const replan = await createReplanDecision({
+        scenario_id: DEFAULT_SCENARIO_ID,
+        incident_event: DEFAULT_INCIDENT_EVENT,
+      });
+      const review = await createMissionReview({
+        scenario_id: DEFAULT_SCENARIO_ID,
+        incident_events: [DEFAULT_INCIDENT_EVENT],
+      });
+
+      if (isMounted) {
+        setMissionContract({ status: "ready", plan, replan, review });
+      }
+    }
+
+    loadMissionContracts().catch((error: unknown) => {
+      if (isMounted) {
+        setMissionContract({
+          status: "failed",
+          message: error instanceof Error ? error.message : "Mission contract check failed.",
+        });
+      }
+    });
 
     return () => {
       isMounted = false;
@@ -126,6 +186,8 @@ export function App() {
                 </div>
               ))}
             </div>
+
+            <MissionContractPreview missionContract={missionContract} />
           </div>
 
           <aside className="border border-slate-800 bg-slate-900/70 p-6">
@@ -142,6 +204,72 @@ export function App() {
         </section>
       </section>
     </main>
+  );
+}
+
+function MissionContractPreview({
+  missionContract,
+}: {
+  missionContract: MissionContractState;
+}) {
+  if (missionContract.status === "loading") {
+    return (
+      <div className="mt-6 border border-slate-800 bg-slate-950/60 p-4 text-sm text-slate-300">
+        Loading Phase 1 mission contracts...
+      </div>
+    );
+  }
+
+  if (missionContract.status === "failed") {
+    return (
+      <div className="mt-6 border border-rose-400/40 bg-rose-400/10 p-4 text-sm text-rose-100">
+        Mission contract check failed: {missionContract.message}
+      </div>
+    );
+  }
+
+  const { plan, replan, review } = missionContract;
+
+  return (
+    <div className="mt-6 grid gap-3 lg:grid-cols-3">
+      <ContractMetric
+        label="Plan"
+        title={plan.mission_plan.recommended_time_window}
+        detail={`${plan.risks.length} risks / ${plan.mission_plan.expected_coverage_percent}% coverage`}
+      />
+      <ContractMetric
+        label="Replan"
+        title={replan.replan_decision.decision}
+        detail={
+          replan.replan_decision.human_takeover_required
+            ? "Human takeover required"
+            : "Autonomous continuation allowed"
+        }
+      />
+      <ContractMetric
+        label="Review"
+        title={`${review.mission_review.completion_rate}% complete`}
+        detail={`${review.mission_review.data_quality_score}% data quality`}
+      />
+    </div>
+  );
+}
+
+function ContractMetric({
+  label,
+  title,
+  detail,
+}: {
+  label: string;
+  title: string;
+  detail: string;
+}) {
+  return (
+    <article className="border border-slate-800 bg-slate-950/60 p-4">
+      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-300">{label}</p>
+      <h3 className="mt-3 text-sm font-semibold leading-5 text-white">{title}</h3>
+      <p className="mt-2 text-xs leading-5 text-slate-400">{detail}</p>
+    </article>
   );
 }
 
@@ -168,4 +296,3 @@ function BackendStatus({ health }: { health: HealthState }) {
     </div>
   );
 }
-
