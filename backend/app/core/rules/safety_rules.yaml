@@ -1,0 +1,10 @@
+max_wind_speed_mps: 8.0
+min_battery_percent: 35
+min_gps_confidence: 0.65
+max_video_latency_ms: 500
+blocked_crowd_levels:
+  - high
+  - critical
+require_airspace_flyable: true
+require_approval_when_needed: true
+
