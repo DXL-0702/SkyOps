@@ -10,5 +10,5 @@ class EnvironmentState(BaseModel):
     visibility_level: str
     crowd_level: RiskLevel
     gps_quality: str
+    gps_confidence: float = Field(ge=0, le=1)
     data_confidence: float = Field(ge=0, le=1)
-
