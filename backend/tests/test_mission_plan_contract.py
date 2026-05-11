@@ -58,3 +58,62 @@ def test_create_mission_plan_returns_404_for_unknown_scenario() -> None:
 
     assert response.status_code == 404
     assert response.json()["detail"] == "Mission scenario not found: unknown_scenario"
+
+
+def test_create_replan_decision_returns_mock_contract() -> None:
+    client = TestClient(app)
+
+    response = client.post(
+        "/missions/replan",
+        json={
+            "scenario_id": "shenzhen_nanshan_highrise_demo",
+            "incident_event": {
+                "id": "incident-wind-001",
+                "mission_id": "mission-shenzhen-nanshan-highrise-demo",
+                "event_type": "wind_speed_spike",
+                "observed_value": "9.4 m/s",
+                "threshold": "8.0 m/s",
+                "severity": "high",
+                "source_type": "mock",
+                "description": "Simulated sudden wind increase near the upper facade.",
+            },
+        },
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    decision = payload["replan_decision"]
+
+    assert decision["incident_id"] == "incident-wind-001"
+    assert decision["decision"] == "pause_and_return_to_standby"
+    assert decision["makeup_flight_required"] is True
+    assert decision["human_takeover_required"] is True
+    assert "preserve collected imagery and telemetry" in decision["actions"]
+    assert all(
+        alternative.startswith("rejected:")
+        for alternative in decision["alternatives_considered"]
+    )
+
+
+def test_create_replan_decision_returns_404_for_unknown_scenario() -> None:
+    client = TestClient(app)
+
+    response = client.post(
+        "/missions/replan",
+        json={
+            "scenario_id": "unknown_scenario",
+            "incident_event": {
+                "id": "incident-wind-001",
+                "mission_id": "mission-shenzhen-nanshan-highrise-demo",
+                "event_type": "wind_speed_spike",
+                "observed_value": "9.4 m/s",
+                "threshold": "8.0 m/s",
+                "severity": "high",
+                "source_type": "mock",
+                "description": "Simulated sudden wind increase near the upper facade.",
+            },
+        },
+    )
+
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Mission scenario not found: unknown_scenario"
