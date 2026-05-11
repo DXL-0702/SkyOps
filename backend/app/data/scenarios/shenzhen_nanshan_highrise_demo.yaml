@@ -22,6 +22,7 @@ environment_state:
   visibility_level: good
   crowd_level: medium
   gps_quality: partial urban canyon risk near the building facade
+  gps_confidence: 0.72
   data_confidence: 0.72
 airspace_constraint:
   source_type: mock
@@ -45,6 +46,7 @@ drone_state:
     - zoom camera
     - wide camera
   link_quality: low
+  video_latency_ms: 180
   available_for_mission: true
 risks:
   - id: risk-wind-gust
@@ -122,4 +124,3 @@ human_explanation:
     - Airspace approval
     - Launch point safety
     - Pilot readiness for manual takeover
-
