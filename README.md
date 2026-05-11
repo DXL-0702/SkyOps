@@ -2,28 +2,55 @@
   <img src="./skyops_readme_header_1.png" alt="SkyOps Agent" width="100%" />
 </p>
 
-# SkyOps Agent
+<h1 align="center">SkyOps Agent</h1>
+
+<p align="center">
+  <strong>Task-level autonomy and risk simulation for low-altitude operations</strong>
+</p>
+
+<p align="center">
+  From “can fly” to “can operate”: safer, explainable, reviewable drone missions for Shenzhen's low-altitude economy.
+</p>
+
+<p align="center">
+  <a href="./README.zh-CN.md">中文文档</a>
+  ·
+  <a href="#overview">Overview</a>
+  ·
+  <a href="#mvp-scenario">MVP</a>
+  ·
+  <a href="#roadmap">Roadmap</a>
+  ·
+  <a href="#safety-and-compliance">Safety</a>
+</p>
+
+<p align="center">
+  <img alt="Backend" src="https://img.shields.io/badge/backend-FastAPI-009688?style=flat-square" />
+  <img alt="Python" src="https://img.shields.io/badge/python-3.11%2B-3776AB?style=flat-square&logo=python&logoColor=white" />
+  <img alt="Pydantic" src="https://img.shields.io/badge/models-Pydantic-E92063?style=flat-square" />
+  <img alt="Frontend" src="https://img.shields.io/badge/frontend-React%20%2B%20Vite-61DAFB?style=flat-square&logo=react&logoColor=111111" />
+  <img alt="Styling" src="https://img.shields.io/badge/styling-Tailwind%20CSS-38BDF8?style=flat-square&logo=tailwindcss&logoColor=white" />
+  <img alt="Status" src="https://img.shields.io/badge/status-planning%20%2F%20scaffold-64748B?style=flat-square" />
+</p>
+
+---
+
+## Overview
 
 **SkyOps Agent** is a task-level autonomy and risk simulation agent for low-altitude operations in Shenzhen's emerging low-altitude economy.
 
-It is not a drone defect detection tool, a crack recognition model, a photovoltaic hotspot detector, or a low-level flight controller. SkyOps Agent focuses on the decision layer between operational demand and execution systems: whether a mission should fly, when it should fly, how it should be split, what risks may appear, and how the plan should be revised when conditions change.
+It is not a drone defect detection tool, a crack recognition model, a photovoltaic hotspot detector, or a low-level flight controller. SkyOps Agent focuses on the intelligent decision layer between operational demand and execution systems:
 
-[中文说明](./README.zh-CN.md)
+| It does not answer | It answers |
+| --- | --- |
+| Can the drone physically fly? | Should this mission fly under current constraints? |
+| Is there a visual defect in an image? | What time window, route, launch point, and mission split are safest? |
+| Can a drone follow a low-level flight command? | What should happen when wind, GPS, battery, airspace, or crowd risk changes? |
+| Can a report be generated after inspection? | How can the mission become explainable, reviewable, and continuously optimized? |
 
-## What It Solves
+The first MVP scenario is **autonomous mission planning and risk simulation for a high-rise building facade inspection in Shenzhen**. Inspection is only the first demo scenario; the same autonomy layer can extend to campus security patrols, construction site checks, photovoltaic inspections, emergency response, fire safety patrols, low-altitude mapping, urban governance, and logistics missions.
 
-SkyOps Agent is designed to answer operational questions that appear before, during, and after a low-altitude mission:
-
-- Should this mission fly under the current constraints?
-- What time window is safest?
-- Which launch and landing points, route strategy, drone, payload, and mission split should be used?
-- What should happen when wind speed rises, GPS confidence drops, video transmission is delayed, crowds gather, airspace restrictions change, or battery becomes insufficient?
-- If the mission cannot be completed in one flight, how should a makeup flight be generated?
-- How can every operation produce an explainable, reviewable, and continuously improving closed loop?
-
-The first MVP scenario is **autonomous mission planning and risk simulation for a high-rise building facade inspection in Shenzhen**. Inspection is only the first demo scenario. The same task-level autonomy layer can extend to campus security patrols, construction site checks, photovoltaic inspections, emergency response, fire safety patrols, low-altitude mapping, urban governance, and logistics missions.
-
-## Core Positioning
+## Positioning
 
 SkyOps Agent sits in the middle layer of a three-level low-altitude system:
 
@@ -39,15 +66,17 @@ It does not replace government airspace platforms or vendor flight controllers. 
 
 ## Core Capabilities
 
-- **Active sensing**: infers missing mission constraints instead of waiting for long forms.
-- **Multi-source constraint reasoning**: considers weather, wind, lighting, crowd density, airspace, GPS, battery, payload, data link, safety, regulation, and business priority together.
-- **Risk simulation**: runs what-if analysis before and during execution.
-- **Autonomous planning**: recommends time windows, launch and landing points, route strategy, mission splits, safety thresholds, and abort conditions.
-- **Incident replanning**: responds to wind changes, GPS issues, temporary restrictions, data-link delay, low battery, and crowd aggregation.
-- **Closed-loop review**: generates mission reviews, risk logs, data quality scores, makeup flight plans, and next-mission improvements.
-- **Explainable decisions**: every key decision must include evidence, tradeoffs, alternatives, and required human confirmations.
+| Capability | Meaning |
+| --- | --- |
+| Active sensing | Infers missing mission constraints instead of waiting for long forms. |
+| Multi-source constraint reasoning | Considers weather, wind, lighting, crowd density, airspace, GPS, battery, payload, data link, safety, regulation, and business priority together. |
+| Risk simulation | Runs what-if analysis before and during execution. |
+| Autonomous planning | Recommends time windows, launch and landing points, route strategy, mission splits, safety thresholds, and abort conditions. |
+| Incident replanning | Responds to wind changes, GPS issues, temporary restrictions, data-link delay, low battery, and crowd aggregation. |
+| Closed-loop review | Generates mission reviews, risk logs, data quality scores, makeup flight plans, and next-mission improvements. |
+| Explainable decisions | Records evidence, tradeoffs, alternatives, and required human confirmations for key decisions. |
 
-## Recommended Multi-Agent Architecture
+## Architecture
 
 | Agent | Responsibility |
 | --- | --- |
@@ -80,7 +109,7 @@ SkyOps Agent uses a lightweight full-stack monorepo focused on simulation, expla
 
 LLMs may be used for natural-language task understanding, missing-information suggestions, explanation generation, and report wording. Hard safety constraints must be implemented as explicit, testable rules and must not rely on free-form LLM output alone.
 
-## Planned Repository Structure
+## Planned Structure
 
 ```text
 backend/
@@ -119,65 +148,50 @@ docs/
 
 ## MVP Scenario
 
-The first demo should implement:
-
 > Autonomous mission planning and risk simulation for a high-rise building facade inspection in Shenzhen.
 
-Example flow:
+```text
+Natural-language task
+  -> Mission understanding
+  -> Mock weather / crowd / airspace / drone state
+  -> Time window + launch point + route strategy + safety thresholds
+  -> Incident injection
+  -> Replanning decision
+  -> Mission review + makeup flight plan
+```
 
-1. User enters a natural-language mission: "Inspect a 180-meter office building facade in Nanshan tomorrow morning, focusing on curtain-wall cracks and detachment risk while minimizing impact on pedestrians."
-2. The system extracts mission goals, constraints, and risk preference.
-3. The system reads or simulates weather, crowd flow, restricted airspace, GPS confidence, battery, and data-link state.
-4. The system recommends a time window, launch and landing points, route strategy, safety thresholds, and abort conditions.
-5. A user or simulator injects incidents such as wind speed increase, GPS confidence drop, video delay, temporary restricted zone update, low battery, or crowd aggregation.
-6. The agent replans and recommends pause, return-to-home, reroute, degraded mission, makeup flight, or human takeover.
-7. The system generates a mission review, risk explanation, makeup flight plan, and next-mission recommendations.
+Example task:
 
-## Development Roadmap
+> Inspect a 180-meter office building facade in Nanshan tomorrow morning, focusing on curtain-wall cracks and detachment risk while minimizing impact on pedestrians.
 
-### Phase 0: Project Baseline
+Example incidents:
 
-- Create the monorepo structure.
-- Initialize FastAPI backend.
-- Initialize React + TypeScript + Vite + Tailwind CSS frontend.
-- Configure Ruff, pytest, frontend build, and basic CI.
-- Define initial API conventions and model locations.
+- Wind speed rises.
+- GPS confidence drops.
+- Video transmission delay increases.
+- Temporary restricted airspace is updated.
+- Battery becomes insufficient.
+- Crowds gather near the target area.
 
-### Phase 1: Simulation MVP
+## Roadmap
 
-- Implement core Pydantic models.
-- Add mock weather, crowd, airspace, and drone data.
-- Implement explicit safety rules.
-- Build deterministic agent orchestration.
-- Generate structured mission plans and human-readable explanations.
-- Support incident injection and replanning.
-- Generate mission review reports.
+| Phase | Goal | Key Work |
+| --- | --- | --- |
+| Phase 0 | Project baseline | Monorepo, FastAPI backend, React + Vite + Tailwind frontend, Ruff, pytest, CI. |
+| Phase 1 | Simulation MVP | Pydantic models, mock data, explicit safety rules, deterministic orchestration, mission plan, incident replanning, review report. |
+| Phase 2 | Visual demo | Operational dashboard, route and risk visualization, incident injection, replanning display, review panel. |
+| Phase 3 | Evaluation set | 30-50 simulation cases, hard constraint pass rate, risk recall, incident response score, explainability score. |
+| Phase 4 | Extensible interfaces | Weather, map, drone, dock, UTM, and inspection-result adapters with mock fallback. |
 
-### Phase 2: Visual Demo
+## Evaluation
 
-- Build an operational dashboard instead of a marketing landing page.
-- Visualize mission input, constraints, route strategy, risk items, incidents, replanning actions, and review outputs.
-- Clearly label all mock and simulated data.
-
-### Phase 3: Evaluation Set
-
-- Build 30-50 low-altitude simulation cases.
-- Measure hard constraint pass rate, risk recall, plan efficiency, incident response score, and explainability score.
-- Produce repeatable evaluation reports.
-
-### Phase 4: Extensible Interfaces
-
-- Prepare adapters for weather, maps, drones, docks, UTM platforms, and inspection-result systems.
-- Keep mock adapters available for local testing.
-- Track data source, timestamp, and confidence for real integrations.
-
-## Evaluation Metrics
-
-- **Hard Constraint Pass Rate**: detects violations of no-fly zones, wind limits, battery thresholds, return-to-home margin, unsafe crowd conditions, and approval requirements.
-- **Risk Recall**: checks whether embedded risks such as GPS blockage, wind rise, crowd peaks, temporary restrictions, glare, low visibility, or data-link delay are identified.
-- **Plan Efficiency**: compares flight time, mission splits, coverage, makeup flight area, manual interventions, and safety margin.
-- **Incident Response Score**: evaluates pause, return-to-home, reroute, data preservation, makeup planning, explanation, and human takeover behavior.
-- **Explainability Score**: checks whether decisions explain evidence, tradeoffs, alternatives, and human confirmation needs.
+| Metric | Checks |
+| --- | --- |
+| Hard Constraint Pass Rate | No-fly zones, wind limits, battery thresholds, return-to-home margin, crowd risk, approval requirements. |
+| Risk Recall | GPS blockage, wind rise, crowd peaks, temporary restrictions, glare, low visibility, data-link delay. |
+| Plan Efficiency | Flight time, mission splits, coverage, makeup flight area, manual interventions, safety margin. |
+| Incident Response Score | Pause, return-to-home, reroute, data preservation, makeup planning, explanation, human takeover. |
+| Explainability Score | Evidence, tradeoffs, alternatives, and human confirmation needs for key decisions. |
 
 ## Safety and Compliance
 
