@@ -61,6 +61,7 @@ export const buttonStyles = {
   incident: "border px-2 font-medium",
   incidentActive: "border-teal-300 bg-teal-300/15 text-teal-100",
   incidentIdle: "border-zinc-800 bg-zinc-950 text-zinc-300 hover:border-zinc-600",
+  disabled: "cursor-not-allowed opacity-50",
 } as const;
 
 export const metricStyles = {

@@ -36,8 +36,12 @@ export function MissionConsole() {
         }
       })
       .catch(() => {
+      .catch(() => {
         if (isMounted) {
-          setHealth({ status: "offline" });
+          setHealth({
+            status: "offline",
+            message: "Backend is not connected.",
+          });
         }
       });
 
@@ -65,7 +69,10 @@ export function MissionConsole() {
 
       setMissionCycle({ status: "ready", plan, replan, review, incidentEvent });
     } catch {
-      setMissionCycle({ status: "failed" });
+      setMissionCycle({
+        status: "failed",
+        message: "Mission data is temporarily unavailable.",
+      });
     }
   }
 
@@ -84,7 +91,7 @@ export function MissionConsole() {
     void runMissionCycle(incidentEvent);
   }
 
-  const isMissionRunning = missionCycle.status === "loading";
+  const isRunning = missionCycle.status === "loading";
 
   return (
     <main className="min-h-screen bg-zinc-950 text-zinc-100">
@@ -111,7 +118,7 @@ export function MissionConsole() {
           <MissionInputPanel
             taskInput={taskInput}
             selectedIncident={selectedIncident}
-            isRunning={isMissionRunning}
+            isRunning={isRunning}
             onIncidentSelect={handleIncidentSelect}
             onRun={() => void runMissionCycle()}
             onTaskInputChange={setTaskInput}

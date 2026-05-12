@@ -9,6 +9,7 @@ import { buttonStyles, cn, formStyles, panelStyles, textStyles } from "./uiToken
 type MissionInputPanelProps = {
   taskInput: string;
   selectedIncident: IncidentEvent;
+  isRunning: boolean;
   onIncidentSelect: (incidentEvent: IncidentEvent) => void;
   onRun: () => void;
   onTaskInputChange: (value: string) => void;
@@ -17,6 +18,7 @@ type MissionInputPanelProps = {
 export function MissionInputPanel({
   taskInput,
   selectedIncident,
+  isRunning,
   onIncidentSelect,
   onRun,
   onTaskInputChange,
@@ -40,8 +42,10 @@ export function MissionInputPanel({
               className={cn(
                 buttonStyles.base,
                 buttonStyles.incident,
+                isRunning && buttonStyles.disabled,
                 isActive ? buttonStyles.incidentActive : buttonStyles.incidentIdle,
               )}
+              disabled={isRunning}
               key={preset.event.event_type}
               onClick={() => onIncidentSelect(preset.event)}
               type="button"
@@ -54,7 +58,13 @@ export function MissionInputPanel({
       </div>
 
       <button
-        className={cn(buttonStyles.base, buttonStyles.primary, "mt-4 w-full")}
+        className={cn(
+          buttonStyles.base,
+          buttonStyles.primary,
+          isRunning && buttonStyles.disabled,
+          "mt-4 w-full",
+        )}
+        disabled={isRunning}
         onClick={onRun}
         type="button"
       >
