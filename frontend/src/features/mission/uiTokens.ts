@@ -75,6 +75,7 @@ export const listStyles = {
     "flex items-center gap-3 border border-zinc-800 bg-zinc-950/70 px-3 py-2 text-sm text-zinc-300",
   number:
     "flex h-6 w-6 items-center justify-center bg-teal-300/15 text-xs font-semibold text-teal-200",
+  dot: "mt-2 h-1.5 w-1.5 shrink-0 bg-teal-300",
 } as const;
 
 export const progressStyles = {

@@ -274,6 +274,8 @@ Phase 2 所有任务必须遵守：
 
 ### Issue P1-M-007: Mission Plan Detail Panel
 
+**Status:** Done
+
 **Priority:** P1
 
 **Difficulty:** M
@@ -306,6 +308,12 @@ Phase 2 所有任务必须遵守：
 - 用户能从面板理解任务为什么这样规划。
 - 长文本不会溢出。
 - `npm run build` 通过。
+
+**Implementation Notes:**
+
+- `MissionPlanPanel` 已展示作业对象、作业区域、风险偏好、作业目标、推荐时间窗口、航线策略、起降点、安全说明、飞行分段、预计覆盖率和预计时长。
+- 起降点展示包含 `name`、`description` 和 `safety_notes`。
+- 长文本使用 `break-words`、`leading-*` 和网格布局控制，避免撑破面板。
 
 ---
 
