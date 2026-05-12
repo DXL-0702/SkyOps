@@ -129,7 +129,7 @@ export function MissionConsole() {
           <RiskPanel missionCycle={missionCycle} />
         </section>
 
-<section className={layoutStyles.evidenceGrid}>
+<section className="grid gap-5 lg:grid-cols-[1fr_1fr]">
   <EnvironmentDronePanel missionCycle={missionCycle} />
   <IncidentReplanPanel missionCycle={missionCycle} />
   <MissionReviewPanel missionCycle={missionCycle} />
