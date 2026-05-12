@@ -319,6 +319,8 @@ Phase 2 所有任务必须遵守：
 
 ### Issue P1-M-008: Environment And Drone State Panel
 
+**Status:** Done
+
 **Priority:** P1
 
 **Difficulty:** M
@@ -355,6 +357,13 @@ Phase 2 所有任务必须遵守：
 - 环境和设备状态可扫描。
 - 关键风险指标有颜色或图标提示。
 - `npm run build` 通过。
+
+**Implementation Notes:**
+
+- 已新增 `EnvironmentDronePanel`，集中展示环境状态和设备状态。
+- 环境侧展示天气、风速、能见度、人流、GPS 质量、GPS 置信度和数据置信度。
+- 设备侧展示无人机编号、机型、电量、续航、返航电量阈值、载荷、链路质量、图传延迟和任务可用性。
+- GPS 置信度、数据置信度、人流、链路质量和图传延迟使用风险颜色/徽标提示。
 
 ---
 
