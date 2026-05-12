@@ -38,11 +38,11 @@ export function MissionConsole() {
           setHealth({ status: "online", data });
         }
       })
-      .catch((error: unknown) => {
+      .catch(() => {
         if (isMounted) {
           setHealth({
             status: "offline",
-            message: error instanceof Error ? error.message : "Backend health check failed.",
+            message: "Unable to reach backend. Confirm 127.0.0.1:8000 is running.",
           });
         }
       });
@@ -51,6 +51,15 @@ export function MissionConsole() {
       isMounted = false;
     };
   }, []);
+
+  function refreshBackendHealth() {
+    fetchBackendHealth()
+      .then((data) => setHealth({ status: "online", data }))
+      .catch(() => setHealth({
+        status: "offline",
+        message: "Unable to reach backend. Confirm 127.0.0.1:8000 is running.",
+      }));
+  }
 
   async function runMissionCycle(incidentEvent: IncidentEvent = selectedIncident) {
     setMissionCycle({ status: "loading" });
@@ -105,7 +114,7 @@ export function MissionConsole() {
             </h1>
           </div>
 
-          <BackendStatus health={health} />
+          <BackendStatus health={health} onRetry={refreshBackendHealth} />
         </header>
 
         <StatusStrip health={health} missionCycle={missionCycle} />
@@ -114,6 +123,8 @@ export function MissionConsole() {
           <MissionInputPanel
             taskInput={taskInput}
             selectedIncident={selectedIncident}
+            missionStatus={missionCycle.status}
+            failureMessage={missionCycle.status === "failed" ? missionCycle.message : undefined}
             onIncidentSelect={handleIncidentSelect}
             onRun={() => void runMissionCycle()}
             onTaskInputChange={setTaskInput}
