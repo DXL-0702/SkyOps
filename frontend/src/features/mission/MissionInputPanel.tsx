@@ -1,6 +1,7 @@
 import { Activity, GitBranch } from "lucide-react";
 
 import type { IncidentEvent } from "../../api/mission";
+import { DataSourceBadge } from "./components/DataSourceBadge";
 import { PanelTitle } from "./components/PanelTitle";
 import { incidentPresets } from "./incidentPresets";
 import { buttonStyles, cn, formStyles, panelStyles, textStyles } from "./uiTokens";
@@ -62,7 +63,10 @@ export function MissionInputPanel({
       </button>
 
       <div className={cn(panelStyles.surfacePadded, "mt-4")}>
-        <p className={textStyles.strongLabel}>Active Incident</p>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className={textStyles.strongLabel}>Active Incident</p>
+          <DataSourceBadge sourceType={selectedIncident.source_type} label="Incident" />
+        </div>
         <p className="mt-2 text-sm font-semibold text-white">{selectedIncident.event_type}</p>
         <p className={cn(textStyles.subtle, "mt-1")}>
           {selectedIncident.observed_value} / {selectedIncident.threshold}

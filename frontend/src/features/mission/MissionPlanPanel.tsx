@@ -1,5 +1,6 @@
 import { Route } from "lucide-react";
 
+import { DataSourceBadge } from "./components/DataSourceBadge";
 import { Metric } from "./components/Metric";
 import { PanelFallback } from "./components/PanelFallback";
 import { PanelTitle } from "./components/PanelTitle";
@@ -23,7 +24,14 @@ export function MissionPlanPanel({ missionCycle }: { missionCycle: MissionCycleS
 
   return (
     <section className={panelStyles.base}>
-      <PanelTitle icon={Route} title="Mission Plan" meta={plan.mission_task.source_type} />
+      <PanelTitle icon={Route} title="Mission Plan" meta="Planning" />
+
+      <div className="mt-4 flex flex-wrap gap-2">
+        <DataSourceBadge sourceType={plan.mission_task.source_type} label="Mission Task" />
+        <DataSourceBadge sourceType={plan.environment_state.source_type} label="Environment" />
+        <DataSourceBadge sourceType={plan.airspace_constraint.source_type} label="Airspace" />
+        <DataSourceBadge sourceType={plan.drone_state.source_type} label="Drone" />
+      </div>
 
       <div className="mt-4 grid gap-3 md:grid-cols-3">
         <Metric label="Coverage" value={`${plan.mission_plan.expected_coverage_percent}%`} />

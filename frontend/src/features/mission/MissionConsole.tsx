@@ -16,6 +16,7 @@ import { MissionPlanPanel } from "./MissionPlanPanel";
 import { MissionReviewPanel } from "./MissionReviewPanel";
 import { RiskPanel } from "./RiskPanel";
 import { StatusStrip } from "./StatusStrip";
+import { DataSourceBadge } from "./components/DataSourceBadge";
 import { incidentPresets } from "./incidentPresets";
 import type { HealthState, MissionCycleState } from "./types";
 import { badgeStyles, cn, layoutStyles } from "./uiTokens";
@@ -95,9 +96,7 @@ export function MissionConsole() {
               <span className={cn(badgeStyles.base, badgeStyles.brand, "tracking-[0.18em]")}>
                 SkyOps Agent
               </span>
-              <span className={cn(badgeStyles.base, badgeStyles.mock, "tracking-[0.18em]")}>
-                Mock Data
-              </span>
+              <DataSourceBadge sourceType="mock" label="Demo Data" />
             </div>
             <h1 className="mt-3 text-3xl font-semibold tracking-normal text-white md:text-4xl">
               Low-Altitude Operations Console
