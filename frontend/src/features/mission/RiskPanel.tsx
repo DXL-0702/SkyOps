@@ -1,5 +1,6 @@
 import { AlertTriangle } from "lucide-react";
 
+import { DataSourceBadge } from "./components/DataSourceBadge";
 import { PanelFallback } from "./components/PanelFallback";
 import { PanelTitle } from "./components/PanelTitle";
 import { RiskBadge } from "./components/RiskBadge";
@@ -14,6 +15,13 @@ export function RiskPanel({ missionCycle }: { missionCycle: MissionCycleState })
   return (
     <aside className={panelStyles.base}>
       <PanelTitle icon={AlertTriangle} title="Risk Stack" meta="Explainable" />
+
+      <div className="mt-4 flex flex-wrap gap-2">
+        <DataSourceBadge
+          sourceType={missionCycle.plan.mission_task.source_type}
+          label="Risk Assessment"
+        />
+      </div>
 
       <div className="mt-4 grid gap-3">
         {missionCycle.plan.risks.map((risk) => (

@@ -1,6 +1,7 @@
 import { CheckCircle2 } from "lucide-react";
 
 import { ActionList } from "./components/ActionList";
+import { DataSourceBadge } from "./components/DataSourceBadge";
 import { PanelFallback } from "./components/PanelFallback";
 import { PanelTitle } from "./components/PanelTitle";
 import { ProgressMetric } from "./components/ProgressMetric";
@@ -17,6 +18,12 @@ export function MissionReviewPanel({ missionCycle }: { missionCycle: MissionCycl
   return (
     <section className={panelStyles.base}>
       <PanelTitle icon={CheckCircle2} title="Mission Review" meta={review.mission_id} />
+
+      <div className="mt-4 flex flex-wrap gap-2">
+        <DataSourceBadge sourceType={missionCycle.plan.mission_task.source_type} label="Mission" />
+        <DataSourceBadge sourceType={missionCycle.incidentEvent.source_type} label="Incident" />
+        <DataSourceBadge sourceType="mock" label="Review Result" />
+      </div>
 
       <div className="mt-4 grid gap-3 md:grid-cols-2">
         <ProgressMetric label="Completion" value={review.completion_rate} />

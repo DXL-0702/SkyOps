@@ -16,6 +16,7 @@ import { MissionPlanPanel } from "./MissionPlanPanel";
 import { MissionReviewPanel } from "./MissionReviewPanel";
 import { RiskPanel } from "./RiskPanel";
 import { StatusStrip } from "./StatusStrip";
+import { DataSourceBadge } from "./components/DataSourceBadge";
 import { incidentPresets } from "./incidentPresets";
 import type { HealthState, MissionCycleState } from "./types";
 
@@ -94,9 +95,7 @@ export function MissionConsole() {
               <span className="border border-teal-400/40 bg-teal-400/10 px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-teal-200">
                 SkyOps Agent
               </span>
-              <span className="border border-amber-400/40 bg-amber-400/10 px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-amber-200">
-                Mock Data
-              </span>
+              <DataSourceBadge sourceType="mock" label="Demo Data" />
             </div>
             <h1 className="mt-3 text-3xl font-semibold tracking-normal text-white md:text-4xl">
               Low-Altitude Operations Console

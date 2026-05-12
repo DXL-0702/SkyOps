@@ -229,6 +229,8 @@ Phase 2 所有任务必须遵守：
 
 ### Issue P1-S-006: Standardize Mock Data Badges
 
+**Status:** Done
+
 **Priority:** P1
 
 **Difficulty:** S
@@ -259,6 +261,12 @@ Phase 2 所有任务必须遵守：
 - 页面中所有核心数据区域均能看到数据来源。
 - mock 数据不会被误认为真实数据。
 - `npm run build` 通过。
+
+**Implementation Notes:**
+
+- 已新增 `DataSourceBadge` 组件，统一展示 `MOCK` / `SIMULATED` / `REAL` 数据来源。
+- 已在任务方案、环境、空域、设备、异常事件、风险推演、重规划和复盘区域标注数据来源。
+- Phase 2 当前不展示真实数据；如后续接入真实数据，必须继续使用同一 badge 机制区分来源。
 
 ---
 

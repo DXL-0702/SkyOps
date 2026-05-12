@@ -1,6 +1,7 @@
 import { GitBranch } from "lucide-react";
 
 import { ActionList } from "./components/ActionList";
+import { DataSourceBadge } from "./components/DataSourceBadge";
 import { Metric } from "./components/Metric";
 import { PanelFallback } from "./components/PanelFallback";
 import { PanelTitle } from "./components/PanelTitle";
@@ -17,6 +18,11 @@ export function IncidentReplanPanel({ missionCycle }: { missionCycle: MissionCyc
   return (
     <section className={panelStyles.base}>
       <PanelTitle icon={GitBranch} title="Incident Replanning" meta={decision.incident_id} />
+
+      <div className="mt-4 flex flex-wrap gap-2">
+        <DataSourceBadge sourceType={missionCycle.incidentEvent.source_type} label="Incident" />
+        <DataSourceBadge sourceType="mock" label="Replan Result" />
+      </div>
 
       <div className="mt-4 grid gap-3 md:grid-cols-3">
         <Metric label="Decision" value={decision.decision} />
