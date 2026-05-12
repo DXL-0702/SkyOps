@@ -17,6 +17,7 @@ export const layoutStyles = {
   primaryGrid: "grid gap-5 xl:grid-cols-[1.05fr_1.55fr_0.9fr]",
   secondaryGrid: "grid gap-5 lg:grid-cols-[1fr_1fr]",
   evidenceGrid: "grid gap-5 xl:grid-cols-[1.05fr_1fr_1fr]",
+  fullWidthGrid: "grid gap-5",
   statusGrid: "grid gap-3 md:grid-cols-4",
 } as const;
 

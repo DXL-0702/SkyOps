@@ -16,6 +16,7 @@ import { MissionInputPanel } from "./MissionInputPanel";
 import { MissionPlanPanel } from "./MissionPlanPanel";
 import { MissionReviewPanel } from "./MissionReviewPanel";
 import { RiskPanel } from "./RiskPanel";
+import { SafetyThresholdPanel } from "./SafetyThresholdPanel";
 import { StatusStrip } from "./StatusStrip";
 import { DataSourceBadge } from "./components/DataSourceBadge";
 import { incidentPresets } from "./incidentPresets";
@@ -127,6 +128,10 @@ export function MissionConsole() {
           <EnvironmentDronePanel missionCycle={missionCycle} />
           <IncidentReplanPanel missionCycle={missionCycle} />
           <MissionReviewPanel missionCycle={missionCycle} />
+        </section>
+
+        <section className={layoutStyles.fullWidthGrid}>
+          <SafetyThresholdPanel missionCycle={missionCycle} />
         </section>
       </section>
     </main>

@@ -369,6 +369,8 @@ Phase 2 所有任务必须遵守：
 
 ### Issue P1-M-009: Safety Thresholds And Abort Conditions Panel
 
+**Status:** Done
+
 **Priority:** P1
 
 **Difficulty:** M
@@ -394,6 +396,13 @@ Phase 2 所有任务必须遵守：
 - 用户能明确看到任务中止条件。
 - 阈值展示和风险颜色一致。
 - `npm run build` 通过。
+
+**Implementation Notes:**
+
+- 已新增 `SafetyThresholdPanel`，单独展示安全阈值和中止条件。
+- 阈值状态使用 `WITHIN LIMIT` / `WATCH` / `TRIGGERED`：teal 表示安全余量，amber 表示接近阈值，red 表示已触发。
+- 未触发的 abort condition 使用中性规则承载层和 `ABORT RULE` 标签，避免把规则说明误读为当前告警。
+- 当前阈值状态基于环境/设备状态与 `mission_plan.safety_thresholds` 的展示层比较，不替代后端硬安全规则。
 
 ---
 
