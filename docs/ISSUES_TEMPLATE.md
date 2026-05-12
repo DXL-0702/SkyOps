@@ -198,6 +198,8 @@ Phase 2 所有任务必须遵守：
 
 ### Issue P1-M-005: Improve Loading And Error States
 
+**Status:** Done
+
 **Priority:** P1
 
 **Difficulty:** M
@@ -206,24 +208,55 @@ Phase 2 所有任务必须遵守：
 
 **Depends On:** P0-L-003
 
-**Goal:** 优化后端未启动、接口失败、任务运行中等状态，让 Demo 不显得“坏掉”。
+**Goal:** 将后端未启动、接口失败、任务运行中等状态设计成专业调度台的可恢复状态，而不是让 Demo 看起来像页面坏掉。状态文案必须服务低空作业任务自治场景：说明当前卡在哪一步、风险是什么、用户下一步能做什么。
 
 **Scope:**
 
-- 改进 backend offline 显示。
-- 改进 mission cycle loading 状态。
-- 改进 mission cycle failed 状态。
+- 改进 backend offline 显示：
+  - 明确说明当前无法连接任务推演后端。
+  - 保留页面主体布局，不出现空白屏或崩溃感。
+  - 显示 backend endpoint，例如 `127.0.0.1:8000` 或当前配置的 API base URL。
+- 改进 mission cycle loading 状态：
+  - 展示任务正在经历的阶段，例如任务解析、约束检查、风险推演、方案生成。
+  - 禁用重复提交，避免连续触发多个任务请求。
+  - 保留已有任务结果或显示稳定 skeleton，不让布局大幅跳动。
+- 改进 mission cycle failed 状态：
+  - 使用面向用户的安全文案，不直接暴露 `Failed to fetch`、HTTP 原始错误、stack trace 或开发调试信息。
+  - 明确区分“事实状态”“可能原因”“建议动作”。
+  - 不伪造任务结果，不把失败状态包装成成功方案。
 - 显示用户可执行动作：
   - 启动后端。
-  - 检查 `127.0.0.1:8000`。
+  - 检查 API 地址。
   - 重新运行任务。
-- 不显示技术堆栈错误给普通用户。
+  - 在风险不确定时建议人工复核或暂停执行。
+- loading / failed / offline 状态应沿用 `uiTokens.ts` 中的视觉 token，不临时新增另一套颜色体系。
+- 如果需要展示调试信息，只能使用折叠的开发辅助区域，并且默认不面向普通用户展示。
+
+**Out of Scope:**
+
+- 不修改后端 API contract。
+- 不新增错误上报服务。
+- 不引入 toast/message UI 框架。
+- 不新增全局状态管理库。
 
 **Acceptance Criteria:**
 
 - 后端未启动时页面仍然美观、可读。
+- mission cycle 运行中有明确、稳定、不跳动的 loading 状态。
+- mission cycle 失败时显示安全、可执行、非技术堆栈式错误文案。
+- 失败状态提供 retry 或重新运行入口。
+- 错误状态不伪造 mock 结果，也不暗示系统已经完成风险推演。
 - 错误信息不会撑破布局。
+- 状态文案体现 SkyOps Agent 是“低空作业任务自治与风险推演”系统，而不是普通聊天或表单工具。
 - `npm run build` 通过。
+
+**Implementation Notes:**
+
+- 已优化 `BackendStatus`，后端离线时展示面向调度台用户的安全说明、API endpoint 和人工复核提示，不再直接暴露原始 fetch 错误。
+- 已在 `MissionInputPanel` 增加 mission cycle 状态卡，覆盖 ready / loading / failed 三种状态。
+- loading 状态展示任务解析、约束推理、风险推演、重规划复盘等阶段，并禁用重复提交和异常按钮。
+- failed 状态区分失败事实、可能原因和建议动作，提供 retry 入口，并明确不生成可用飞行建议。
+- 已扩展 `PanelFallback` 和 `uiTokens.ts` 的状态样式，保证各面板 loading / failed 表达一致。
 
 ---
 
@@ -410,6 +443,8 @@ Phase 2 所有任务必须遵守：
 
 ### Issue P1-M-010: Risk Stack Filtering And Grouping
 
+**Status:** Done
+
 **Priority:** P1
 
 **Difficulty:** M
@@ -418,30 +453,69 @@ Phase 2 所有任务必须遵守：
 
 **Depends On:** P0-L-003
 
-**Goal:** 优化风险面板，让风险可按等级和类别快速扫描。
+**Goal:** 将风险面板从普通风险列表升级为“任务级自治决策风险栈”。用户应能快速看出哪些风险会阻断任务、哪些风险需要人工确认、哪些风险可以通过保守航线/改时间/补飞等方式缓解。
 
 **Scope:**
 
-- 按 risk_level 分组或排序：
+- 按 risk_level 分组或排序，高风险优先：
   - critical
   - high
   - medium
   - low
-- 展示：
+- 增加风险等级 filter 控件：
+  - All
+  - Critical
+  - High
+  - Medium
+  - Low
+- 展示每个风险项的关键字段：
   - category
   - description
   - trigger_condition
   - mitigation
   - evidence
   - requires_human_confirmation
-- 增加风险等级 filter 控件。
+- 对 `requires_human_confirmation` 做清晰标注：
+  - 需要人工确认的风险必须明显可见。
+  - 不需要人工确认的风险也应避免被误读为“无风险”，可使用较弱提示展示其自动处理状态。
+- 展示风险与任务决策的关系：
+  - 是否影响 recommended_time_window。
+  - 是否影响 route_strategy。
+  - 是否触发 safety_thresholds 或 abort_conditions。
+  - 是否可能导致 replan、return-to-home、pause、manual takeover 或 supplement flight。
+- 空结果状态要清楚说明当前 filter 下没有对应风险，而不是让用户误以为系统没有风险评估能力。
+- 风险颜色必须复用 `uiTokens.ts` 的 risk semantic tokens：
+  - critical / high 使用 red 系。
+  - medium 使用 amber 系。
+  - low 使用 teal 或 neutral 系，按现有 token 执行。
+- 列表应保持扫描效率：不要把所有字段做成大段散文。
+
+**Out of Scope:**
+
+- 不修改后端风险模型字段。
+- 不新增风险等级枚举。
+- 不在前端重新实现硬安全规则。
+- 不引入图表库或复杂风险树可视化；风险树展示留给后续任务。
 
 **Acceptance Criteria:**
 
 - 高风险项优先显示。
 - 人工确认项清晰标注。
+- 用户能一眼区分阻断型风险、警告型风险和可监控风险。
+- 风险项至少展示触发条件、缓解动作和证据来源。
+- filter 有可用的空状态。
 - filter 不破坏布局。
+- 风险颜色与 P1-M-009 的安全阈值颜色保持一致。
+- 面板表达的是任务自治与风险推演，不是缺陷识别结果列表。
 - `npm run build` 通过。
+
+**Implementation Notes:**
+
+- 已将 `RiskPanel` 从普通列表升级为任务级风险栈，按 `critical -> high -> medium -> low` 排序。
+- 已增加 All / Critical / High / Medium / Low 筛选控件和空结果状态。
+- 每个风险项展示 category、trigger condition、description、mitigation、evidence、human confirmation 和 decision impact。
+- 风险卡片和风险徽章统一复用 `uiTokens.ts` 中的 red / amber / teal / zinc 语义色，和 `SafetyThresholdPanel` 的安全阈值颜色保持一致。
+- decision impact 为前端解释层基于现有风险字段推导，不修改后端风险模型，也不替代硬安全规则。
 
 ---
 

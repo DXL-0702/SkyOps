@@ -22,7 +22,12 @@ export type MissionCycleState =
       review: MissionReviewResponse;
       incidentEvent: IncidentEvent;
     }
-  | { status: "failed"; message: string };
+  | {
+      status: "failed";
+      message: string;
+      possibleCauses: string[];
+      suggestedActions: string[];
+    };
 
 export type IncidentPreset = {
   label: string;

@@ -58,11 +58,24 @@ export const bannerStyles = {
 } as const;
 
 export const buttonStyles = {
-  base: "flex h-11 items-center justify-center gap-2 text-sm transition",
+  base: "flex h-11 items-center justify-center gap-2 text-sm transition disabled:cursor-not-allowed disabled:opacity-50",
   primary: "bg-teal-300 px-4 font-semibold text-zinc-950 hover:bg-teal-200",
   incident: "border px-2 font-medium",
   incidentActive: "border-teal-300 bg-teal-300/15 text-teal-100",
   incidentIdle: "border-zinc-800 bg-zinc-950 text-zinc-300 hover:border-zinc-600",
+  filter: "h-9 border px-3 text-xs font-semibold uppercase tracking-[0.12em]",
+  filterActive: "border-teal-300 bg-teal-300/15 text-teal-100",
+  filterIdle: "border-zinc-800 bg-zinc-950 text-zinc-400 hover:border-zinc-600 hover:text-zinc-200",
+  compact:
+    "h-9 border border-zinc-700 bg-zinc-950 px-3 text-xs font-semibold uppercase tracking-[0.12em] text-zinc-300 hover:border-zinc-500 hover:text-zinc-100",
+} as const;
+
+export const stateStyles = {
+  loadingSurface: "border border-zinc-800 bg-zinc-950/70 p-4",
+  failedSurface: "border border-red-400/40 bg-red-400/10 p-4",
+  readySurface: "border border-teal-400/40 bg-teal-400/10 p-4",
+  pipelineItem:
+    "flex items-center gap-2 border border-zinc-800 bg-zinc-950/70 px-3 py-2 text-xs text-zinc-300",
 } as const;
 
 export const metricStyles = {
@@ -91,6 +104,14 @@ export const riskToneStyles = {
   high: "border-red-400/40 bg-red-400/10 text-red-200",
   critical: "border-red-500/60 bg-red-500/15 text-red-100",
   default: "border-zinc-700 bg-zinc-950 text-zinc-400",
+} as const;
+
+export const riskSurfaceStyles = {
+  low: "border-teal-400/30 bg-teal-400/5",
+  medium: "border-amber-400/35 bg-amber-400/5",
+  high: "border-red-400/35 bg-red-400/5",
+  critical: "border-red-500/50 bg-red-500/10",
+  default: "border-zinc-800 bg-zinc-950/70",
 } as const;
 
 export const iconBoxStyles = {

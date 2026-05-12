@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import { API_BASE_URL } from "../../api/client";
 import { fetchBackendHealth } from "../../api/health";
 import {
   DEFAULT_SCENARIO_ID,
@@ -23,11 +24,45 @@ import { incidentPresets } from "./incidentPresets";
 import type { HealthState, MissionCycleState } from "./types";
 import { badgeStyles, cn, layoutStyles } from "./uiTokens";
 
+const configuredApiEndpoint = API_BASE_URL === "" ? "Vite proxy -> 127.0.0.1:8000" : API_BASE_URL;
+
+const healthOfflineMessage =
+  "Mission autonomy backend is unavailable. Keep the current plan in review mode until the service is reachable.";
+
+const missionFailureMessage =
+  "Mission decision loop is temporarily unavailable. No flight recommendation was generated for this request.";
+
+const missionFailurePossibleCauses = [
+  "The FastAPI backend is not running or the API endpoint is unreachable.",
+  "The mission planning, replanning, or review endpoint returned an invalid response.",
+  "The current mock scenario is unavailable or does not match the frontend contract.",
+];
+
+const missionFailureSuggestedActions = [
+  `Check the configured API endpoint: ${configuredApiEndpoint}.`,
+  "Restart the backend service and run the mission loop again.",
+  "Pause execution and request manual review before using this task plan.",
+];
+
 export function MissionConsole() {
   const [health, setHealth] = useState<HealthState>({ status: "loading" });
   const [taskInput, setTaskInput] = useState(DEFAULT_TASK_INPUT);
   const [selectedIncident, setSelectedIncident] = useState(incidentPresets[0].event);
   const [missionCycle, setMissionCycle] = useState<MissionCycleState>({ status: "loading" });
+
+  function refreshBackendHealth() {
+    setHealth({ status: "loading" });
+
+    fetchBackendHealth()
+      .then((data) => setHealth({ status: "online", data }))
+      .catch((error: unknown) => {
+        console.warn("Backend health check failed.", error);
+        setHealth({
+          status: "offline",
+          message: healthOfflineMessage,
+        });
+      });
+  }
 
   useEffect(() => {
     let isMounted = true;
@@ -38,11 +73,12 @@ export function MissionConsole() {
           setHealth({ status: "online", data });
         }
       })
-      .catch(() => {
+      .catch((error: unknown) => {
         if (isMounted) {
+          console.warn("Backend health check failed.", error);
           setHealth({
             status: "offline",
-            message: "Unable to reach backend. Confirm 127.0.0.1:8000 is running.",
+            message: healthOfflineMessage,
           });
         }
       });
@@ -51,15 +87,6 @@ export function MissionConsole() {
       isMounted = false;
     };
   }, []);
-
-  function refreshBackendHealth() {
-    fetchBackendHealth()
-      .then((data) => setHealth({ status: "online", data }))
-      .catch(() => setHealth({
-        status: "offline",
-        message: "Unable to reach backend. Confirm 127.0.0.1:8000 is running.",
-      }));
-  }
 
   async function runMissionCycle(incidentEvent: IncidentEvent = selectedIncident) {
     setMissionCycle({ status: "loading" });
@@ -80,9 +107,12 @@ export function MissionConsole() {
 
       setMissionCycle({ status: "ready", plan, replan, review, incidentEvent });
     } catch (error: unknown) {
+      console.error("Mission decision loop failed.", error);
       setMissionCycle({
         status: "failed",
-        message: error instanceof Error ? error.message : "Mission cycle failed.",
+        message: missionFailureMessage,
+        possibleCauses: missionFailurePossibleCauses,
+        suggestedActions: missionFailureSuggestedActions,
       });
     }
   }
@@ -121,10 +151,9 @@ export function MissionConsole() {
 
         <section className={layoutStyles.primaryGrid}>
           <MissionInputPanel
+            missionCycle={missionCycle}
             taskInput={taskInput}
             selectedIncident={selectedIncident}
-            missionStatus={missionCycle.status}
-            failureMessage={missionCycle.status === "failed" ? missionCycle.message : undefined}
             onIncidentSelect={handleIncidentSelect}
             onRun={() => void runMissionCycle()}
             onTaskInputChange={setTaskInput}
