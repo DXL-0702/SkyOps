@@ -20,7 +20,6 @@ import { StatusStrip } from "./StatusStrip";
 import { DataSourceBadge } from "./components/DataSourceBadge";
 import { incidentPresets } from "./incidentPresets";
 import type { HealthState, MissionCycleState } from "./types";
-import { badgeStyles, cn, layoutStyles } from "./uiTokens";
 
 export function MissionConsole() {
   const [health, setHealth] = useState<HealthState>({ status: "loading" });
@@ -37,11 +36,11 @@ export function MissionConsole() {
           setHealth({ status: "online", data });
         }
       })
-      .catch((error: unknown) => {
+      .catch(() => {
         if (isMounted) {
           setHealth({
             status: "offline",
-            message: error instanceof Error ? error.message : "Backend health check failed.",
+            message: "Backend is not connected.",
           });
         }
       });
@@ -69,10 +68,10 @@ export function MissionConsole() {
       });
 
       setMissionCycle({ status: "ready", plan, replan, review, incidentEvent });
-    } catch (error: unknown) {
+    } catch {
       setMissionCycle({
         status: "failed",
-        message: error instanceof Error ? error.message : "Mission cycle failed.",
+        message: "Mission data is temporarily unavailable.",
       });
     }
   }
@@ -84,17 +83,23 @@ export function MissionConsole() {
   }, []);
 
   function handleIncidentSelect(incidentEvent: IncidentEvent) {
+    if (missionCycle.status === "loading") {
+      return;
+    }
+
     setSelectedIncident(incidentEvent);
     void runMissionCycle(incidentEvent);
   }
 
+  const isRunning = missionCycle.status === "loading";
+
   return (
-    <main className={layoutStyles.page}>
-      <section className={layoutStyles.shell}>
-        <header className={layoutStyles.header}>
+    <main className="min-h-screen bg-zinc-950 text-zinc-100">
+      <section className="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-5 px-4 py-5 sm:px-6 lg:px-8">
+        <header className="flex flex-col gap-4 border-b border-zinc-800 pb-5 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <div className="flex flex-wrap items-center gap-2">
-              <span className={cn(badgeStyles.base, badgeStyles.brand, "tracking-[0.18em]")}>
+              <span className="border border-teal-400/40 bg-teal-400/10 px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-teal-200">
                 SkyOps Agent
               </span>
               <DataSourceBadge sourceType="mock" label="Demo Data" />
@@ -109,10 +114,11 @@ export function MissionConsole() {
 
         <StatusStrip health={health} missionCycle={missionCycle} />
 
-        <section className={layoutStyles.primaryGrid}>
+        <section className="grid gap-5 xl:grid-cols-[1.05fr_1.55fr_0.9fr]">
           <MissionInputPanel
             taskInput={taskInput}
             selectedIncident={selectedIncident}
+            isRunning={isRunning}
             onIncidentSelect={handleIncidentSelect}
             onRun={() => void runMissionCycle()}
             onTaskInputChange={setTaskInput}
@@ -123,11 +129,11 @@ export function MissionConsole() {
           <RiskPanel missionCycle={missionCycle} />
         </section>
 
-        <section className={layoutStyles.evidenceGrid}>
-          <EnvironmentDronePanel missionCycle={missionCycle} />
-          <IncidentReplanPanel missionCycle={missionCycle} />
-          <MissionReviewPanel missionCycle={missionCycle} />
-        </section>
+<section className="grid gap-5 lg:grid-cols-[1fr_1fr]">
+  <EnvironmentDronePanel missionCycle={missionCycle} />
+  <IncidentReplanPanel missionCycle={missionCycle} />
+  <MissionReviewPanel missionCycle={missionCycle} />
+</section>
       </section>
     </main>
   );
