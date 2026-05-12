@@ -16,6 +16,7 @@ export const layoutStyles = {
     "flex flex-col gap-4 border-b border-zinc-800 pb-5 lg:flex-row lg:items-center lg:justify-between",
   primaryGrid: "grid gap-5 xl:grid-cols-[1.05fr_1.55fr_0.9fr]",
   secondaryGrid: "grid gap-5 lg:grid-cols-[1fr_1fr]",
+  evidenceGrid: "grid gap-5 xl:grid-cols-[1.05fr_1fr_1fr]",
   statusGrid: "grid gap-3 md:grid-cols-4",
 } as const;
 
@@ -76,6 +77,7 @@ export const listStyles = {
     "flex items-center gap-3 border border-zinc-800 bg-zinc-950/70 px-3 py-2 text-sm text-zinc-300",
   number:
     "flex h-6 w-6 items-center justify-center bg-teal-300/15 text-xs font-semibold text-teal-200",
+  dot: "mt-2 h-1.5 w-1.5 shrink-0 bg-teal-300",
 } as const;
 
 export const progressStyles = {

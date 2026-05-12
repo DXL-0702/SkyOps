@@ -10,6 +10,7 @@ import {
   createReplanDecision,
 } from "../../api/mission";
 import { BackendStatus } from "./BackendStatus";
+import { EnvironmentDronePanel } from "./EnvironmentDronePanel";
 import { IncidentReplanPanel } from "./IncidentReplanPanel";
 import { MissionInputPanel } from "./MissionInputPanel";
 import { MissionPlanPanel } from "./MissionPlanPanel";
@@ -128,10 +129,11 @@ export function MissionConsole() {
           <RiskPanel missionCycle={missionCycle} />
         </section>
 
-        <section className="grid gap-5 lg:grid-cols-[1fr_1fr]">
-          <IncidentReplanPanel missionCycle={missionCycle} />
-          <MissionReviewPanel missionCycle={missionCycle} />
-        </section>
+<section className={layoutStyles.evidenceGrid}>
+  <EnvironmentDronePanel missionCycle={missionCycle} />
+  <IncidentReplanPanel missionCycle={missionCycle} />
+  <MissionReviewPanel missionCycle={missionCycle} />
+</section>
       </section>
     </main>
   );

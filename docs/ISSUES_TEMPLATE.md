@@ -274,6 +274,8 @@ Phase 2 所有任务必须遵守：
 
 ### Issue P1-M-007: Mission Plan Detail Panel
 
+**Status:** Done
+
 **Priority:** P1
 
 **Difficulty:** M
@@ -307,9 +309,17 @@ Phase 2 所有任务必须遵守：
 - 长文本不会溢出。
 - `npm run build` 通过。
 
+**Implementation Notes:**
+
+- `MissionPlanPanel` 已展示作业对象、作业区域、风险偏好、作业目标、推荐时间窗口、航线策略、起降点、安全说明、飞行分段、预计覆盖率和预计时长。
+- 起降点展示包含 `name`、`description` 和 `safety_notes`。
+- 长文本使用 `break-words`、`leading-*` 和网格布局控制，避免撑破面板。
+
 ---
 
 ### Issue P1-M-008: Environment And Drone State Panel
+
+**Status:** Done
 
 **Priority:** P1
 
@@ -347,6 +357,13 @@ Phase 2 所有任务必须遵守：
 - 环境和设备状态可扫描。
 - 关键风险指标有颜色或图标提示。
 - `npm run build` 通过。
+
+**Implementation Notes:**
+
+- 已新增 `EnvironmentDronePanel`，集中展示环境状态和设备状态。
+- 环境侧展示天气、风速、能见度、人流、GPS 质量、GPS 置信度和数据置信度。
+- 设备侧展示无人机编号、机型、电量、续航、返航电量阈值、载荷、链路质量、图传延迟和任务可用性。
+- GPS 置信度、数据置信度、人流、链路质量和图传延迟使用风险颜色/徽标提示。
 
 ---
 
