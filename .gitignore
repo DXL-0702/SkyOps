@@ -32,5 +32,8 @@ build/
 .idea/
 .vscode/
 
+# Issues
+docs/issues-draft.md
+
 
  
