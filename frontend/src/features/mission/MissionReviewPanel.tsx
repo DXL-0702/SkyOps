@@ -5,6 +5,7 @@ import { PanelFallback } from "./components/PanelFallback";
 import { PanelTitle } from "./components/PanelTitle";
 import { ProgressMetric } from "./components/ProgressMetric";
 import type { MissionCycleState } from "./types";
+import { panelStyles } from "./uiTokens";
 
 export function MissionReviewPanel({ missionCycle }: { missionCycle: MissionCycleState }) {
   if (missionCycle.status !== "ready") {
@@ -14,7 +15,7 @@ export function MissionReviewPanel({ missionCycle }: { missionCycle: MissionCycl
   const review = missionCycle.review.mission_review;
 
   return (
-    <section className="border border-zinc-800 bg-zinc-900/70 p-5">
+    <section className={panelStyles.base}>
       <PanelTitle icon={CheckCircle2} title="Mission Review" meta={review.mission_id} />
 
       <div className="mt-4 grid gap-3 md:grid-cols-2">

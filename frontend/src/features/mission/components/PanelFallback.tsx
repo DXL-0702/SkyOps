@@ -1,5 +1,6 @@
 import { Clock3 } from "lucide-react";
 
+import { cn, panelStyles } from "../uiTokens";
 import { PanelTitle } from "./PanelTitle";
 
 type PanelFallbackProps = {
@@ -9,9 +10,9 @@ type PanelFallbackProps = {
 
 export function PanelFallback({ title, state }: PanelFallbackProps) {
   return (
-    <section className="border border-zinc-800 bg-zinc-900/70 p-5">
+    <section className={panelStyles.base}>
       <PanelTitle icon={Clock3} title={title} meta={state} />
-      <div className="mt-4 border border-zinc-800 bg-zinc-950/70 p-4 text-sm text-zinc-300">
+      <div className={cn(panelStyles.surfacePadded, "mt-4 text-sm text-zinc-300")}>
         {state === "loading" ? "Loading mock mission data..." : "Mission data unavailable."}
       </div>
     </section>

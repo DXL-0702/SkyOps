@@ -3,6 +3,7 @@ import { Activity, GitBranch } from "lucide-react";
 import type { IncidentEvent } from "../../api/mission";
 import { PanelTitle } from "./components/PanelTitle";
 import { incidentPresets } from "./incidentPresets";
+import { buttonStyles, cn, formStyles, panelStyles, textStyles } from "./uiTokens";
 
 type MissionInputPanelProps = {
   taskInput: string;
@@ -20,11 +21,11 @@ export function MissionInputPanel({
   onTaskInputChange,
 }: MissionInputPanelProps) {
   return (
-    <section className="border border-zinc-800 bg-zinc-900/70 p-5">
+    <section className={panelStyles.base}>
       <PanelTitle icon={Activity} title="Mission Intake" meta="Natural language" />
 
       <textarea
-        className="mt-4 min-h-36 w-full resize-none border border-zinc-800 bg-zinc-950 p-4 text-sm leading-6 text-zinc-100 outline-none transition focus:border-teal-400"
+        className={formStyles.textarea}
         value={taskInput}
         onChange={(event) => onTaskInputChange(event.target.value)}
       />
@@ -35,11 +36,11 @@ export function MissionInputPanel({
           const isActive = selectedIncident.event_type === preset.event.event_type;
           return (
             <button
-              className={`flex h-11 items-center justify-center gap-2 border px-2 text-sm font-medium transition ${
-                isActive
-                  ? "border-teal-300 bg-teal-300/15 text-teal-100"
-                  : "border-zinc-800 bg-zinc-950 text-zinc-300 hover:border-zinc-600"
-              }`}
+              className={cn(
+                buttonStyles.base,
+                buttonStyles.incident,
+                isActive ? buttonStyles.incidentActive : buttonStyles.incidentIdle,
+              )}
               key={preset.event.event_type}
               onClick={() => onIncidentSelect(preset.event)}
               type="button"
@@ -52,7 +53,7 @@ export function MissionInputPanel({
       </div>
 
       <button
-        className="mt-4 flex h-11 w-full items-center justify-center gap-2 bg-teal-300 px-4 text-sm font-semibold text-zinc-950 transition hover:bg-teal-200"
+        className={cn(buttonStyles.base, buttonStyles.primary, "mt-4 w-full")}
         onClick={onRun}
         type="button"
       >
@@ -60,12 +61,10 @@ export function MissionInputPanel({
         Run Mission Loop
       </button>
 
-      <div className="mt-4 border border-zinc-800 bg-zinc-950/70 p-4">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-zinc-500">
-          Active Incident
-        </p>
+      <div className={cn(panelStyles.surfacePadded, "mt-4")}>
+        <p className={textStyles.strongLabel}>Active Incident</p>
         <p className="mt-2 text-sm font-semibold text-white">{selectedIncident.event_type}</p>
-        <p className="mt-1 text-xs leading-5 text-zinc-400">
+        <p className={cn(textStyles.subtle, "mt-1")}>
           {selectedIncident.observed_value} / {selectedIncident.threshold}
         </p>
       </div>

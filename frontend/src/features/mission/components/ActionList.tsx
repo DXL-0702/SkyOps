@@ -1,5 +1,6 @@
 import { CheckCircle2 } from "lucide-react";
 
+import { listStyles } from "../uiTokens";
 import { SectionLabel } from "./SectionLabel";
 
 type ActionListProps = {
@@ -16,10 +17,7 @@ export function ActionList({ title, items, tone }: ActionListProps) {
       <SectionLabel label={title} />
       <div className="mt-3 grid gap-2">
         {items.slice(0, 4).map((item) => (
-          <div
-            className="flex items-start gap-2 border border-zinc-800 bg-zinc-950/70 px-3 py-2 text-sm leading-5 text-zinc-300"
-            key={item}
-          >
+          <div className={listStyles.item} key={item}>
             <CheckCircle2 aria-hidden="true" className={`mt-0.5 shrink-0 ${color}`} size={15} />
             <span>{item}</span>
           </div>

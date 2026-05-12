@@ -5,6 +5,7 @@ import { PanelFallback } from "./components/PanelFallback";
 import { PanelTitle } from "./components/PanelTitle";
 import { SectionLabel } from "./components/SectionLabel";
 import type { MissionCycleState } from "./types";
+import { cn, listStyles, panelStyles, textStyles } from "./uiTokens";
 
 export function MissionPlanPanel({ missionCycle }: { missionCycle: MissionCycleState }) {
   if (missionCycle.status !== "ready") {
@@ -21,7 +22,7 @@ export function MissionPlanPanel({ missionCycle }: { missionCycle: MissionCycleS
   ];
 
   return (
-    <section className="border border-zinc-800 bg-zinc-900/70 p-5">
+    <section className={panelStyles.base}>
       <PanelTitle icon={Route} title="Mission Plan" meta={plan.mission_task.source_type} />
 
       <div className="mt-4 grid gap-3 md:grid-cols-3">
@@ -31,23 +32,19 @@ export function MissionPlanPanel({ missionCycle }: { missionCycle: MissionCycleS
       </div>
 
       <div className="mt-5 grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
-        <div className="border border-zinc-800 bg-zinc-950/70 p-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-zinc-500">
-            Time Window
-          </p>
+        <div className={panelStyles.surfacePadded}>
+          <p className={textStyles.strongLabel}>Time Window</p>
           <p className="mt-2 text-sm font-semibold leading-5 text-white">
             {plan.mission_plan.recommended_time_window}
           </p>
-          <p className="mt-3 text-xs leading-5 text-zinc-400">
+          <p className={cn(textStyles.subtle, "mt-3")}>
             {plan.mission_task.operation_object}
           </p>
         </div>
 
-        <div className="border border-zinc-800 bg-zinc-950/70 p-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-zinc-500">
-            Route Strategy
-          </p>
-          <p className="mt-2 text-sm leading-6 text-zinc-200">
+        <div className={panelStyles.surfacePadded}>
+          <p className={textStyles.strongLabel}>Route Strategy</p>
+          <p className={cn(textStyles.body, "mt-2 text-zinc-200")}>
             {plan.mission_plan.route_strategy}
           </p>
         </div>
@@ -58,13 +55,8 @@ export function MissionPlanPanel({ missionCycle }: { missionCycle: MissionCycleS
           <SectionLabel label="Flight Segments" />
           <div className="mt-3 grid gap-2">
             {plan.mission_plan.flight_segments.map((segment, index) => (
-              <div
-                className="flex items-center gap-3 border border-zinc-800 bg-zinc-950/70 px-3 py-2 text-sm text-zinc-300"
-                key={segment}
-              >
-                <span className="flex h-6 w-6 items-center justify-center bg-teal-300/15 text-xs font-semibold text-teal-200">
-                  {index + 1}
-                </span>
+              <div className={listStyles.numberedItem} key={segment}>
+                <span className={listStyles.number}>{index + 1}</span>
                 {segment}
               </div>
             ))}

@@ -5,6 +5,7 @@ import { Metric } from "./components/Metric";
 import { PanelFallback } from "./components/PanelFallback";
 import { PanelTitle } from "./components/PanelTitle";
 import type { MissionCycleState } from "./types";
+import { cn, panelStyles } from "./uiTokens";
 
 export function IncidentReplanPanel({ missionCycle }: { missionCycle: MissionCycleState }) {
   if (missionCycle.status !== "ready") {
@@ -14,7 +15,7 @@ export function IncidentReplanPanel({ missionCycle }: { missionCycle: MissionCyc
   const decision = missionCycle.replan.replan_decision;
 
   return (
-    <section className="border border-zinc-800 bg-zinc-900/70 p-5">
+    <section className={panelStyles.base}>
       <PanelTitle icon={GitBranch} title="Incident Replanning" meta={decision.incident_id} />
 
       <div className="mt-4 grid gap-3 md:grid-cols-3">
@@ -23,9 +24,7 @@ export function IncidentReplanPanel({ missionCycle }: { missionCycle: MissionCyc
         <Metric label="Takeover" value={decision.human_takeover_required ? "Required" : "No"} />
       </div>
 
-      <p className="mt-4 border border-zinc-800 bg-zinc-950/70 p-4 text-sm leading-6 text-zinc-300">
-        {decision.reason}
-      </p>
+      <p className={cn(panelStyles.textSurface, "mt-4")}>{decision.reason}</p>
 
       <div className="mt-4 grid gap-4 md:grid-cols-2">
         <ActionList title="Actions" items={decision.actions} tone="teal" />

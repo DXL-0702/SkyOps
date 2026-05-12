@@ -143,6 +143,8 @@ Phase 2 所有任务必须遵守：
 
 ### Issue P0-L-004: Define Phase 2 Visual Direction And UI Tokens
 
+**Status:** Done
+
 **Priority:** P0
 
 **Difficulty:** L
@@ -185,6 +187,12 @@ Phase 2 所有任务必须遵守：
 - 风险等级颜色一致。
 - mock/simulated 标识样式统一。
 - `npm run build` 通过。
+
+**Implementation Notes:**
+
+- Phase 2 UI 定调为：专业低空运营调度台为主体，选择性引入城市低空指挥中心的空间态势感。
+- 已新增 `frontend/src/features/mission/uiTokens.ts`，集中管理 operational tokens、risk semantic tokens 和 command-layer tokens。
+- 后续局部组件、沙盘、航线、风险区域、异常重规划展示应优先复用这些 tokens，不要各自临时定义颜色体系。
 
 ---
 
