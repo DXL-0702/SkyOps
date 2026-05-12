@@ -36,7 +36,6 @@ export function MissionConsole() {
         }
       })
       .catch(() => {
-      .catch(() => {
         if (isMounted) {
           setHealth({
             status: "offline",
