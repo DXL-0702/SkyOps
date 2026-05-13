@@ -1,28 +1,30 @@
 import { Activity, CircleDot, GitBranch, MapPinned } from "lucide-react";
 
 import { StatusTile } from "./components/StatusTile";
+import type { MissionConsoleCopy } from "./i18n";
 import type { HealthState, MissionCycleState } from "./types";
 import { layoutStyles } from "./uiTokens";
 
 type StatusStripProps = {
   health: HealthState;
   missionCycle: MissionCycleState;
+  copy: MissionConsoleCopy["status"];
 };
 
-export function StatusStrip({ health, missionCycle }: StatusStripProps) {
+export function StatusStrip({ health, missionCycle, copy }: StatusStripProps) {
   const missionStatus =
     missionCycle.status === "ready"
-      ? "Decision loop ready"
+      ? copy.loopReady
       : missionCycle.status === "failed"
-        ? "Decision loop failed"
-        : "Decision loop running";
+        ? copy.loopFailed
+        : copy.loopRunning;
 
   return (
     <section className={layoutStyles.statusGrid}>
-      <StatusTile label="Backend" value={health.status} icon={Activity} />
-      <StatusTile label="Scenario" value="Shenzhen high-rise" icon={MapPinned} />
-      <StatusTile label="Data Mode" value="Mock / simulated" icon={CircleDot} />
-      <StatusTile label="Loop" value={missionStatus} icon={GitBranch} />
+      <StatusTile label={copy.backend} value={health.status} icon={Activity} />
+      <StatusTile label={copy.scenario} value={copy.scenarioValue} icon={MapPinned} />
+      <StatusTile label={copy.dataMode} value={copy.dataModeValue} icon={CircleDot} />
+      <StatusTile label={copy.loop} value={missionStatus} icon={GitBranch} />
     </section>
   );
 }

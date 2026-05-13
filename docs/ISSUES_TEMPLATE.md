@@ -907,6 +907,42 @@ Phase 2 所有任务必须遵守：
 
 ---
 
+### Issue P2-S-020A: Header Language Toggle
+
+**Status:** Done
+
+**Priority:** P2
+
+**Difficulty:** S
+
+**Owner Suggestion:** Leader
+
+**Depends On:** P1-L-018
+
+**Goal:** 在顶部增加轻量中英文切换，让比赛演示和 GitHub 展示更易读。
+
+**Scope:**
+
+- 增加 `ZH / EN` 分段切换按钮。
+- 默认中文。
+- 翻译顶部标题、状态摘要、工作台导航和阶段说明。
+- 后端返回的 mock 任务数据、风险描述、复盘内容先保持原文。
+- 暂不实现深浅色主题切换。
+
+**Acceptance Criteria:**
+
+- 切换语言不会重新请求后端或重置 mission cycle。
+- 不引入 i18n 框架或新依赖。
+- `npm run build` 通过。
+
+**Implementation Notes:**
+
+- 已在 Mission Console 顶部加入 `ZH / EN` 切换控件。
+- UI shell 默认中文，可切换英文；业务数据和 mock API response 保持原始内容。
+- 主题切换暂缓，继续保持当前深色低空指挥台视觉基调。
+
+---
+
 ## Phase 2.8：可选增强，不阻塞主 Demo
 
 ### Issue P2-L-021: Simplified Sandbox Map Panel

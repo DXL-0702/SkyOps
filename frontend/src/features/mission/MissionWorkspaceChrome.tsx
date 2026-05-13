@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
+import type { MissionConsoleCopy } from "./i18n";
 import type { MissionCycleState } from "./types";
 import { badgeStyles, cn, panelStyles, textStyles } from "./uiTokens";
 
@@ -14,120 +15,101 @@ export type ConsoleViewId = "task" | "plan" | "risk" | "incident" | "review";
 
 export type ConsoleView = {
   id: ConsoleViewId;
-  label: string;
-  eyebrow: string;
-  title: string;
-  description: string;
   icon: LucideIcon;
 };
 
 export const consoleViews: ConsoleView[] = [
   {
     id: "task",
-    label: "Task",
-    eyebrow: "Step 01",
-    title: "Task Intake",
-    description: "Start from natural-language task input and run the demo decision loop.",
     icon: ClipboardCheck,
   },
   {
     id: "plan",
-    label: "Plan",
-    eyebrow: "Step 02",
-    title: "Mission Plan",
-    description:
-      "Review recommended time window, route strategy, environment, drone state, and abort thresholds.",
     icon: Route,
   },
   {
     id: "risk",
-    label: "Risk",
-    eyebrow: "Step 03",
-    title: "Risk Reasoning",
-    description:
-      "Inspect sorted risks, decision impacts, evidence, and explainable human-facing rationale.",
     icon: AlertTriangle,
   },
   {
     id: "incident",
-    label: "Incident",
-    eyebrow: "Step 04",
-    title: "Incident Replanning",
-    description:
-      "Inject a simulated incident and inspect the resulting pause, return, reroute, or review decision.",
     icon: GitBranch,
   },
   {
     id: "review",
-    label: "Review",
-    eyebrow: "Step 05",
-    title: "Mission Review",
-    description:
-      "Close the loop with completion, data quality, risk logs, makeup flight advice, and review actions.",
     icon: CheckCircle2,
   },
 ];
 
-function getActiveViewStatus(viewId: ConsoleViewId, missionCycle: MissionCycleState): string {
+type WorkspaceCopy = MissionConsoleCopy["workspace"];
+
+function getActiveViewStatus(
+  viewId: ConsoleViewId,
+  missionCycle: MissionCycleState,
+  copy: WorkspaceCopy,
+): string {
   if (missionCycle.status === "failed") {
-    return "Manual Review";
+    return copy.viewStatus.manualReview;
   }
 
   if (missionCycle.status === "loading") {
-    return viewId === "task" ? "Running" : "Waiting";
+    return viewId === "task" ? copy.viewStatus.running : copy.viewStatus.waiting;
   }
 
-  return viewId === "task" ? "Ready" : "Available";
+  return viewId === "task" ? copy.viewStatus.ready : copy.viewStatus.available;
 }
 
-function getActiveIncidentLabel(missionCycle: MissionCycleState): string {
+function getActiveIncidentLabel(missionCycle: MissionCycleState, copy: WorkspaceCopy): string {
   if (missionCycle.status !== "ready") {
-    return "Pending decision loop";
+    return copy.pendingIncident;
   }
 
   return missionCycle.incidentEvent.event_type;
 }
 
-function getMissionObjectLabel(missionCycle: MissionCycleState): string {
+function getMissionObjectLabel(missionCycle: MissionCycleState, copy: WorkspaceCopy): string {
   if (missionCycle.status !== "ready") {
-    return "Shenzhen high-rise demo";
+    return copy.fallbackObject;
   }
 
   return missionCycle.plan.mission_task.operation_object;
 }
 
-function getMissionRiskSummary(missionCycle: MissionCycleState): string {
+function getMissionRiskSummary(missionCycle: MissionCycleState, copy: WorkspaceCopy): string {
   if (missionCycle.status !== "ready") {
-    return "Risk stack pending";
+    return copy.pendingRisk;
   }
 
   const highPriorityCount = missionCycle.plan.risks.filter(
     (risk) => risk.risk_level === "critical" || risk.risk_level === "high",
   ).length;
 
-  return `${highPriorityCount} high-priority risks`;
+  return copy.highPriorityRisks(highPriorityCount);
 }
 
 export function MissionFlowSidebar({
   activeView,
+  copy,
   missionCycle,
   onViewChange,
 }: {
   activeView: ConsoleViewId;
+  copy: WorkspaceCopy;
   missionCycle: MissionCycleState;
   onViewChange: (viewId: ConsoleViewId) => void;
 }) {
   return (
     <aside className={cn(panelStyles.base, "lg:sticky lg:top-5 lg:self-start")}>
       <div>
-        <p className={textStyles.eyebrow}>Mission Flow</p>
-        <p className="mt-2 text-sm font-semibold text-white">Task-level autonomy workspace</p>
+        <p className={textStyles.eyebrow}>{copy.flowTitle}</p>
+        <p className="mt-2 text-sm font-semibold text-white">{copy.flowSubtitle}</p>
       </div>
 
       <nav aria-label="Mission console sections" className="mt-4 grid gap-2">
         {consoleViews.map((view) => {
           const Icon = view.icon;
           const isActive = activeView === view.id;
+          const viewCopy = copy.views[view.id];
 
           return (
             <button
@@ -154,12 +136,12 @@ export function MissionFlowSidebar({
                   <Icon aria-hidden="true" size={16} />
                 </span>
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold">{view.label}</p>
-                  <p className={cn(textStyles.muted, "mt-0.5")}>{view.eyebrow}</p>
+                  <p className="text-sm font-semibold">{viewCopy.label}</p>
+                  <p className={cn(textStyles.muted, "mt-0.5")}>{viewCopy.eyebrow}</p>
                 </div>
               </div>
               <p className={cn(textStyles.subtle, "mt-3")}>
-                {getActiveViewStatus(view.id, missionCycle)}
+                {getActiveViewStatus(view.id, missionCycle, copy)}
               </p>
             </button>
           );
@@ -167,11 +149,13 @@ export function MissionFlowSidebar({
       </nav>
 
       <div className={cn(panelStyles.surfacePadded, "mt-4")}>
-        <p className={textStyles.strongLabel}>Current Focus</p>
+        <p className={textStyles.strongLabel}>{copy.currentFocus}</p>
         <p className="mt-2 break-words text-sm font-semibold text-white">
-          {getMissionObjectLabel(missionCycle)}
+          {getMissionObjectLabel(missionCycle, copy)}
         </p>
-        <p className={cn(textStyles.subtle, "mt-2")}>{getMissionRiskSummary(missionCycle)}</p>
+        <p className={cn(textStyles.subtle, "mt-2")}>
+          {getMissionRiskSummary(missionCycle, copy)}
+        </p>
       </div>
     </aside>
   );
@@ -179,18 +163,22 @@ export function MissionFlowSidebar({
 
 export function ActiveViewHeader({
   activeView,
+  copy,
   missionCycle,
 }: {
   activeView: ConsoleView;
+  copy: WorkspaceCopy;
   missionCycle: MissionCycleState;
 }) {
+  const activeViewCopy = copy.views[activeView.id];
+
   return (
     <section className={panelStyles.base}>
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="min-w-0">
-          <p className={textStyles.eyebrow}>{activeView.eyebrow}</p>
-          <h2 className="mt-2 text-2xl font-semibold text-white">{activeView.title}</h2>
-          <p className={cn(textStyles.body, "mt-2 max-w-3xl")}>{activeView.description}</p>
+          <p className={textStyles.eyebrow}>{activeViewCopy.eyebrow}</p>
+          <h2 className="mt-2 text-2xl font-semibold text-white">{activeViewCopy.title}</h2>
+          <p className={cn(textStyles.body, "mt-2 max-w-3xl")}>{activeViewCopy.description}</p>
         </div>
         <span
           className={cn(
@@ -208,21 +196,21 @@ export function ActiveViewHeader({
 
       <div className="mt-4 grid gap-3 md:grid-cols-3">
         <div className={panelStyles.surfacePadded}>
-          <p className={textStyles.strongLabel}>Mission Object</p>
+          <p className={textStyles.strongLabel}>{copy.missionObject}</p>
           <p className="mt-2 break-words text-sm font-semibold text-white">
-            {getMissionObjectLabel(missionCycle)}
+            {getMissionObjectLabel(missionCycle, copy)}
           </p>
         </div>
         <div className={panelStyles.surfacePadded}>
-          <p className={textStyles.strongLabel}>Active Incident</p>
+          <p className={textStyles.strongLabel}>{copy.activeIncident}</p>
           <p className="mt-2 break-words text-sm font-semibold text-white">
-            {getActiveIncidentLabel(missionCycle)}
+            {getActiveIncidentLabel(missionCycle, copy)}
           </p>
         </div>
         <div className={panelStyles.surfacePadded}>
-          <p className={textStyles.strongLabel}>Risk Focus</p>
+          <p className={textStyles.strongLabel}>{copy.riskFocus}</p>
           <p className="mt-2 break-words text-sm font-semibold text-white">
-            {getMissionRiskSummary(missionCycle)}
+            {getMissionRiskSummary(missionCycle, copy)}
           </p>
         </div>
       </div>
