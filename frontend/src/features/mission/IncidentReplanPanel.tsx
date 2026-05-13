@@ -9,11 +9,12 @@ import {
 } from "lucide-react";
 
 import { DataSourceBadge } from "./components/DataSourceBadge";
+import { EmptyState } from "./components/EmptyState";
 import { PanelFallback } from "./components/PanelFallback";
 import { PanelTitle } from "./components/PanelTitle";
 import { SectionLabel } from "./components/SectionLabel";
 import type { MissionCycleState } from "./types";
-import { badgeStyles, cn, listStyles, panelStyles, stateStyles, textStyles } from "./uiTokens";
+import { badgeStyles, cn, listStyles, panelStyles, textStyles } from "./uiTokens";
 
 function normalizeRejectedAlternative(alternative: string): string {
   return alternative.replace(/^rejected:\s*/i, "").trim();
@@ -29,6 +30,7 @@ function OperationalFlag({
   critical?: boolean;
 }) {
   const isAttentionRequired = value && critical;
+  const valueLabel = value ? "Required" : "Not Required";
 
   return (
     <article className={panelStyles.surfacePadded}>
@@ -43,13 +45,27 @@ function OperationalFlag({
         ) : (
           <ShieldCheck aria-hidden="true" className="text-teal-200" size={16} />
         )}
-        <span className="text-sm font-semibold text-white">{value ? "Yes" : "No"}</span>
+        <span className="text-sm font-semibold text-white">{valueLabel}</span>
       </div>
     </article>
   );
 }
 
 function AffectedSegmentsList({ segments }: { segments: string[] }) {
+  if (segments.length === 0) {
+    return (
+      <div>
+        <SectionLabel label="Affected Segments" />
+        <EmptyState
+          className="mt-3"
+          icon={Route}
+          title="No affected segment listed"
+          message="The current mock replan result did not provide route segments. Keep the active segment under manual review."
+        />
+      </div>
+    );
+  }
+
   return (
     <div>
       <SectionLabel label="Affected Segments" />
@@ -70,9 +86,12 @@ function ReplanActionsTimeline({ actions }: { actions?: string[] | null }) {
     return (
       <div>
         <SectionLabel label="Replan Actions Timeline" />
-        <div className={cn(stateStyles.loadingSurface, "mt-3")}>
-          <p className={textStyles.subtle}>No replan actions available.</p>
-        </div>
+        <EmptyState
+          className="mt-3"
+          icon={ListChecks}
+          title="No replan actions available"
+          message="The mock response returned no ordered action list. Keep this decision in manual review before execution."
+        />
       </div>
     );
   }
@@ -80,7 +99,7 @@ function ReplanActionsTimeline({ actions }: { actions?: string[] | null }) {
   return (
     <div>
       <SectionLabel label="Replan Actions Timeline" />
-      <ol className="mt-3 grid gap-0">
+      <ol aria-label="Replan action sequence" className="mt-3 grid gap-0">
         {actions.map((action, index) => {
           const isLastStep = index === actions.length - 1;
 
@@ -112,6 +131,16 @@ function ReplanActionsTimeline({ actions }: { actions?: string[] | null }) {
 }
 
 function RejectedAlternativesList({ alternatives }: { alternatives: string[] }) {
+  if (alternatives.length === 0) {
+    return (
+      <EmptyState
+        icon={XCircle}
+        title="No rejected alternatives recorded"
+        message="The current mock replan result did not return alternative options. Treat the selected decision as requiring human review."
+      />
+    );
+  }
+
   return (
     <div className={cn(panelStyles.surfacePadded, "border-red-400/35 bg-red-400/5")}>
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -152,6 +181,7 @@ export function IncidentReplanPanel({ missionCycle }: { missionCycle: MissionCyc
   }
 
   const decision = missionCycle.replan.replan_decision;
+  const hasRejectedAlternatives = decision.alternatives_considered.length > 0;
 
   return (
     <section className={panelStyles.base}>
@@ -197,7 +227,9 @@ export function IncidentReplanPanel({ missionCycle }: { missionCycle: MissionCyc
           <SectionLabel label="Alternatives Considered" />
         </div>
         <p className={cn(textStyles.subtle, "mt-2")}>
-          The system compared the selected decision against the rejected alternatives below.
+          {hasRejectedAlternatives
+            ? "The selected decision is shown with rejected alternatives from the deterministic replan rule."
+            : "No rejected alternatives were returned by the mock replan rule, so the selected decision should remain reviewable."}
         </p>
       </div>
 

@@ -72,6 +72,7 @@ export const buttonStyles = {
 
 export const stateStyles = {
   loadingSurface: "border border-zinc-800 bg-zinc-950/70 p-4",
+  emptySurface: "border border-dashed border-zinc-800 bg-zinc-950/60 p-4",
   failedSurface: "border border-red-400/40 bg-red-400/10 p-4",
   readySurface: "border border-teal-400/40 bg-teal-400/10 p-4",
   pipelineItem:

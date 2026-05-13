@@ -1,4 +1,4 @@
-import { metricStyles, progressStyles, textStyles } from "../uiTokens";
+import { cn, metricStyles, progressStyles, textStyles } from "../uiTokens";
 
 type ProgressMetricProps = {
   label: string;
@@ -14,18 +14,55 @@ function normalizePercent(value: number): number {
   return Math.min(100, Math.max(0, Math.round(percent)));
 }
 
+function getMetricTone(percent: number): {
+  label: string;
+  valueClassName: string;
+  fillClassName: string;
+} {
+  if (percent >= 90) {
+    return {
+      label: "Nominal",
+      valueClassName: "text-teal-200",
+      fillClassName: "bg-teal-300",
+    };
+  }
+
+  if (percent >= 75) {
+    return {
+      label: "Review",
+      valueClassName: "text-amber-200",
+      fillClassName: "bg-amber-300",
+    };
+  }
+
+  return {
+    label: "Attention",
+    valueClassName: "text-red-200",
+    fillClassName: "bg-red-400",
+  };
+}
+
 export function ProgressMetric({ label, value }: ProgressMetricProps) {
   const percent = normalizePercent(value);
+  const tone = getMetricTone(percent);
 
   return (
     <article className={metricStyles.card}>
       <div className="flex items-center justify-between gap-3">
         <p className={textStyles.label}>{label}</p>
-        <p className="text-sm font-semibold text-white">{percent}%</p>
+        <p className={cn("text-sm font-semibold", tone.valueClassName)}>{percent}%</p>
       </div>
-      <div className={progressStyles.track}>
-        <div className={progressStyles.fill} style={{ width: `${percent}%` }} />
+      <div
+        aria-label={label}
+        aria-valuemax={100}
+        aria-valuemin={0}
+        aria-valuenow={percent}
+        className={progressStyles.track}
+        role="progressbar"
+      >
+        <div className={cn("h-2", tone.fillClassName)} style={{ width: `${percent}%` }} />
       </div>
+      <p className={cn(textStyles.subtle, "mt-2")}>{tone.label}</p>
     </article>
   );
 }

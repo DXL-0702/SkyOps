@@ -646,6 +646,8 @@ Phase 2 所有任务必须遵守：
 
 ### Issue P1-M-014: Replan Decision Detail Panel
 
+**Status:** Done
+
 **Priority:** P1
 
 **Difficulty:** M
@@ -674,9 +676,18 @@ Phase 2 所有任务必须遵守：
 - rejected alternatives 不会被误解为推荐方案。
 - `npm run build` 通过。
 
+**Implementation Notes:**
+
+- 已在 `IncidentReplanPanel` 中展示 decision、reason、actions、affected_segments、makeup_flight_required、human_takeover_required 和 alternatives_considered。
+- `makeup_flight_required` 与 `human_takeover_required` 使用 Required / Not Required 文案，避免布尔值过于工程化。
+- rejected alternatives 使用红色风险语义、Rejected 标识和 Not Recommended 标签，避免被误读为推荐备选方案。
+- 当 affected segments 或 alternatives 为空时，展示稳定空状态，并提示需要人工复核。
+
 ---
 
 ### Issue P2-M-015: Replan Timeline Visualization
+
+**Status:** Done
 
 **Priority:** P2
 
@@ -700,11 +711,20 @@ Phase 2 所有任务必须遵守：
 - actions 为空时有占位。
 - `npm run build` 通过。
 
+**Implementation Notes:**
+
+- 已将 replan actions 渲染为纵向 timeline，每一步包含图标、步骤编号和动作名称。
+- Timeline 使用现有 Tailwind 与 UI token 实现，未引入动画库或新依赖。
+- actions 为空时使用统一 `EmptyState` 展示，不再复用 loading 样式。
+- Timeline 加入 `aria-label`，便于后续无障碍检查。
+
 ---
 
 ## Phase 2.6：复盘报告展示
 
 ### Issue P1-M-016: Mission Review Report Panel
+
+**Status:** Done
 
 **Priority:** P1
 
@@ -734,9 +754,18 @@ Phase 2 所有任务必须遵守：
 - 风险触发记录清晰。
 - `npm run build` 通过。
 
+**Implementation Notes:**
+
+- 已在 `MissionReviewPanel` 中展示 completion_rate、data_quality_score、risk_trigger_log、uncovered_areas、makeup_flight_plan、human_review_checklist 和 next_mission_optimizations。
+- 完成度和数据质量使用 `ProgressMetric` 展示，并根据数值显示 Nominal / Review / Attention 状态。
+- 复盘面板保留 mock 数据标识，明确当前输出来自演示数据而非真实飞行结论。
+- 补飞建议、风险触发记录和人工复核清单均以可扫描列表呈现，服务“闭环复盘”定位。
+
 ---
 
 ### Issue P2-S-017: Review Empty State And No-Incident State
+
+**Status:** Done
 
 **Priority:** P2
 
@@ -759,6 +788,13 @@ Phase 2 所有任务必须遵守：
 - 空状态不显得像 bug。
 - 文案不误导用户以为任务真实完成。
 - `npm run build` 通过。
+
+**Implementation Notes:**
+
+- 已新增通用 `EmptyState` 组件，统一处理复盘与重规划中的空状态。
+- 无 incident、无 risk trigger、无 uncovered area、无 makeup flight plan 时均展示稳定文案。
+- 空状态文案明确限定为 mock review 结果，不暗示真实任务已经完成或已获得合规放行。
+- Review summary badge 在无异常场景显示 `No Incident Injected`，避免把无异常误读成真实安全背书。
 
 ---
 
