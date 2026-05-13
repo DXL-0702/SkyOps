@@ -1,4 +1,12 @@
-import { AlertTriangle, CheckCircle2, Filter, ShieldAlert, UserCheck } from "lucide-react";
+import {
+  AlertTriangle,
+  CheckCircle2,
+  ChevronDown,
+  ChevronUp,
+  Filter,
+  ShieldAlert,
+  UserCheck,
+} from "lucide-react";
 import { useState } from "react";
 
 import type { RiskItem, RiskLevel } from "../../api/mission";
@@ -34,6 +42,8 @@ const filterOptions: Array<{ label: string; value: RiskFilter }> = [
   { label: "Medium", value: "medium" },
   { label: "Low", value: "low" },
 ];
+
+const COLLAPSED_EVIDENCE_COUNT = 2;
 
 function getRiskSurfaceClass(level: RiskLevel): string {
   return riskSurfaceStyles[level] ?? riskSurfaceStyles.default;
@@ -90,6 +100,45 @@ function getDecisionImpacts(risk: RiskItem): string[] {
   return Array.from(impacts).slice(0, 3);
 }
 
+function EvidenceList({ evidence }: { evidence: string[] }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const hiddenCount = Math.max(evidence.length - COLLAPSED_EVIDENCE_COUNT, 0);
+  const visibleEvidence = isExpanded ? evidence : evidence.slice(0, COLLAPSED_EVIDENCE_COUNT);
+
+  return (
+    <div className="mt-2 grid min-w-0 gap-2">
+      {visibleEvidence.map((item, index) => (
+        <div className={cn(listStyles.item, "min-w-0 overflow-hidden")} key={`${index}-${item}`}>
+          <span className={listStyles.dot} />
+          <span className="min-w-0 break-words">{item}</span>
+        </div>
+      ))}
+
+      {hiddenCount > 0 ? (
+        <button
+          className={cn(
+            buttonStyles.base,
+            "h-8 w-fit border border-zinc-800 bg-zinc-950 px-2.5 text-xs font-semibold text-zinc-400 hover:border-zinc-600 hover:text-zinc-100",
+          )}
+          onClick={() => setIsExpanded((current) => !current)}
+          type="button"
+        >
+          {isExpanded ? (
+            <>
+              <ChevronUp aria-hidden="true" size={14} />
+              Show less
+            </>
+          ) : (
+            <>
+              <ChevronDown aria-hidden="true" size={14} />+{hiddenCount} more
+            </>
+          )}
+        </button>
+      ) : null}
+    </div>
+  );
+}
+
 function RiskSummary({
   risks,
   filteredCount,
@@ -124,7 +173,7 @@ function RiskCard({ risk }: { risk: RiskItem }) {
   const decisionImpacts = getDecisionImpacts(risk);
 
   return (
-    <article className={cn("border p-4", getRiskSurfaceClass(risk.risk_level))}>
+    <article className={cn("min-w-0 overflow-hidden border p-4", getRiskSurfaceClass(risk.risk_level))}>
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
@@ -185,14 +234,7 @@ function RiskCard({ risk }: { risk: RiskItem }) {
 
         <div>
           <SectionLabel label="Evidence" />
-          <div className="mt-2 grid gap-2">
-            {risk.evidence.map((item) => (
-              <div className={listStyles.item} key={item}>
-                <span className={listStyles.dot} />
-                <span>{item}</span>
-              </div>
-            ))}
-          </div>
+          <EvidenceList evidence={risk.evidence} />
         </div>
       </div>
     </article>
