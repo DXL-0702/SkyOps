@@ -12,6 +12,7 @@ import {
 } from "../../api/mission";
 import { BackendStatus } from "./BackendStatus";
 import { EnvironmentDronePanel } from "./EnvironmentDronePanel";
+import { HumanExplanationPanel } from "./HumanExplanationPanel";
 import { IncidentReplanPanel } from "./IncidentReplanPanel";
 import { MissionInputPanel } from "./MissionInputPanel";
 import { MissionPlanPanel } from "./MissionPlanPanel";
@@ -172,6 +173,7 @@ export function MissionConsole() {
 
         <section className={layoutStyles.fullWidthGrid}>
           <SafetyThresholdPanel missionCycle={missionCycle} />
+          <HumanExplanationPanel missionCycle={missionCycle} />
         </section>
       </section>
     </main>

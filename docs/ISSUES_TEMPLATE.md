@@ -521,6 +521,8 @@ Phase 2 所有任务必须遵守：
 
 ### Issue P1-M-011: Human Explanation Panel
 
+**Status:** Done
+
 **Priority:** P1
 
 **Difficulty:** M
@@ -546,6 +548,14 @@ Phase 2 所有任务必须遵守：
 - 用户能区分事实、推理、建议和人工确认。
 - 列表为空时有稳定占位。
 - `npm run build` 通过。
+
+**Implementation Notes:**
+
+- 已新增 `HumanExplanationPanel`，展示 `human_explanation` 中的 facts、inferences、recommended_actions 和 human_confirmation_required。
+- 四类信息分别使用事实输入、模型推理、建议动作、人工确认的视觉层级，便于用户区分事实、推理和建议。
+- 面板顶部明确标注 `Not flight permission`，强调解释内容只用于决策辅助和复盘，不替代空域审批、现场安全责任或人工放飞确认。
+- 空列表会显示稳定占位，避免误以为空白区域是渲染异常。
+- 已接入 `MissionConsole` 的 full-width 区域，保持与 `SafetyThresholdPanel` 同一信息层级。
 
 ---
 
