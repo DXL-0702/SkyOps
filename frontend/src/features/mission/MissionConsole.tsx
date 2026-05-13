@@ -50,6 +50,8 @@ export function MissionConsole() {
   const [taskInput, setTaskInput] = useState(DEFAULT_TASK_INPUT);
   const [selectedIncident, setSelectedIncident] = useState(incidentPresets[0].event);
   const [missionCycle, setMissionCycle] = useState<MissionCycleState>({ status: "loading" });
+  const [isIncidentUpdating, setIsIncidentUpdating] = useState(false);
+  const [incidentUpdateError, setIncidentUpdateError] = useState<string | null>(null);
 
   function refreshBackendHealth() {
     setHealth({ status: "loading" });
@@ -89,8 +91,11 @@ export function MissionConsole() {
     };
   }, []);
 
-  async function runMissionCycle(incidentEvent: IncidentEvent = selectedIncident) {
+  async function runAllDemoFlow(incidentEvent: IncidentEvent = selectedIncident) {
+    setSelectedIncident(incidentEvent);
     setMissionCycle({ status: "loading" });
+    setIsIncidentUpdating(false);
+    setIncidentUpdateError(null);
 
     try {
       const plan = await createMissionPlan({
@@ -119,14 +124,55 @@ export function MissionConsole() {
   }
 
   useEffect(() => {
-    void runMissionCycle(incidentPresets[0].event);
+    void runAllDemoFlow(incidentPresets[0].event);
     // Initial mock mission cycle only.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  function handleIncidentSelect(incidentEvent: IncidentEvent) {
+  async function handleIncidentSelect(incidentEvent: IncidentEvent) {
     setSelectedIncident(incidentEvent);
-    void runMissionCycle(incidentEvent);
+
+    if (missionCycle.status !== "ready") {
+      await runAllDemoFlow(incidentEvent);
+      return;
+    }
+
+    setIsIncidentUpdating(true);
+    setIncidentUpdateError(null);
+
+    try {
+      const [replan, review] = await Promise.all([
+        createReplanDecision({
+          scenario_id: DEFAULT_SCENARIO_ID,
+          incident_event: incidentEvent,
+        }),
+        createMissionReview({
+          scenario_id: DEFAULT_SCENARIO_ID,
+          incident_events: [incidentEvent],
+        }),
+      ]);
+
+      setMissionCycle((currentCycle) => {
+        if (currentCycle.status !== "ready") {
+          return currentCycle;
+        }
+
+        return {
+          status: "ready",
+          plan: currentCycle.plan,
+          replan,
+          review,
+          incidentEvent,
+        };
+      });
+    } catch (error: unknown) {
+      console.error("Incident replan or review update failed.", error);
+      setIncidentUpdateError(
+        "Incident update failed. The current mission plan is preserved for manual review.",
+      );
+    } finally {
+      setIsIncidentUpdating(false);
+    }
   }
 
   return (
@@ -155,8 +201,10 @@ export function MissionConsole() {
             missionCycle={missionCycle}
             taskInput={taskInput}
             selectedIncident={selectedIncident}
+            isIncidentUpdating={isIncidentUpdating}
+            incidentUpdateError={incidentUpdateError}
             onIncidentSelect={handleIncidentSelect}
-            onRun={() => void runMissionCycle()}
+            onRun={() => void runAllDemoFlow()}
             onTaskInputChange={setTaskInput}
           />
 
