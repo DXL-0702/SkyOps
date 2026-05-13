@@ -177,6 +177,7 @@ export function MissionInputPanel({
             const Icon = preset.icon;
             const incident = preset.event;
             const isActive = selectedIncident.id === incident.id;
+            const isPending = isIncidentUpdating && isActive;
 
             return (
               <button
@@ -205,9 +206,16 @@ export function MissionInputPanel({
                       <Icon aria-hidden="true" size={17} />
                     </span>
                     <div className="min-w-0">
-                      <p className="break-words text-sm font-semibold text-white">
-                        {incident.event_type}
-                      </p>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="break-words text-sm font-semibold text-white">
+                          {incident.event_type}
+                        </p>
+                        {isPending ? (
+                          <span className={cn(badgeStyles.base, badgeStyles.warning)}>
+                            Updating
+                          </span>
+                        ) : null}
+                      </div>
                       <p className={cn(textStyles.muted, "mt-1")}>{preset.label} incident</p>
                     </div>
                   </div>

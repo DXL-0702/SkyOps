@@ -105,6 +105,15 @@ function EvidenceList({ evidence }: { evidence: string[] }) {
   const hiddenCount = Math.max(evidence.length - COLLAPSED_EVIDENCE_COUNT, 0);
   const visibleEvidence = isExpanded ? evidence : evidence.slice(0, COLLAPSED_EVIDENCE_COUNT);
 
+  if (evidence.length === 0) {
+    return (
+      <div className={cn(listStyles.item, "mt-2 text-zinc-500")}>
+        <span className="mt-2 h-1.5 w-1.5 shrink-0 bg-zinc-600" />
+        <span>No evidence items provided by this risk response.</span>
+      </div>
+    );
+  }
+
   return (
     <div className="mt-2 grid min-w-0 gap-2">
       {visibleEvidence.map((item, index) => (
@@ -116,10 +125,8 @@ function EvidenceList({ evidence }: { evidence: string[] }) {
 
       {hiddenCount > 0 ? (
         <button
-          className={cn(
-            buttonStyles.base,
-            "h-8 w-fit border border-zinc-800 bg-zinc-950 px-2.5 text-xs font-semibold text-zinc-400 hover:border-zinc-600 hover:text-zinc-100",
-          )}
+          aria-expanded={isExpanded}
+          className={cn(buttonStyles.base, buttonStyles.compact, "w-fit px-2.5")}
           onClick={() => setIsExpanded((current) => !current)}
           type="button"
         >

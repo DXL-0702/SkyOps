@@ -130,13 +130,13 @@ export function MissionConsole() {
   }, []);
 
   async function handleIncidentSelect(incidentEvent: IncidentEvent) {
-    setSelectedIncident(incidentEvent);
-
     if (missionCycle.status !== "ready") {
       await runAllDemoFlow(incidentEvent);
       return;
     }
 
+    const previousIncident = selectedIncident;
+    setSelectedIncident(incidentEvent);
     setIsIncidentUpdating(true);
     setIncidentUpdateError(null);
 
@@ -167,8 +167,9 @@ export function MissionConsole() {
       });
     } catch (error: unknown) {
       console.error("Incident replan or review update failed.", error);
+      setSelectedIncident(previousIncident);
       setIncidentUpdateError(
-        "Incident update failed. The current mission plan is preserved for manual review.",
+        "Incident update failed. The previous mission plan and active incident are preserved for manual review.",
       );
     } finally {
       setIsIncidentUpdating(false);

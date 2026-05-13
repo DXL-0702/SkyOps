@@ -561,6 +561,8 @@ Phase 2 所有任务必须遵守：
 
 ### Issue P2-S-012: Risk Evidence Display Polish
 
+**Status:** Done
+
 **Priority:** P2
 
 **Difficulty:** S
@@ -583,11 +585,21 @@ Phase 2 所有任务必须遵守：
 - 展开/收起逻辑简单稳定。
 - `npm run build` 通过。
 
+**Implementation Notes:**
+
+- 已新增 risk evidence 折叠展示，默认最多展示 2 条 evidence。
+- 超过 2 条时显示 `+N more`，并支持展开后 `Show less` 收起。
+- Evidence 文本使用 `min-w-0`、`overflow-hidden` 和 `break-words`，避免长文本撑破风险卡片。
+- 空 evidence 会显示稳定占位，避免误认为渲染异常。
+- 展开/收起按钮复用既有 compact button token，保持与 Phase 2 控件样式一致。
+
 ---
 
 ## Phase 2.5：异常注入与重规划展示
 
 ### Issue P1-L-013: Incident Control Panel Interaction Flow
+
+**Status:** Done
 
 **Priority:** P1
 
@@ -620,6 +632,15 @@ Phase 2 所有任务必须遵守：
 - 用户能清楚知道当前注入了什么异常。
 - 异常切换后重规划和复盘同步更新。
 - `npm run build` 通过。
+
+**Implementation Notes:**
+
+- 已将异常注入按钮升级为 Event Control Panel。
+- 每个异常卡片展示 `event_type`、`observed_value`、`threshold`、`severity` 和 `description`。
+- 点击异常后会更新 active incident，并调用 replan 与 review；当当前任务方案已 ready 时，会保留现有 mission plan，只同步替换 replan/review。
+- 已保留 `Run All Demo Flow`，用于完整执行 plan、replan、review 流程。
+- 异常更新中会禁用重复操作并展示 updating 状态。
+- 如果异常更新失败，会保留上一组 mission plan 和 active incident，并提示人工复核。
 
 ---
 
