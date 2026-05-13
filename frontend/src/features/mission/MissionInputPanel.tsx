@@ -3,6 +3,8 @@ import { Activity, AlertTriangle, CheckCircle2, Clock3, GitBranch, RotateCw } fr
 import type { IncidentEvent } from "../../api/mission";
 import { DataSourceBadge } from "./components/DataSourceBadge";
 import { PanelTitle } from "./components/PanelTitle";
+import type { Locale } from "./i18n";
+import { t } from "./i18n";
 import { incidentPresets } from "./incidentPresets";
 import type { MissionCycleState } from "./types";
 import {
@@ -17,6 +19,7 @@ import {
 } from "./uiTokens";
 
 type MissionInputPanelProps = {
+  locale: Locale;
   missionCycle: MissionCycleState;
   taskInput: string;
   isIncidentUpdating: boolean;
@@ -25,6 +28,7 @@ type MissionInputPanelProps = {
 };
 
 type IncidentControlPanelProps = {
+  locale: Locale;
   missionCycle: MissionCycleState;
   selectedIncident: IncidentEvent;
   isIncidentUpdating: boolean;
@@ -40,9 +44,11 @@ const missionPipeline = [
 ];
 
 function MissionCycleStatusCard({
+  locale,
   missionCycle,
   onRun,
 }: {
+  locale: Locale;
   missionCycle: MissionCycleState;
   onRun: () => void;
 }) {
@@ -50,12 +56,18 @@ function MissionCycleStatusCard({
     return (
       <div className={cn(stateStyles.readySurface, "mt-4")}>
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className="text-sm font-semibold text-teal-50">Decision loop ready</p>
-          <span className={cn(badgeStyles.base, badgeStyles.success)}>Explainable plan</span>
+          <p className="text-sm font-semibold text-teal-50">
+            {t(locale, "Decision loop ready")}
+          </p>
+          <span className={cn(badgeStyles.base, badgeStyles.success)}>
+            {t(locale, "Explainable plan")}
+          </span>
         </div>
         <p className="mt-2 text-xs leading-5 text-teal-100/80">
-          Plan, risk stack, incident response, and review summary are generated from mock mission
-          data.
+          {t(
+            locale,
+            "Plan, risk stack, incident response, and review summary are generated from mock mission data.",
+          )}
         </p>
       </div>
     );
@@ -65,18 +77,24 @@ function MissionCycleStatusCard({
     return (
       <div className={cn(stateStyles.loadingSurface, "mt-4")} aria-live="polite">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className="text-sm font-semibold text-white">Mission decision loop running</p>
-          <span className={cn(badgeStyles.base, badgeStyles.neutral)}>In progress</span>
+          <p className="text-sm font-semibold text-white">
+            {t(locale, "Mission decision loop running")}
+          </p>
+          <span className={cn(badgeStyles.base, badgeStyles.neutral)}>
+            {t(locale, "In progress")}
+          </span>
         </div>
         <p className={cn(textStyles.subtle, "mt-2")}>
-          SkyOps is turning the natural-language task into a constrained low-altitude operation
-          plan.
+          {t(
+            locale,
+            "SkyOps is turning the natural-language task into a constrained low-altitude operation plan.",
+          )}
         </p>
         <div className="mt-4 grid gap-2 sm:grid-cols-2">
           {missionPipeline.map((step) => (
             <div className={stateStyles.pipelineItem} key={step}>
               <Clock3 aria-hidden="true" className="shrink-0 text-teal-200" size={14} />
-              <span>{step}</span>
+              <span>{t(locale, step)}</span>
             </div>
           ))}
         </div>
@@ -87,14 +105,20 @@ function MissionCycleStatusCard({
   return (
     <div className={cn(stateStyles.failedSurface, "mt-4")} aria-live="polite">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm font-semibold text-red-50">Mission decision loop unavailable</p>
-        <span className={cn(badgeStyles.base, badgeStyles.danger)}>Manual review</span>
+        <p className="text-sm font-semibold text-red-50">
+          {t(locale, "Mission decision loop unavailable")}
+        </p>
+        <span className={cn(badgeStyles.base, badgeStyles.danger)}>
+          {t(locale, "Manual review")}
+        </span>
       </div>
-      <p className="mt-2 text-sm leading-6 text-red-50">{missionCycle.message}</p>
+      <p className="mt-2 text-sm leading-6 text-red-50">{t(locale, missionCycle.message)}</p>
 
       <div className="mt-4 grid gap-3 lg:grid-cols-2">
         <div>
-          <p className={cn(textStyles.strongLabel, "text-red-100/80")}>Possible Causes</p>
+          <p className={cn(textStyles.strongLabel, "text-red-100/80")}>
+            {t(locale, "Possible Causes")}
+          </p>
           <div className="mt-2 grid gap-2">
             {missionCycle.possibleCauses.map((cause) => (
               <div className={listStyles.item} key={cause}>
@@ -103,14 +127,16 @@ function MissionCycleStatusCard({
                   className="mt-0.5 shrink-0 text-red-200"
                   size={15}
                 />
-                <span>{cause}</span>
+                <span>{t(locale, cause)}</span>
               </div>
             ))}
           </div>
         </div>
 
         <div>
-          <p className={cn(textStyles.strongLabel, "text-red-100/80")}>Suggested Actions</p>
+          <p className={cn(textStyles.strongLabel, "text-red-100/80")}>
+            {t(locale, "Suggested Actions")}
+          </p>
           <div className="mt-2 grid gap-2">
             {missionCycle.suggestedActions.map((action) => (
               <div className={listStyles.item} key={action}>
@@ -119,7 +145,7 @@ function MissionCycleStatusCard({
                   className="mt-0.5 shrink-0 text-amber-200"
                   size={15}
                 />
-                <span>{action}</span>
+                <span>{t(locale, action)}</span>
               </div>
             ))}
           </div>
@@ -132,13 +158,14 @@ function MissionCycleStatusCard({
         type="button"
       >
         <RotateCw aria-hidden="true" size={15} />
-        Retry Mission Loop
+        {t(locale, "Retry Mission Loop")}
       </button>
     </div>
   );
 }
 
 export function MissionInputPanel({
+  locale,
   missionCycle,
   taskInput,
   isIncidentUpdating,
@@ -150,7 +177,11 @@ export function MissionInputPanel({
 
   return (
     <section className={panelStyles.base}>
-      <PanelTitle icon={Activity} title="Mission Intake" meta="Natural language" />
+      <PanelTitle
+        icon={Activity}
+        title={t(locale, "Mission Intake")}
+        meta={t(locale, "Natural language")}
+      />
 
       <textarea
         className={formStyles.textarea}
@@ -166,15 +197,16 @@ export function MissionInputPanel({
         type="button"
       >
         <GitBranch aria-hidden="true" size={17} />
-        {isRunning ? "Demo Flow Running" : "Run All Demo Flow"}
+        {t(locale, isRunning ? "Demo Flow Running" : "Run All Demo Flow")}
       </button>
 
-      <MissionCycleStatusCard missionCycle={missionCycle} onRun={onRun} />
+      <MissionCycleStatusCard locale={locale} missionCycle={missionCycle} onRun={onRun} />
     </section>
   );
 }
 
 export function IncidentControlPanel({
+  locale,
   missionCycle,
   selectedIncident,
   isIncidentUpdating,
@@ -186,20 +218,30 @@ export function IncidentControlPanel({
 
   return (
     <section className={panelStyles.base}>
-      <PanelTitle icon={GitBranch} title="Incident Control" meta="Replan trigger" />
+      <PanelTitle
+        icon={GitBranch}
+        title={t(locale, "Incident Control")}
+        meta={t(locale, "Replan trigger")}
+      />
 
       <div className={cn(panelStyles.surfacePadded, "mt-4")}>
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <p className={textStyles.strongLabel}>Event Control Panel</p>
+            <p className={textStyles.strongLabel}>{t(locale, "Event Control Panel")}</p>
             <p className={cn(textStyles.subtle, "mt-1")}>
-              Select one incident to inject, then synchronize replanning and review.
+              {t(locale, "Select one incident to inject, then synchronize replanning and review.")}
             </p>
           </div>
           {isIncidentUpdating ? (
-            <span className={cn(badgeStyles.base, badgeStyles.warning)}>Updating</span>
+            <span className={cn(badgeStyles.base, badgeStyles.warning)}>
+              {t(locale, "Updating")}
+            </span>
           ) : (
-            <DataSourceBadge sourceType={selectedIncident.source_type} label="Incident" />
+            <DataSourceBadge
+              locale={locale}
+              sourceType={selectedIncident.source_type}
+              label="Incident"
+            />
           )}
         </div>
 
@@ -243,11 +285,13 @@ export function IncidentControlPanel({
                         </p>
                         {isPending ? (
                           <span className={cn(badgeStyles.base, badgeStyles.warning)}>
-                            Updating
+                            {t(locale, "Updating")}
                           </span>
                         ) : null}
                       </div>
-                      <p className={cn(textStyles.muted, "mt-1")}>{preset.label} incident</p>
+                      <p className={cn(textStyles.muted, "mt-1")}>
+                        {t(locale, preset.label)} {t(locale, "Incident")}
+                      </p>
                     </div>
                   </div>
                   <span
@@ -260,26 +304,26 @@ export function IncidentControlPanel({
                           : badgeStyles.success,
                     )}
                   >
-                    {incident.severity}
+                    {t(locale, incident.severity)}
                   </span>
                 </div>
 
                 <div className="mt-4 grid gap-2 sm:grid-cols-2">
                   <div className="border border-zinc-800 bg-zinc-900/60 px-3 py-2">
-                    <p className={textStyles.label}>Observed Value</p>
+                    <p className={textStyles.label}>{t(locale, "Observed Value")}</p>
                     <p className="mt-1 break-words text-sm font-semibold text-zinc-100">
-                      {incident.observed_value}
+                      {t(locale, incident.observed_value)}
                     </p>
                   </div>
                   <div className="border border-zinc-800 bg-zinc-900/60 px-3 py-2">
-                    <p className={textStyles.label}>Threshold</p>
+                    <p className={textStyles.label}>{t(locale, "Threshold")}</p>
                     <p className="mt-1 break-words text-sm font-semibold text-zinc-100">
-                      {incident.threshold}
+                      {t(locale, incident.threshold)}
                     </p>
                   </div>
                 </div>
 
-                <p className={cn(textStyles.body, "mt-3")}>{incident.description}</p>
+                <p className={cn(textStyles.body, "mt-3")}>{t(locale, incident.description)}</p>
               </button>
             );
           })}
@@ -287,22 +331,32 @@ export function IncidentControlPanel({
 
         {incidentUpdateError ? (
           <div className={cn(stateStyles.failedSurface, "mt-4")} role="alert">
-            <p className="text-sm font-semibold text-red-50">Incident update unavailable</p>
-            <p className="mt-2 text-xs leading-5 text-red-50">{incidentUpdateError}</p>
+            <p className="text-sm font-semibold text-red-50">
+              {t(locale, "Incident update unavailable")}
+            </p>
+            <p className="mt-2 text-xs leading-5 text-red-50">{t(locale, incidentUpdateError)}</p>
           </div>
         ) : null}
       </div>
 
       <div className={cn(panelStyles.surfacePadded, "mt-4")}>
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className={textStyles.strongLabel}>Active Incident</p>
-          <DataSourceBadge sourceType={selectedIncident.source_type} label="Incident" />
+          <p className={textStyles.strongLabel}>{t(locale, "Active Incident")}</p>
+          <DataSourceBadge
+            locale={locale}
+            sourceType={selectedIncident.source_type}
+            label="Incident"
+          />
         </div>
-        <p className="mt-2 text-sm font-semibold text-white">{selectedIncident.event_type}</p>
-        <p className={cn(textStyles.subtle, "mt-1")}>
-          {selectedIncident.observed_value} / {selectedIncident.threshold}
+        <p className="mt-2 text-sm font-semibold text-white">
+          {t(locale, selectedIncident.event_type)}
         </p>
-        <p className={cn(textStyles.subtle, "mt-2")}>{selectedIncident.description}</p>
+        <p className={cn(textStyles.subtle, "mt-1")}>
+          {t(locale, selectedIncident.observed_value)} / {t(locale, selectedIncident.threshold)}
+        </p>
+        <p className={cn(textStyles.subtle, "mt-2")}>
+          {t(locale, selectedIncident.description)}
+        </p>
       </div>
     </section>
   );

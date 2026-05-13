@@ -15,6 +15,8 @@ import { PanelFallback } from "./components/PanelFallback";
 import { PanelTitle } from "./components/PanelTitle";
 import { ProgressMetric } from "./components/ProgressMetric";
 import { SectionLabel } from "./components/SectionLabel";
+import type { Locale } from "./i18n";
+import { t } from "./i18n";
 import type { MissionCycleState } from "./types";
 import { badgeStyles, cn, listStyles, panelStyles, textStyles } from "./uiTokens";
 
@@ -60,6 +62,7 @@ function isNoIncidentReviewNote(item: string): boolean {
 }
 
 function ReportList({
+  locale,
   title,
   items,
   emptyTitle,
@@ -67,6 +70,7 @@ function ReportList({
   icon,
   tone,
 }: {
+  locale: Locale;
   title: string;
   items: string[];
   emptyTitle: string;
@@ -84,15 +88,20 @@ function ReportList({
 
   return (
     <div>
-      <SectionLabel label={title} />
+      <SectionLabel label={t(locale, title)} />
       {items.length === 0 ? (
-        <EmptyState className="mt-3" icon={Icon} title={emptyTitle} message={emptyMessage} />
+        <EmptyState
+          className="mt-3"
+          icon={Icon}
+          title={t(locale, emptyTitle)}
+          message={t(locale, emptyMessage)}
+        />
       ) : (
         <div className="mt-3 grid gap-2">
           {items.map((item, index) => (
             <div className={listStyles.item} key={`${title}-${item}-${index}`}>
               <Icon aria-hidden="true" className={cn("mt-0.5 shrink-0", iconColor)} size={15} />
-              <span>{item}</span>
+              <span>{t(locale, item)}</span>
             </div>
           ))}
         </div>
@@ -101,9 +110,15 @@ function ReportList({
   );
 }
 
-export function MissionReviewPanel({ missionCycle }: { missionCycle: MissionCycleState }) {
+export function MissionReviewPanel({
+  locale,
+  missionCycle,
+}: {
+  locale: Locale;
+  missionCycle: MissionCycleState;
+}) {
   if (missionCycle.status !== "ready") {
-    return <PanelFallback title="Mission Review" state={missionCycle.status} />;
+    return <PanelFallback locale={locale} title="Mission Review" state={missionCycle.status} />;
   }
 
   const review = missionCycle.review.mission_review;
@@ -139,28 +154,44 @@ export function MissionReviewPanel({ missionCycle }: { missionCycle: MissionCycl
 
   return (
     <section className={panelStyles.base}>
-      <PanelTitle icon={CheckCircle2} title="Mission Review" meta={review.mission_id} />
+      <PanelTitle icon={CheckCircle2} title={t(locale, "Mission Review")} meta={review.mission_id} />
 
       <div className="mt-4 flex flex-wrap gap-2">
-        <DataSourceBadge sourceType={missionCycle.plan.mission_task.source_type} label="Mission" />
-        <DataSourceBadge sourceType={missionCycle.incidentEvent.source_type} label="Incident" />
-        <DataSourceBadge sourceType="mock" label="Review Result" />
+        <DataSourceBadge
+          locale={locale}
+          sourceType={missionCycle.plan.mission_task.source_type}
+          label="Mission"
+        />
+        <DataSourceBadge
+          locale={locale}
+          sourceType={missionCycle.incidentEvent.source_type}
+          label="Incident"
+        />
+        <DataSourceBadge locale={locale} sourceType="mock" label="Review Result" />
       </div>
 
       <div className={cn(panelStyles.surfacePadded, "mt-4")}>
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <SectionLabel label="Review Report" />
-          <span className={cn(badgeStyles.base, reviewBadgeStyle)}>{reviewBadgeLabel}</span>
+          <SectionLabel label={t(locale, "Review Report")} />
+          <span className={cn(badgeStyles.base, reviewBadgeStyle)}>
+            {t(locale, reviewBadgeLabel)}
+          </span>
         </div>
         <p className={cn(textStyles.subtle, "mt-2")}>
-          Mission completion, data quality, triggered risks, uncovered work, and next-step review
-          items are generated from mock review data.
+          {t(
+            locale,
+            "Mission completion, data quality, triggered risks, uncovered work, and next-step review items are generated from mock review data.",
+          )}
         </p>
       </div>
 
       <div className="mt-4 grid gap-3 md:grid-cols-2">
-        <ProgressMetric label="Mission Completion" value={review.completion_rate} />
-        <ProgressMetric label="Data Quality" value={review.data_quality_score} />
+        <ProgressMetric
+          label="Mission Completion"
+          locale={locale}
+          value={review.completion_rate}
+        />
+        <ProgressMetric label="Data Quality" locale={locale} value={review.data_quality_score} />
       </div>
 
       <div className="mt-4">
@@ -169,6 +200,7 @@ export function MissionReviewPanel({ missionCycle }: { missionCycle: MissionCycl
           emptyMessage="The current mock review did not include injected incident events."
           icon={Zap}
           items={incidentEvents}
+          locale={locale}
           title="Incident Events"
           tone="amber"
         />
@@ -180,6 +212,7 @@ export function MissionReviewPanel({ missionCycle }: { missionCycle: MissionCycl
           emptyMessage="No incident-derived risk trigger is present in this mock review."
           icon={AlertTriangle}
           items={riskTriggerLog}
+          locale={locale}
           title="Risk Trigger Log"
           tone="red"
         />
@@ -191,6 +224,7 @@ export function MissionReviewPanel({ missionCycle }: { missionCycle: MissionCycl
           emptyMessage="The mock review did not list unfinished work. Keep final completion subject to human review."
           icon={MapPinned}
           items={uncoveredAreas}
+          locale={locale}
           title="Uncovered Areas"
           tone="amber"
         />
@@ -199,6 +233,7 @@ export function MissionReviewPanel({ missionCycle }: { missionCycle: MissionCycl
           emptyMessage="The mock review did not recommend a makeup flight. This is not a regulatory clearance."
           icon={Plane}
           items={makeupFlightPlan}
+          locale={locale}
           title="Makeup Flight Plan"
           tone={hasMakeupFlightSuggestion ? "amber" : "teal"}
         />
@@ -210,6 +245,7 @@ export function MissionReviewPanel({ missionCycle }: { missionCycle: MissionCycl
           emptyMessage="No human review checklist item was returned by the mock review."
           icon={ClipboardCheck}
           items={humanReviewChecklist}
+          locale={locale}
           title="Human Review Checklist"
           tone="amber"
         />
@@ -218,6 +254,7 @@ export function MissionReviewPanel({ missionCycle }: { missionCycle: MissionCycl
           emptyMessage="No next-mission optimization was returned by the mock review."
           icon={Sparkles}
           items={nextMissionOptimizations}
+          locale={locale}
           title="Next Mission Optimizations"
           tone="teal"
         />

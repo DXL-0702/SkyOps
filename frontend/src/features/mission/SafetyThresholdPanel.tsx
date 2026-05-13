@@ -3,6 +3,8 @@ import { ShieldAlert } from "lucide-react";
 import { DataSourceBadge } from "./components/DataSourceBadge";
 import { PanelFallback } from "./components/PanelFallback";
 import { PanelTitle } from "./components/PanelTitle";
+import type { Locale } from "./i18n";
+import { t } from "./i18n";
 import type { MissionCycleState } from "./types";
 import { badgeStyles, cn, panelStyles, textStyles } from "./uiTokens";
 
@@ -41,16 +43,16 @@ function getMinLimitStatus(current: number, min: number, watchMargin: number): L
   return "within";
 }
 
-function getStatusLabel(status: LimitStatus): string {
+function getStatusLabel(status: LimitStatus, locale: Locale): string {
   if (status === "triggered") {
-    return "TRIGGERED";
+    return t(locale, "TRIGGERED");
   }
 
   if (status === "watch") {
-    return "WATCH";
+    return t(locale, "WATCH");
   }
 
-  return "WITHIN LIMIT";
+  return t(locale, "WITHIN LIMIT");
 }
 
 function getStatusBadgeClass(status: LimitStatus): string {
@@ -77,48 +79,62 @@ function getStatusSurfaceClass(status: LimitStatus): string {
   return panelStyles.surfacePadded;
 }
 
-function LimitStatusBadge({ status }: { status: LimitStatus }) {
+function LimitStatusBadge({ locale, status }: { locale: Locale; status: LimitStatus }) {
   return (
     <span className={cn(badgeStyles.base, getStatusBadgeClass(status))}>
-      {getStatusLabel(status)}
+      {getStatusLabel(status, locale)}
     </span>
   );
 }
 
-function ThresholdCard({ item }: { item: ThresholdItem }) {
+function ThresholdCard({ item, locale }: { item: ThresholdItem; locale: Locale }) {
   return (
     <article className={cn("p-4", getStatusSurfaceClass(item.status))}>
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className={textStyles.strongLabel}>{item.label}</p>
-          <p className="mt-2 text-sm font-semibold text-white">Current: {item.currentValue}</p>
-          <p className={cn(textStyles.subtle, "mt-1")}>Limit: {item.limitValue}</p>
+          <p className="mt-2 text-sm font-semibold text-white">
+            {t(locale, "Current")}: {item.currentValue}
+          </p>
+          <p className={cn(textStyles.subtle, "mt-1")}>
+            {t(locale, "Limit")}: {item.limitValue}
+          </p>
         </div>
-        <LimitStatusBadge status={item.status} />
+        <LimitStatusBadge locale={locale} status={item.status} />
       </div>
-      <p className={cn(textStyles.body, "mt-3")}>{item.explanation}</p>
+      <p className={cn(textStyles.body, "mt-3")}>{t(locale, item.explanation)}</p>
     </article>
   );
 }
 
-function AbortRuleCard({ condition }: { condition: string }) {
+function AbortRuleCard({ condition, locale }: { condition: string; locale: Locale }) {
   return (
     <article className={cn(panelStyles.surfacePadded, "border-l-2 border-l-red-400/70")}>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="break-words text-sm font-semibold text-white">{condition}</p>
-        <span className={cn(badgeStyles.base, badgeStyles.danger)}>ABORT RULE</span>
+        <p className="break-words text-sm font-semibold text-white">{t(locale, condition)}</p>
+        <span className={cn(badgeStyles.base, badgeStyles.danger)}>
+          {t(locale, "ABORT RULE")}
+        </span>
       </div>
       <p className={cn(textStyles.muted, "mt-2")}>
-        Rule is defined as a conservative stop condition. It stays neutral until current
-        telemetry enters watch or triggered range.
+        {t(
+          locale,
+          "Rule is defined as a conservative stop condition. It stays neutral until current telemetry enters watch or triggered range.",
+        )}
       </p>
     </article>
   );
 }
 
-export function SafetyThresholdPanel({ missionCycle }: { missionCycle: MissionCycleState }) {
+export function SafetyThresholdPanel({
+  locale,
+  missionCycle,
+}: {
+  locale: Locale;
+  missionCycle: MissionCycleState;
+}) {
   if (missionCycle.status !== "ready") {
-    return <PanelFallback title="Safety Thresholds" state={missionCycle.status} />;
+    return <PanelFallback locale={locale} title="Safety Thresholds" state={missionCycle.status} />;
   }
 
   const { environment_state: environment, drone_state: drone, mission_plan: missionPlan } =
@@ -166,28 +182,38 @@ export function SafetyThresholdPanel({ missionCycle }: { missionCycle: MissionCy
 
   return (
     <section className={panelStyles.base}>
-      <PanelTitle icon={ShieldAlert} title="Safety Thresholds" meta="Abort Logic" />
+      <PanelTitle
+        icon={ShieldAlert}
+        title={t(locale, "Safety Thresholds")}
+        meta={t(locale, "Abort Logic")}
+      />
 
       <div className="mt-4 flex flex-wrap gap-2">
-        <DataSourceBadge sourceType={environment.source_type} label="Environment" />
-        <DataSourceBadge sourceType={drone.source_type} label="Drone" />
-        <DataSourceBadge sourceType={missionCycle.plan.mission_task.source_type} label="Rules" />
+        <DataSourceBadge locale={locale} sourceType={environment.source_type} label="Environment" />
+        <DataSourceBadge locale={locale} sourceType={drone.source_type} label="Drone" />
+        <DataSourceBadge
+          locale={locale}
+          sourceType={missionCycle.plan.mission_task.source_type}
+          label="Rules"
+        />
       </div>
 
       <div className="mt-4 grid gap-3 lg:grid-cols-4">
         {thresholdItems.map((item) => (
-          <ThresholdCard item={item} key={item.id} />
+          <ThresholdCard item={item} key={item.id} locale={locale} />
         ))}
       </div>
 
       <div className="mt-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className={textStyles.strongLabel}>Abort Conditions</p>
-          <span className={cn(badgeStyles.base, badgeStyles.neutral)}>RULE ONLY</span>
+          <p className={textStyles.strongLabel}>{t(locale, "Abort Conditions")}</p>
+          <span className={cn(badgeStyles.base, badgeStyles.neutral)}>
+            {t(locale, "RULE ONLY")}
+          </span>
         </div>
         <div className="mt-3 grid gap-3 md:grid-cols-2">
           {missionPlan.abort_conditions.map((condition) => (
-            <AbortRuleCard condition={condition} key={condition} />
+            <AbortRuleCard condition={condition} key={condition} locale={locale} />
           ))}
         </div>
       </div>

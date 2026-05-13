@@ -11,6 +11,8 @@ import type { Explanation } from "../../api/mission";
 import { DataSourceBadge } from "./components/DataSourceBadge";
 import { PanelFallback } from "./components/PanelFallback";
 import { PanelTitle } from "./components/PanelTitle";
+import type { Locale } from "./i18n";
+import { t } from "./i18n";
 import type { MissionCycleState } from "./types";
 import { badgeStyles, cn, listStyles, panelStyles, textStyles } from "./uiTokens";
 
@@ -26,16 +28,26 @@ type ExplanationSection = {
   surfaceClassName: string;
 };
 
-function EmptyExplanationItem({ label }: { label: string }) {
+function EmptyExplanationItem({ label, locale }: { label: string; locale: Locale }) {
   return (
     <div className={cn(listStyles.item, "text-zinc-500")}>
       <span className="mt-2 h-1.5 w-1.5 shrink-0 bg-zinc-600" />
-      <span>No {label.toLowerCase()} provided by this mission response.</span>
+      <span>
+        {locale === "zh"
+          ? `该任务响应未提供${label}。`
+          : `No ${label.toLowerCase()} provided by this mission response.`}
+      </span>
     </div>
   );
 }
 
-function ExplanationList({ section }: { section: ExplanationSection }) {
+function ExplanationList({
+  locale,
+  section,
+}: {
+  locale: Locale;
+  section: ExplanationSection;
+}) {
   const Icon = section.icon;
 
   return (
@@ -51,11 +63,15 @@ function ExplanationList({ section }: { section: ExplanationSection }) {
             <Icon aria-hidden="true" size={17} />
           </div>
           <div className="min-w-0">
-            <p className="break-words text-sm font-semibold text-white">{section.title}</p>
-            <p className={cn(textStyles.subtle, "mt-1")}>{section.description}</p>
+            <p className="break-words text-sm font-semibold text-white">
+              {t(locale, section.title)}
+            </p>
+            <p className={cn(textStyles.subtle, "mt-1")}>{t(locale, section.description)}</p>
           </div>
         </div>
-        <span className={cn(badgeStyles.base, badgeStyles.neutral)}>{section.badge}</span>
+        <span className={cn(badgeStyles.base, badgeStyles.neutral)}>
+          {t(locale, section.badge)}
+        </span>
       </div>
 
       <div className="mt-4 grid gap-2">
@@ -67,11 +83,11 @@ function ExplanationList({ section }: { section: ExplanationSection }) {
                 className={cn("mt-0.5 shrink-0", section.iconClassName)}
                 size={15}
               />
-              <span>{item}</span>
+              <span>{t(locale, item)}</span>
             </div>
           ))
         ) : (
-          <EmptyExplanationItem label={section.title} />
+          <EmptyExplanationItem label={t(locale, section.title)} locale={locale} />
         )}
       </div>
     </article>
@@ -127,16 +143,23 @@ function buildExplanationSections(explanation: Explanation): ExplanationSection[
   ];
 }
 
-export function HumanExplanationPanel({ missionCycle }: { missionCycle: MissionCycleState }) {
+export function HumanExplanationPanel({
+  locale,
+  missionCycle,
+}: {
+  locale: Locale;
+  missionCycle: MissionCycleState;
+}) {
   if (missionCycle.status !== "ready") {
     return (
       <PanelFallback
+        locale={locale}
         title="Human Explanation"
         state={missionCycle.status}
         message={
           missionCycle.status === "failed"
             ? missionCycle.message
-            : "Waiting for facts, inferences, recommended actions, and human confirmation items."
+            : t(locale, "Waiting for facts, inferences, recommended actions, and human confirmation items.")
         }
       />
     );
@@ -147,28 +170,43 @@ export function HumanExplanationPanel({ missionCycle }: { missionCycle: MissionC
 
   return (
     <section className={panelStyles.base}>
-      <PanelTitle icon={ShieldAlert} title="Human Explanation" meta="Decision Basis" />
+      <PanelTitle
+        icon={ShieldAlert}
+        title={t(locale, "Human Explanation")}
+        meta={t(locale, "Decision Basis")}
+      />
 
       <div className="mt-4 flex flex-wrap gap-2">
-        <DataSourceBadge sourceType={missionCycle.plan.mission_task.source_type} label="Mission" />
         <DataSourceBadge
+          locale={locale}
+          sourceType={missionCycle.plan.mission_task.source_type}
+          label="Mission"
+        />
+        <DataSourceBadge
+          locale={locale}
           sourceType={missionCycle.plan.environment_state.source_type}
           label="Inputs"
         />
-        <span className={cn(badgeStyles.base, badgeStyles.warning)}>Not flight permission</span>
+        <span className={cn(badgeStyles.base, badgeStyles.warning)}>
+          {t(locale, "Not flight permission")}
+        </span>
       </div>
 
       <div className={cn(panelStyles.textSurface, "mt-4 border-amber-400/30 bg-amber-400/5")}>
-        <p className="text-sm font-semibold text-amber-100">Decision support only</p>
+        <p className="text-sm font-semibold text-amber-100">
+          {t(locale, "Decision support only")}
+        </p>
         <p className={cn(textStyles.subtle, "mt-2 text-amber-100/80")}>
-          These explanations make the mission plan auditable. They do not replace airspace
-          approval, site safety responsibility, or manual go/no-go confirmation.
+          {t(
+            locale,
+            "These explanations make the mission plan auditable. They do not replace airspace approval, site safety responsibility, or manual go/no-go confirmation.",
+          )}
         </p>
       </div>
 
       <div className="mt-4 grid gap-3 xl:grid-cols-2">
         {sections.map((section) => (
-          <ExplanationList key={section.id} section={section} />
+          <ExplanationList key={section.id} locale={locale} section={section} />
         ))}
       </div>
     </section>

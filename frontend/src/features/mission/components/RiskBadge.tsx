@@ -1,3 +1,5 @@
+import type { Locale } from "../i18n";
+import { t } from "../i18n";
 import { cn, riskToneStyles } from "../uiTokens";
 
 function getRiskBadgeClass(level: string): string {
@@ -20,7 +22,7 @@ function getRiskBadgeClass(level: string): string {
   return riskToneStyles.default;
 }
 
-export function RiskBadge({ level }: { level: string }) {
+export function RiskBadge({ level, locale = "en" }: { level: string; locale?: Locale }) {
   return (
     <span
       className={cn(
@@ -28,7 +30,7 @@ export function RiskBadge({ level }: { level: string }) {
         getRiskBadgeClass(level),
       )}
     >
-      {level}
+      {t(locale, level)}
     </span>
   );
 }

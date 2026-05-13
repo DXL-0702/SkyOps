@@ -15,6 +15,8 @@ import { PanelFallback } from "./components/PanelFallback";
 import { PanelTitle } from "./components/PanelTitle";
 import { RiskBadge } from "./components/RiskBadge";
 import { SectionLabel } from "./components/SectionLabel";
+import type { Locale } from "./i18n";
+import { t } from "./i18n";
 import type { MissionCycleState } from "./types";
 import {
   badgeStyles,
@@ -100,7 +102,7 @@ function getDecisionImpacts(risk: RiskItem): string[] {
   return Array.from(impacts).slice(0, 3);
 }
 
-function EvidenceList({ evidence }: { evidence: string[] }) {
+function EvidenceList({ evidence, locale }: { evidence: string[]; locale: Locale }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const hiddenCount = Math.max(evidence.length - COLLAPSED_EVIDENCE_COUNT, 0);
   const visibleEvidence = isExpanded ? evidence : evidence.slice(0, COLLAPSED_EVIDENCE_COUNT);
@@ -109,7 +111,7 @@ function EvidenceList({ evidence }: { evidence: string[] }) {
     return (
       <div className={cn(listStyles.item, "mt-2 text-zinc-500")}>
         <span className="mt-2 h-1.5 w-1.5 shrink-0 bg-zinc-600" />
-        <span>No evidence items provided by this risk response.</span>
+        <span>{t(locale, "No evidence items provided by this risk response.")}</span>
       </div>
     );
   }
@@ -133,7 +135,7 @@ function EvidenceList({ evidence }: { evidence: string[] }) {
           {isExpanded ? (
             <>
               <ChevronUp aria-hidden="true" size={14} />
-              Show less
+              {t(locale, "Show less")}
             </>
           ) : (
             <>
@@ -147,9 +149,11 @@ function EvidenceList({ evidence }: { evidence: string[] }) {
 }
 
 function RiskSummary({
+  locale,
   risks,
   filteredCount,
 }: {
+  locale: Locale;
   risks: RiskItem[];
   filteredCount: number;
 }) {
@@ -161,22 +165,22 @@ function RiskSummary({
   return (
     <div className="mt-4 grid gap-3 sm:grid-cols-3">
       <div className={panelStyles.surfacePadded}>
-        <p className={textStyles.strongLabel}>Visible Risks</p>
+        <p className={textStyles.strongLabel}>{t(locale, "Visible Risks")}</p>
         <p className="mt-2 text-2xl font-semibold text-white">{filteredCount}</p>
       </div>
       <div className={cn(panelStyles.surfacePadded, "border-red-400/30 bg-red-400/5")}>
-        <p className={textStyles.strongLabel}>High Priority</p>
+        <p className={textStyles.strongLabel}>{t(locale, "High Priority")}</p>
         <p className="mt-2 text-2xl font-semibold text-red-100">{criticalOrHigh}</p>
       </div>
       <div className={cn(panelStyles.surfacePadded, "border-amber-400/30 bg-amber-400/5")}>
-        <p className={textStyles.strongLabel}>Human Confirm</p>
+        <p className={textStyles.strongLabel}>{t(locale, "Human Confirm")}</p>
         <p className="mt-2 text-2xl font-semibold text-amber-100">{manualCount}</p>
       </div>
     </div>
   );
 }
 
-function RiskCard({ risk }: { risk: RiskItem }) {
+function RiskCard({ locale, risk }: { locale: Locale; risk: RiskItem }) {
   const decisionImpacts = getDecisionImpacts(risk);
 
   return (
@@ -184,29 +188,31 @@ function RiskCard({ risk }: { risk: RiskItem }) {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <p className="break-words text-sm font-semibold text-white">{risk.category}</p>
+            <p className="break-words text-sm font-semibold text-white">
+              {t(locale, risk.category)}
+            </p>
             <span className={cn(badgeStyles.base, badgeStyles.neutral)}>
-              {getRiskDecisionType(risk.risk_level)}
+              {t(locale, getRiskDecisionType(risk.risk_level))}
             </span>
           </div>
           <p className={cn(textStyles.label, "mt-2 break-words")}>{risk.trigger_condition}</p>
         </div>
-        <RiskBadge level={risk.risk_level} />
+        <RiskBadge locale={locale} level={risk.risk_level} />
       </div>
 
-      <p className={cn(textStyles.body, "mt-3 text-zinc-200")}>{risk.description}</p>
+      <p className={cn(textStyles.body, "mt-3 text-zinc-200")}>{t(locale, risk.description)}</p>
 
       <div className="mt-4 grid gap-3 xl:grid-cols-2">
         <div>
-          <SectionLabel label="Mitigation" />
+          <SectionLabel label={t(locale, "Mitigation")} />
           <div className={cn(listStyles.item, "mt-2")}>
             <ShieldAlert aria-hidden="true" className="mt-0.5 shrink-0 text-teal-200" size={15} />
-            <span>{risk.mitigation}</span>
+            <span>{t(locale, risk.mitigation)}</span>
           </div>
         </div>
 
         <div>
-          <SectionLabel label="Human Confirmation" />
+          <SectionLabel label={t(locale, "Human Confirmation")} />
           <div className={cn(listStyles.item, "mt-2")}>
             {risk.requires_human_confirmation ? (
               <UserCheck aria-hidden="true" className="mt-0.5 shrink-0 text-amber-200" size={15} />
@@ -219,8 +225,8 @@ function RiskCard({ risk }: { risk: RiskItem }) {
             )}
             <span>
               {risk.requires_human_confirmation
-                ? "Required before execution or replanning."
-                : "Not required by this risk item; continue monitoring."}
+                ? t(locale, "Required before execution or replanning.")
+                : t(locale, "Not required by this risk item; continue monitoring.")}
             </span>
           </div>
         </div>
@@ -228,38 +234,45 @@ function RiskCard({ risk }: { risk: RiskItem }) {
 
       <div className="mt-4 grid gap-3 xl:grid-cols-2">
         <div>
-          <SectionLabel label="Decision Impact" />
+          <SectionLabel label={t(locale, "Decision Impact")} />
           <div className="mt-2 grid gap-2">
             {decisionImpacts.map((impact) => (
               <div className={listStyles.item} key={impact}>
                 <span className={listStyles.dot} />
-                <span>{impact}</span>
+                <span>{t(locale, impact)}</span>
               </div>
             ))}
           </div>
         </div>
 
         <div>
-          <SectionLabel label="Evidence" />
-          <EvidenceList evidence={risk.evidence} />
+          <SectionLabel label={t(locale, "Evidence")} />
+          <EvidenceList evidence={risk.evidence.map((item) => t(locale, item))} locale={locale} />
         </div>
       </div>
     </article>
   );
 }
 
-export function RiskPanel({ missionCycle }: { missionCycle: MissionCycleState }) {
+export function RiskPanel({
+  locale,
+  missionCycle,
+}: {
+  locale: Locale;
+  missionCycle: MissionCycleState;
+}) {
   const [activeFilter, setActiveFilter] = useState<RiskFilter>("all");
 
   if (missionCycle.status !== "ready") {
     return (
       <PanelFallback
         title="Risk Stack"
+        locale={locale}
         state={missionCycle.status}
         message={
           missionCycle.status === "failed"
             ? missionCycle.message
-            : "Waiting for risk simulation results from the mission decision loop."
+            : t(locale, "Waiting for risk simulation results from the mission decision loop.")
         }
       />
     );
@@ -275,19 +288,22 @@ export function RiskPanel({ missionCycle }: { missionCycle: MissionCycleState })
 
   return (
     <aside className={panelStyles.base}>
-      <PanelTitle icon={AlertTriangle} title="Risk Stack" meta="Explainable" />
+      <PanelTitle icon={AlertTriangle} title={t(locale, "Risk Stack")} meta={t(locale, "Explainable")} />
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap gap-2">
           <DataSourceBadge
             sourceType={missionCycle.plan.mission_task.source_type}
             label="Risk Assessment"
+            locale={locale}
           />
-          <span className={cn(badgeStyles.base, badgeStyles.neutral)}>Sorted by severity</span>
+          <span className={cn(badgeStyles.base, badgeStyles.neutral)}>
+            {t(locale, "Sorted by severity")}
+          </span>
         </div>
         <div className="flex items-center gap-2 text-xs text-zinc-500">
           <Filter aria-hidden="true" size={14} />
-          <span>Filter</span>
+          <span>{t(locale, "Filter")}</span>
         </div>
       </div>
 
@@ -303,20 +319,22 @@ export function RiskPanel({ missionCycle }: { missionCycle: MissionCycleState })
             onClick={() => setActiveFilter(option.value)}
             type="button"
           >
-            {option.label}
+            {t(locale, option.label)}
           </button>
         ))}
       </div>
 
-      <RiskSummary risks={sortedRisks} filteredCount={filteredRisks.length} />
+      <RiskSummary locale={locale} risks={sortedRisks} filteredCount={filteredRisks.length} />
 
       <div className="mt-4 grid gap-3">
         {filteredRisks.length > 0 ? (
-          filteredRisks.map((risk) => <RiskCard key={risk.id} risk={risk} />)
+          filteredRisks.map((risk) => <RiskCard key={risk.id} locale={locale} risk={risk} />)
         ) : (
           <div className={cn(panelStyles.surfacePadded, "text-sm text-zinc-300")}>
-            No risks match this filter. The complete risk assessment is still available under
-            other severity levels.
+            {t(
+              locale,
+              "No risks match this filter. The complete risk assessment is still available under other severity levels.",
+            )}
           </div>
         )}
       </div>

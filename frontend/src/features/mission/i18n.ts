@@ -1,5 +1,470 @@
 export type Locale = "zh" | "en";
 
+const zhText: Record<string, string> = {
+  loading: "加载中",
+  online: "在线",
+  offline: "离线",
+  ready: "已就绪",
+  failed: "失败",
+  mock: "模拟",
+  simulated: "仿真",
+  real: "真实",
+  MOCK: "模拟",
+  SIMULATED: "仿真",
+  REAL: "真实",
+  critical: "严重",
+  high: "高",
+  medium: "中",
+  low: "低",
+  "Manual review": "人工复核",
+  "Manual Review": "人工复核",
+  "Backend online": "后端在线",
+  "Backend offline": "后端离线",
+  "Checking mission autonomy backend": "正在检查任务自治后端",
+  "Retry health check": "重新检查后端",
+  "Open backend URL": "打开后端地址",
+  Endpoint: "接口地址",
+
+  "Mission Intake": "任务输入",
+  "Natural language": "自然语言",
+  "Run All Demo Flow": "运行完整演示流程",
+  "Demo Flow Running": "演示流程运行中",
+  "Decision loop ready": "决策闭环已就绪",
+  "Explainable plan": "可解释方案",
+  "Plan, risk stack, incident response, and review summary are generated from mock mission data.":
+    "任务方案、风险栈、异常处置和复盘摘要均由模拟任务数据生成。",
+  "Mission decision loop running": "任务决策闭环运行中",
+  "In progress": "进行中",
+  "SkyOps is turning the natural-language task into a constrained low-altitude operation plan.":
+    "SkyOps 正在将自然语言任务转化为带约束的低空作业方案。",
+  "Task parsing": "任务解析",
+  "Constraint reasoning": "约束推理",
+  "Risk simulation": "风险推演",
+  "Replan and review": "重规划与复盘",
+  "Mission decision loop unavailable": "任务决策闭环不可用",
+  "Possible Causes": "可能原因",
+  "Suggested Actions": "建议动作",
+  "Retry Mission Loop": "重试任务闭环",
+  "Incident Control": "异常控制",
+  "Replan trigger": "重规划触发",
+  "Event Control Panel": "事件控制面板",
+  "Select one incident to inject, then synchronize replanning and review.":
+    "选择一个异常注入事件，然后同步更新重规划与复盘。",
+  Updating: "更新中",
+  Incident: "异常",
+  "Observed Value": "观测值",
+  Threshold: "阈值",
+  "Incident update unavailable": "异常更新不可用",
+  "Active Incident": "当前异常",
+
+  "Mission Plan": "任务方案",
+  Planning: "规划",
+  "Mission Task": "任务",
+  Environment: "环境",
+  Airspace: "空域",
+  Drone: "设备",
+  Coverage: "覆盖率",
+  Duration: "时长",
+  Wind: "风速",
+  GPS: "GPS",
+  Video: "图传",
+  Battery: "电量",
+  "Operation Object": "作业对象",
+  "Operation Area": "作业区域",
+  "Risk Preference": "风险偏好",
+  "Operation Goals": "作业目标",
+  "Time Window": "时间窗口",
+  Requested: "用户要求",
+  "Route Strategy": "航线策略",
+  "Launch And Landing Points": "起降点",
+  "Flight Segments": "飞行分段",
+  "Safety Thresholds": "安全阈值",
+
+  "Environment & Drone": "环境与设备",
+  "Planning Inputs": "规划输入",
+  "Environment State": "环境状态",
+  Visibility: "能见度",
+  "GPS Confidence": "GPS 置信度",
+  "Data Confidence": "数据置信度",
+  "Crowd level": "人流等级",
+  "Data confidence": "数据置信度",
+  "Drone State": "设备状态",
+  Endurance: "续航",
+  "RTH Battery": "返航电量",
+  "Video Latency": "图传延迟",
+  Aircraft: "无人机",
+  AVAILABLE: "可用",
+  UNAVAILABLE: "不可用",
+  "Link Quality": "链路质量",
+
+  "Risk Stack": "风险栈",
+  Explainable: "可解释",
+  "Risk Assessment": "风险评估",
+  "Sorted by severity": "按严重程度排序",
+  Filter: "筛选",
+  All: "全部",
+  Critical: "严重",
+  High: "高",
+  Medium: "中",
+  Low: "低",
+  "Visible Risks": "当前风险",
+  "High Priority": "高优先级",
+  "Human Confirm": "人工确认",
+  "Blocking risk": "阻断风险",
+  "Abort or manual review": "中止或人工复核",
+  "Watch and constrain": "观察并约束",
+  Monitor: "监控",
+  Mitigation: "缓解措施",
+  "Human Confirmation": "人工确认",
+  "Decision Impact": "决策影响",
+  Evidence: "证据",
+  "Show less": "收起",
+  "No evidence items provided by this risk response.": "该风险响应未提供证据项。",
+  "Required before execution or replanning.": "执行或重规划前需要人工确认。",
+  "Not required by this risk item; continue monitoring.": "该风险项暂不要求人工确认，继续监控。",
+  "May shift the recommended time window or trigger wind abort thresholds.":
+    "可能调整推荐时间窗口，或触发风速中止阈值。",
+  "May require a conservative route strategy and larger standoff distance.":
+    "可能需要保守航线策略和更大的安全距离。",
+  "May force task splitting, return-to-home, or supplement flight planning.":
+    "可能迫使任务拆分、返航或生成补飞计划。",
+  "May pause low-altitude work or move launch and landing operations.":
+    "可能暂停低空作业，或调整起降操作。",
+  "May block execution until compliance review or approval is confirmed.":
+    "可能阻断执行，直到合规复核或审批确认。",
+  "May pause close-range segments or request manual takeover.":
+    "可能暂停近距离航段，或请求人工接管。",
+  "Review before execution and keep this risk visible during replanning.":
+    "执行前需要复核，并在重规划时保持该风险可见。",
+  "No risks match this filter. The complete risk assessment is still available under other severity levels.":
+    "当前筛选条件下没有风险项。完整风险评估仍可在其他严重等级中查看。",
+  "Waiting for risk simulation results from the mission decision loop.":
+    "正在等待任务决策闭环返回风险推演结果。",
+
+  "Abort Logic": "中止逻辑",
+  Rules: "规则",
+  "Wind Speed": "风速",
+  "Battery Reserve": "电量余量",
+  TRIGGERED: "已触发",
+  WATCH: "观察",
+  "WITHIN LIMIT": "限值内",
+  Current: "当前",
+  Limit: "限制",
+  "Abort Conditions": "中止条件",
+  "ABORT RULE": "中止规则",
+  "RULE ONLY": "仅规则",
+  "Rule is defined as a conservative stop condition. It stays neutral until current telemetry enters watch or triggered range.":
+    "该规则定义为保守中止条件。在当前遥测进入观察或触发区间前保持中立。",
+  "Abort if wind reaches the configured limit. Upper facade operations should keep extra margin for gust exposure.":
+    "风速达到配置上限时中止。高层外立面作业应为阵风暴露预留额外余量。",
+  "Abort if battery crosses the safe return margin. The plan should preserve enough reserve for return and contingency.":
+    "电量越过安全返航余量时中止。任务方案必须保留足够返航和应急余量。",
+  "Abort or switch to conservative standoff if GPS confidence drops below the navigation threshold.":
+    "GPS 置信度低于导航阈值时中止，或切换到保守安全距离航线。",
+  "Abort or pause close-range work if video latency exceeds the maximum safe monitoring threshold.":
+    "图传延迟超过安全监控上限时，中止或暂停近距离作业。",
+
+  "Incident Replanning": "异常重规划",
+  "Replan Result": "重规划结果",
+  "Decision Summary": "决策摘要",
+  "Selected Decision": "已选择决策",
+  Reason: "原因",
+  "Makeup Flight Required": "需要补飞",
+  "Human Takeover Required": "需要人工接管",
+  Required: "需要",
+  "Not Required": "不需要",
+  "Affected Segments": "受影响航段",
+  "No affected segment listed": "未列出受影响航段",
+  "The current mock replan result did not provide route segments. Keep the active segment under manual review.":
+    "当前模拟重规划结果未提供航段信息。请将当前活动航段保留在人工复核中。",
+  "Replan Actions Timeline": "重规划动作时间线",
+  "No replan actions available": "无可用重规划动作",
+  "The mock response returned no ordered action list. Keep this decision in manual review before execution.":
+    "模拟响应未返回有序动作列表。执行前请保持人工复核。",
+  Step: "步骤",
+  "Alternatives Considered": "已评估备选方案",
+  "Rejected Alternatives": "已拒绝备选方案",
+  "Not Recommended": "不推荐",
+  Rejected: "已拒绝",
+  "No rejected alternatives recorded": "未记录已拒绝备选方案",
+  "The current mock replan result did not return alternative options. Treat the selected decision as requiring human review.":
+    "当前模拟重规划结果未返回备选方案。请将已选择决策视为需要人工复核。",
+  "These options were evaluated by the replan rule and explicitly rejected. They are not recommended next steps.":
+    "这些方案已由重规划规则评估并明确拒绝，不应作为下一步推荐动作。",
+  "The selected decision is shown with rejected alternatives from the deterministic replan rule.":
+    "当前展示的是确定性重规划规则选中的决策及其已拒绝备选方案。",
+  "No rejected alternatives were returned by the mock replan rule, so the selected decision should remain reviewable.":
+    "模拟重规划规则未返回已拒绝备选方案，因此该决策仍应保持可复核。",
+
+  "Mission Review": "任务复盘",
+  Mission: "任务",
+  "Review Result": "复盘结果",
+  "Review Report": "复盘报告",
+  "No Incident Injected": "未注入异常",
+  "Makeup Flight Suggested": "建议补飞",
+  "No Makeup Flight Required": "无需补飞",
+  "Mission completion, data quality, triggered risks, uncovered work, and next-step review items are generated from mock review data.":
+    "任务完成度、数据质量、风险触发、未覆盖工作和下一步复核项均由模拟复盘数据生成。",
+  "Mission Completion": "任务完成度",
+  "Data Quality": "数据质量",
+  "Incident Events": "异常事件",
+  "Risk Trigger Log": "风险触发记录",
+  "Uncovered Areas": "未覆盖区域",
+  "Makeup Flight Plan": "补飞计划",
+  "Human Review Checklist": "人工复核清单",
+  "Next Mission Optimizations": "下次任务优化",
+  "No incident recorded": "未记录异常",
+  "The current mock review did not include injected incident events.":
+    "当前模拟复盘未包含注入异常事件。",
+  "No risk trigger recorded": "未记录风险触发",
+  "No incident-derived risk trigger is present in this mock review.":
+    "当前模拟复盘中没有由异常生成的风险触发项。",
+  "No uncovered area": "无未覆盖区域",
+  "The mock review did not list unfinished work. Keep final completion subject to human review.":
+    "模拟复盘未列出未完成工作。最终完成情况仍需人工复核。",
+  "No makeup flight required": "无需补飞",
+  "The mock review did not recommend a makeup flight. This is not a regulatory clearance.":
+    "模拟复盘未建议补飞。这不代表获得合规放行。",
+  "No checklist item recorded": "未记录复核项",
+  "No human review checklist item was returned by the mock review.":
+    "模拟复盘未返回人工复核清单项。",
+  "No optimization recorded": "未记录优化建议",
+  "No next-mission optimization was returned by the mock review.":
+    "模拟复盘未返回下次任务优化建议。",
+  Nominal: "正常",
+  Review: "复核",
+  Attention: "注意",
+
+  "Human Explanation": "决策解释",
+  "Decision Basis": "决策依据",
+  Inputs: "输入",
+  "Not flight permission": "不是飞行许可",
+  "Decision support only": "仅作决策辅助",
+  "These explanations make the mission plan auditable. They do not replace airspace approval, site safety responsibility, or manual go/no-go confirmation.":
+    "这些解释用于让任务方案可审计，不替代空域审批、现场安全责任或人工放飞确认。",
+  "Fact Inputs": "事实输入",
+  Observed: "已观测",
+  "Data and rule outputs used as decision evidence.": "作为决策证据的数据和规则输出。",
+  "Model Inferences": "模型推理",
+  Reasoned: "已推理",
+  "Derived judgments from task, environment, airspace, and drone constraints.":
+    "基于任务、环境、空域和设备约束得出的判断。",
+  "Recommended Actions": "建议动作",
+  Advisory: "建议",
+  "Operational actions proposed by the task autonomy layer.": "任务自治层提出的作业动作。",
+  "Items that must remain under human safety or compliance review.":
+    "必须保留给人工安全或合规复核的事项。",
+  "Waiting for facts, inferences, recommended actions, and human confirmation items.":
+    "正在等待事实输入、模型推理、建议动作和人工确认项。",
+
+  "Mission decision loop is running.": "任务决策闭环运行中。",
+  "Mission data unavailable.": "任务数据不可用。",
+  "SkyOps is parsing the task, checking constraints, simulating risks, and preparing an explainable plan.":
+    "SkyOps 正在解析任务、检查约束、推演风险并生成可解释方案。",
+  "No flight recommendation should be used until the failed state is reviewed.":
+    "失败状态完成复核前，不应使用任何飞行建议。",
+  "Task understanding": "任务理解",
+  "Constraint check": "约束检查",
+  "Plan assembly": "方案组装",
+  "Pause execution and keep the task under manual review.": "暂停执行，并保持人工复核。",
+  "Retry after backend status and mock scenario data are confirmed.":
+    "确认后端状态和模拟场景数据后重试。",
+
+  "Mission autonomy backend is unavailable. Keep the current plan in review mode until the service is reachable.":
+    "任务自治后端不可用。在服务恢复前，请将当前方案保持在复核模式。",
+  "Mission decision loop is temporarily unavailable. No flight recommendation was generated for this request.":
+    "任务决策闭环暂时不可用。本次请求未生成飞行建议。",
+  "The FastAPI backend is not running or the API endpoint is unreachable.":
+    "FastAPI 后端未运行，或 API 地址不可达。",
+  "The mission planning, replanning, or review endpoint returned an invalid response.":
+    "任务规划、重规划或复盘接口返回了无效响应。",
+  "The current mock scenario is unavailable or does not match the frontend contract.":
+    "当前模拟场景不可用，或与前端契约不匹配。",
+  "Restart the backend service and run the mission loop again.":
+    "重启后端服务并重新运行任务闭环。",
+  "Pause execution and request manual review before using this task plan.":
+    "暂停执行，并在使用该任务方案前请求人工复核。",
+  "Incident update failed. The previous mission plan and active incident are preserved for manual review.":
+    "异常更新失败。已保留上一版任务方案和当前异常，等待人工复核。",
+
+  "180m high-rise office building facade": "180米高层办公楼外立面",
+  "Nanshan District, Shenzhen": "深圳市南山区",
+  "curtain wall crack screening": "幕墙裂缝排查",
+  "detachment risk screening": "脱落风险排查",
+  "tomorrow morning": "明天上午",
+  "safety first; minimize pedestrian impact": "安全优先；尽量减少对行人影响",
+  "good": "良好",
+  "partial urban canyon risk near the building facade": "建筑外立面附近存在局部城市峡谷风险",
+  "Simulated partly cloudy morning with moderate wind.": "模拟多云上午，风速中等。",
+  "DJI Matrice class mock platform": "DJI Matrice 级模拟平台",
+  "zoom camera": "变焦相机",
+  "wide camera": "广角相机",
+  weather: "天气",
+  navigation: "导航",
+  "Wind gusts may increase near the upper facade.": "高层外立面附近阵风可能增强。",
+  "Facade geometry may reduce GPS confidence in close-range flight.":
+    "外立面几何结构可能降低近距离飞行的 GPS 置信度。",
+  "wind_speed_mps >= 8.0": "风速 >= 8.0 m/s",
+  "gps_confidence < 0.65": "GPS 置信度 < 0.65",
+  "Pause facade segment and return to standby point if gust threshold is exceeded.":
+    "如超过阵风阈值，暂停外立面航段并返回待命点。",
+  "Switch to conservative standoff route and request pilot confirmation.":
+    "切换到保守安全距离航线，并请求飞手确认。",
+  "mock weather profile": "模拟天气画像",
+  "high-rise facade wind exposure": "高层外立面风暴露",
+  "mock urban canyon zone": "模拟城市峡谷区域",
+  "building height 180m": "建筑高度 180米",
+  "09:45-11:15 simulated local time": "09:45-11:15 模拟本地时间",
+  "South plaza buffer point": "南侧广场缓冲点",
+  "Mock launch point away from pedestrian peak flow.": "远离行人高峰流线的模拟起飞点。",
+  "keep pedestrian separation": "保持人机/行人隔离",
+  "manual confirmation required before takeoff": "起飞前需要人工确认",
+  "Two-segment conservative vertical facade scan with increased standoff distance near GPS-risk area.":
+    "采用两段式保守垂直外立面扫描，并在 GPS 风险区域增加安全距离。",
+  "south facade lower segment": "南立面下部航段",
+  "south facade upper segment": "南立面上部航段",
+  "battery_percent <= 35": "电量 <= 35%",
+  "crowd_level == high": "人流等级 == 高",
+  "Input mission targets a high-rise facade in Nanshan District.":
+    "输入任务目标为南山区高层建筑外立面。",
+  "All environment, airspace, and drone states are mock data.":
+    "所有环境、空域和无人机状态均为模拟数据。",
+  "The mission should use a conservative route because GPS confidence may drop near the facade.":
+    "由于外立面附近 GPS 置信度可能下降，任务应采用保守航线。",
+  "Approval is required before execution according to the mock airspace constraint.":
+    "根据模拟空域约束，执行前需要审批。",
+  "Use the recommended late-morning window.": "使用推荐的上午偏后时间窗口。",
+  "Confirm approval status and pedestrian separation before takeoff.":
+    "起飞前确认审批状态和行人隔离。",
+  "Prepare a makeup flight for uncovered upper facade areas.":
+    "为未覆盖的上部外立面区域准备补飞。",
+  "Airspace approval": "空域审批",
+  "Launch point safety": "起降点安全",
+  "Pilot readiness for manual takeover": "飞手人工接管准备",
+
+  wind_speed_spike: "风速突增",
+  gps_confidence_drop: "GPS 置信度下降",
+  video_latency_increase: "图传延迟增加",
+  battery_low: "电量不足",
+  crowd_gathering: "人流聚集",
+  temporary_airspace_restriction: "临时空域限制",
+  "Simulated sudden wind increase near the upper facade.": "模拟高层外立面附近风速突然升高。",
+  "Simulated GPS confidence drop near the facade.": "模拟外立面附近 GPS 置信度下降。",
+  "Simulated video transmission latency increase.": "模拟图传延迟增加。",
+  "Simulated battery level crossing the safe return margin.": "模拟电量越过安全返航余量。",
+  "Simulated pedestrian gathering near the launch area.": "模拟起飞区域附近出现行人聚集。",
+  "Simulated temporary airspace restriction update.": "模拟临时空域限制更新。",
+  "temporary restriction active": "临时限制生效",
+  "no active restriction": "无生效限制",
+
+  pause_and_return_to_standby: "暂停任务并返回待命点",
+  switch_to_conservative_standoff_route: "切换到保守安全距离航线",
+  pause_until_link_recovers: "暂停至链路恢复",
+  return_to_home_and_split_makeup_flight: "返航并拆分补飞",
+  pause_and_clear_pedestrian_risk: "暂停并清除行人风险",
+  abort_and_request_compliance_review: "中止任务并请求合规复核",
+  pause_for_manual_review: "暂停并请求人工复核",
+  "pause current facade scan": "暂停当前外立面扫描",
+  "return to launch or standby point": "返回起飞点或待命点",
+  "preserve collected imagery and telemetry": "保留已采集影像和遥测数据",
+  "generate makeup flight for unfinished facade segments": "为未完成外立面航段生成补飞计划",
+  "resume only after wind speed returns below threshold": "仅在风速回落至阈值以下后恢复",
+  "pause close-range facade segment": "暂停近距离外立面航段",
+  "increase standoff distance": "增加安全距离",
+  "switch to conservative waypoint path": "切换到保守航点路径",
+  "request pilot readiness for manual takeover": "请求飞手做好人工接管准备",
+  "mark low-confidence area for makeup flight": "将低置信度区域标记为补飞区域",
+  "pause mission progress": "暂停任务进度",
+  "hold or return to standby point based on pilot confirmation": "根据飞手确认悬停或返回待命点",
+  "check video transmission quality": "检查图传质量",
+  "preserve collected data before retrying": "重试前保留已采集数据",
+  "resume only after latency returns below threshold": "仅在延迟回落至阈值以下后恢复",
+  "stop new data collection": "停止新增数据采集",
+  "return to launch point immediately": "立即返回起飞点",
+  "preserve completed segment data": "保留已完成航段数据",
+  "record unfinished coverage": "记录未完成覆盖区域",
+  "create makeup flight after battery replacement": "换电后创建补飞任务",
+  "pause low-altitude operation": "暂停低空作业",
+  "avoid hovering above crowd area": "避免在人群区域上方悬停",
+  "move to safe standby point": "移动至安全待命点",
+  "notify human safety responsible person": "通知人工安全负责人",
+  "reschedule affected area to lower crowd window": "将受影响区域改排至低人流时段",
+  "abort mission execution": "中止任务执行",
+  "record restricted area update": "记录限制区域更新",
+  "request compliance review before makeup flight": "补飞前请求合规复核",
+  "pause mission": "暂停任务",
+  "preserve collected data": "保留已采集数据",
+  "request human review of unknown incident": "请求人工复核未知异常",
+  "resume only after explicit confirmation": "仅在明确确认后恢复",
+  "Observed wind condition exceeds the mission safety threshold, so coverage is deprioritized in favor of aircraft stability and pedestrian safety.":
+    "观测到的风况超过任务安全阈值，因此应优先保障飞行器稳定和行人安全，而不是继续追求覆盖率。",
+  "GPS confidence has fallen below the navigation safety threshold near the building facade, so close-range autonomous flight should be degraded.":
+    "建筑外立面附近 GPS 置信度已低于导航安全阈值，因此应降级近距离自主飞行。",
+  "Video transmission latency exceeds the configured safety threshold, reducing operator situational awareness during low-altitude work.":
+    "图传延迟超过配置的安全阈值，会降低操作员在低空作业中的态势感知。",
+  "Battery level is at or below the safe return margin, so the mission must protect return-to-home capability before coverage.":
+    "电量已达到或低于安全返航余量，因此任务必须优先保障返航能力，而不是继续覆盖。",
+  "A crowd gathering increases ground safety risk, so low-altitude operation should pause until pedestrian separation is restored.":
+    "人群聚集会增加地面安全风险，因此低空作业应暂停，直到恢复行人隔离。",
+  "A temporary airspace restriction changes mission compliance status, so the system must stop instead of attempting to route around it without review.":
+    "临时空域限制改变了任务合规状态，因此系统必须停止，而不是在未经复核时尝试绕飞。",
+  "The incident type is not covered by deterministic replan rules, so the safe default is to pause and request manual review.":
+    "该异常类型未被确定性重规划规则覆盖，因此安全默认动作是暂停并请求人工复核。",
+  "continue with reduced speed": "降低速度继续执行",
+  "switch to closer facade route": "切换到更贴近外立面的航线",
+  "wait in hover near target area": "在目标区域附近悬停等待",
+  "continue original route": "继续原航线",
+  "descend along current facade path": "沿当前外立面路径下降",
+  "complete remaining coverage without makeup flight": "不补飞并完成剩余覆盖",
+  "continue without live video confidence": "在缺乏实时图传信心时继续执行",
+  "ignore video latency while telemetry remains active": "在遥测仍可用时忽略图传延迟",
+  "increase speed to finish the segment": "提高速度完成航段",
+  "finish the current segment before return": "返航前完成当前航段",
+  "reduce payload usage and continue": "降低载荷使用并继续执行",
+  "continue until critical battery warning": "继续执行直到严重低电量告警",
+  "continue at lower altitude": "降低高度继续执行",
+  "hover until crowd disperses": "悬停等待人群散开",
+  "complete the facade segment above the crowd": "在人群上方完成外立面航段",
+  "fly around the restricted area without review": "未经复核绕开限制区域飞行",
+  "continue below the altitude limit": "在高度限制以下继续执行",
+  "complete only the remaining short segment": "仅完成剩余短航段",
+  "infer a new route without a known rule": "在没有已知规则时推断新航线",
+  "current active segment": "当前活动航段",
+  "planned uncovered facade zones outside initial mock coverage": "初始模拟覆盖外的计划未覆盖外立面区域",
+  "Schedule makeup flight for uncovered areas: planned uncovered facade zones outside initial mock coverage, south facade lower segment, south facade upper segment.":
+    "为未覆盖区域安排补飞：初始模拟覆盖外的计划未覆盖外立面区域、南立面下部航段、南立面上部航段。",
+  "Recheck wind, GPS confidence, video latency, battery margin, crowd level, and airspace.":
+    "重新检查风速、GPS 置信度、图传延迟、电量余量、人流等级和空域状态。",
+  "Use conservative route and preserve previously collected data before retrying.":
+    "重试前使用保守航线并保留此前已采集数据。",
+  "Require human safety confirmation before makeup flight execution.":
+    "补飞执行前需要人工安全确认。",
+  "Confirm all review inputs are mock or simulated data before presenting the result.":
+    "展示结果前确认所有复盘输入均为 mock 或仿真数据。",
+  "Review airspace approval, launch safety, and pilot readiness before reuse.":
+    "复用前复核空域审批、起飞安全和飞手准备情况。",
+  "Review human takeover requirement for incident incident-wind-001.":
+    "复核异常 incident-wind-001 的人工接管要求。",
+  "Compare planned coverage, completed coverage, and makeup areas before the next mission.":
+    "下次任务前比较计划覆盖、已完成覆盖和补飞区域。",
+  "Move the next flight to a calmer wind window or split upper facade work.":
+    "将下次飞行调整到风况更平稳的窗口，或拆分上部外立面作业。",
+};
+
+export function t(locale: Locale, value: string): string {
+  if (locale === "en") {
+    return value;
+  }
+
+  return zhText[value] ?? value;
+}
+
+export function formatCheckEndpoint(locale: Locale, endpoint: string): string {
+  return locale === "zh"
+    ? `检查当前 API 地址：${endpoint}。`
+    : `Check the configured API endpoint: ${endpoint}.`;
+}
+
 export type MissionConsoleCopy = {
   appBadge: string;
   dataBadge: string;

@@ -27,7 +27,7 @@ import { RiskPanel } from "./RiskPanel";
 import { SafetyThresholdPanel } from "./SafetyThresholdPanel";
 import { StatusStrip } from "./StatusStrip";
 import { DataSourceBadge } from "./components/DataSourceBadge";
-import { missionConsoleCopy, type Locale } from "./i18n";
+import { formatCheckEndpoint, missionConsoleCopy, type Locale } from "./i18n";
 import { incidentPresets } from "./incidentPresets";
 import type { HealthState, MissionCycleState } from "./types";
 import { badgeStyles, buttonStyles, cn, layoutStyles, textStyles } from "./uiTokens";
@@ -101,7 +101,7 @@ export function MissionConsole() {
   const copy = missionConsoleCopy[locale];
   const configuredApiEndpoint = API_BASE_URL === "" ? copy.backendFallback : API_BASE_URL;
   const missionFailureSuggestedActions = [
-    `Check the configured API endpoint: ${configuredApiEndpoint}.`,
+    formatCheckEndpoint(locale, configuredApiEndpoint),
     "Restart the backend service and run the mission loop again.",
     "Pause execution and request manual review before using this task plan.",
   ];
@@ -234,6 +234,7 @@ export function MissionConsole() {
       return (
         <section className={layoutStyles.fullWidthGrid}>
           <MissionInputPanel
+            locale={locale}
             missionCycle={missionCycle}
             taskInput={taskInput}
             isIncidentUpdating={isIncidentUpdating}
@@ -247,10 +248,10 @@ export function MissionConsole() {
     if (activeViewId === "plan") {
       return (
         <section className={layoutStyles.fullWidthGrid}>
-          <MissionPlanPanel missionCycle={missionCycle} />
+          <MissionPlanPanel locale={locale} missionCycle={missionCycle} />
           <section className={layoutStyles.secondaryGrid}>
-            <EnvironmentDronePanel missionCycle={missionCycle} />
-            <SafetyThresholdPanel missionCycle={missionCycle} />
+            <EnvironmentDronePanel locale={locale} missionCycle={missionCycle} />
+            <SafetyThresholdPanel locale={locale} missionCycle={missionCycle} />
           </section>
         </section>
       );
@@ -259,8 +260,8 @@ export function MissionConsole() {
     if (activeViewId === "risk") {
       return (
         <section className={layoutStyles.fullWidthGrid}>
-          <RiskPanel missionCycle={missionCycle} />
-          <HumanExplanationPanel missionCycle={missionCycle} />
+          <RiskPanel locale={locale} missionCycle={missionCycle} />
+          <HumanExplanationPanel locale={locale} missionCycle={missionCycle} />
         </section>
       );
     }
@@ -269,21 +270,22 @@ export function MissionConsole() {
       return (
         <section className={layoutStyles.secondaryGrid}>
           <IncidentControlPanel
+            locale={locale}
             missionCycle={missionCycle}
             selectedIncident={selectedIncident}
             isIncidentUpdating={isIncidentUpdating}
             incidentUpdateError={incidentUpdateError}
             onIncidentSelect={handleIncidentSelect}
           />
-          <IncidentReplanPanel missionCycle={missionCycle} />
+          <IncidentReplanPanel locale={locale} missionCycle={missionCycle} />
         </section>
       );
     }
 
     return (
       <section className={layoutStyles.fullWidthGrid}>
-        <MissionReviewPanel missionCycle={missionCycle} />
-        <HumanExplanationPanel missionCycle={missionCycle} />
+        <MissionReviewPanel locale={locale} missionCycle={missionCycle} />
+        <HumanExplanationPanel locale={locale} missionCycle={missionCycle} />
       </section>
     );
   }
@@ -297,7 +299,7 @@ export function MissionConsole() {
               <span className={cn(badgeStyles.base, badgeStyles.brand, "tracking-[0.18em]")}>
                 {copy.appBadge}
               </span>
-              <DataSourceBadge sourceType="mock" label={copy.dataBadge} />
+              <DataSourceBadge locale={locale} sourceType="mock" label={copy.dataBadge} />
             </div>
             <h1 className="mt-3 text-3xl font-semibold tracking-normal text-white md:text-4xl">
               {copy.pageTitle}
@@ -310,7 +312,7 @@ export function MissionConsole() {
               locale={locale}
               onLocaleChange={setLocale}
             />
-            <BackendStatus health={health} onRetry={refreshBackendHealth} />
+            <BackendStatus health={health} locale={locale} onRetry={refreshBackendHealth} />
           </div>
         </header>
 
