@@ -1,10 +1,9 @@
 import { API_BASE_URL } from "../../api/client";
 import type { Locale } from "./i18n";
-import { t } from "./i18n";
+import { formatApiEndpointLabel, t } from "./i18n";
 import type { HealthState } from "./types";
 import { badgeStyles, bannerStyles, buttonStyles, cn, textStyles } from "./uiTokens";
 
-const apiEndpointLabel = API_BASE_URL === "" ? "Vite proxy -> 127.0.0.1:8000" : API_BASE_URL;
 const backendUrl = API_BASE_URL === "" ? "http://127.0.0.1:8000" : API_BASE_URL;
 
 type BackendStatusProps = {
@@ -14,6 +13,8 @@ type BackendStatusProps = {
 };
 
 export function BackendStatus({ health, locale, onRetry }: BackendStatusProps) {
+  const apiEndpointLabel = formatApiEndpointLabel(locale, API_BASE_URL);
+
   if (health.status === "loading") {
     return (
       <div className={cn(bannerStyles.loading, "min-w-72")}>
@@ -35,7 +36,9 @@ export function BackendStatus({ health, locale, onRetry }: BackendStatusProps) {
           </span>
         </div>
         <p className="mt-2 leading-6">{t(locale, health.message)}</p>
-        <p className="mt-2 text-xs leading-5 text-red-100/80">Endpoint: {apiEndpointLabel}</p>
+        <p className="mt-2 text-xs leading-5 text-red-100/80">
+          {t(locale, "Endpoint")}: {apiEndpointLabel}
+        </p>
         <div className="mt-3 flex flex-wrap gap-2">
           <button
             className={cn(

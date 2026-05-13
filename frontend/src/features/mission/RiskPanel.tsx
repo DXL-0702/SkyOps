@@ -16,7 +16,7 @@ import { PanelTitle } from "./components/PanelTitle";
 import { RiskBadge } from "./components/RiskBadge";
 import { SectionLabel } from "./components/SectionLabel";
 import type { Locale } from "./i18n";
-import { t } from "./i18n";
+import { formatMoreCount, t } from "./i18n";
 import type { MissionCycleState } from "./types";
 import {
   badgeStyles,
@@ -139,7 +139,8 @@ function EvidenceList({ evidence, locale }: { evidence: string[]; locale: Locale
             </>
           ) : (
             <>
-              <ChevronDown aria-hidden="true" size={14} />+{hiddenCount} more
+              <ChevronDown aria-hidden="true" size={14} />
+              {formatMoreCount(locale, hiddenCount)}
             </>
           )}
         </button>
@@ -195,7 +196,7 @@ function RiskCard({ locale, risk }: { locale: Locale; risk: RiskItem }) {
               {t(locale, getRiskDecisionType(risk.risk_level))}
             </span>
           </div>
-          <p className={cn(textStyles.label, "mt-2 break-words")}>{risk.trigger_condition}</p>
+          <p className={cn(textStyles.label, "mt-2 break-words")}>{t(locale, risk.trigger_condition)}</p>
         </div>
         <RiskBadge locale={locale} level={risk.risk_level} />
       </div>

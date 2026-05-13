@@ -16,7 +16,7 @@ import { PanelTitle } from "./components/PanelTitle";
 import { ProgressMetric } from "./components/ProgressMetric";
 import { SectionLabel } from "./components/SectionLabel";
 import type { Locale } from "./i18n";
-import { t } from "./i18n";
+import { formatIncidentObservation, formatRiskTriggerSummary, t } from "./i18n";
 import type { MissionCycleState } from "./types";
 import { badgeStyles, cn, listStyles, panelStyles, textStyles } from "./uiTokens";
 
@@ -129,11 +129,28 @@ export function MissionReviewPanel({
     : normalizeTextList(
         missionCycle.incidentEvent
           ? [
-              `${missionCycle.incidentEvent.event_type}: observed ${missionCycle.incidentEvent.observed_value} against threshold ${missionCycle.incidentEvent.threshold}.`,
+              formatIncidentObservation(
+                locale,
+                missionCycle.incidentEvent.event_type,
+                missionCycle.incidentEvent.observed_value,
+                missionCycle.incidentEvent.threshold,
+              ),
             ]
           : [],
       );
-  const riskTriggerLog = reviewHasNoIncidentEvents ? [] : rawRiskTriggerLog;
+  const riskTriggerLog =
+    reviewHasNoIncidentEvents || !missionCycle.incidentEvent
+      ? []
+      : [
+          formatRiskTriggerSummary(
+            locale,
+            missionCycle.incidentEvent.id,
+            missionCycle.incidentEvent.event_type,
+            missionCycle.incidentEvent.observed_value,
+            missionCycle.incidentEvent.threshold,
+            missionCycle.replan.replan_decision.decision,
+          ),
+        ];
   const uncoveredAreas = normalizeTextList(review.uncovered_areas);
   const makeupFlightPlan = normalizeTextList(review.makeup_flight_plan);
   const humanReviewChecklist = normalizeTextList(review.human_review_checklist);

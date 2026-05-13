@@ -6,6 +6,8 @@ const zhText: Record<string, string> = {
   offline: "离线",
   ready: "已就绪",
   failed: "失败",
+  waiting: "等待中",
+  available: "可查看",
   mock: "模拟",
   simulated: "仿真",
   real: "真实",
@@ -24,6 +26,8 @@ const zhText: Record<string, string> = {
   "Retry health check": "重新检查后端",
   "Open backend URL": "打开后端地址",
   Endpoint: "接口地址",
+  "Vite proxy -> 127.0.0.1:8000": "Vite 代理 -> 127.0.0.1:8000",
+  "Mission console sections": "任务控制台分区",
 
   "Mission Intake": "任务输入",
   "Natural language": "自然语言",
@@ -52,6 +56,7 @@ const zhText: Record<string, string> = {
     "选择一个异常注入事件，然后同步更新重规划与复盘。",
   Updating: "更新中",
   Incident: "异常",
+  Crowd: "人流",
   "Observed Value": "观测值",
   Threshold: "阈值",
   "Incident update unavailable": "异常更新不可用",
@@ -69,6 +74,12 @@ const zhText: Record<string, string> = {
   GPS: "GPS",
   Video: "图传",
   Battery: "电量",
+  battery: "电量",
+  data_link: "数据链路",
+  "Data Link": "数据链路",
+  "data link": "数据链路",
+  crowd: "人流",
+  airspace: "空域",
   "Operation Object": "作业对象",
   "Operation Area": "作业区域",
   "Risk Preference": "风险偏好",
@@ -119,6 +130,7 @@ const zhText: Record<string, string> = {
   "Decision Impact": "决策影响",
   Evidence: "证据",
   "Show less": "收起",
+  "Show more evidence": "展开更多证据",
   "No evidence items provided by this risk response.": "该风险响应未提供证据项。",
   "Required before execution or replanning.": "执行或重规划前需要人工确认。",
   "Not required by this risk item; continue monitoring.": "该风险项暂不要求人工确认，继续监控。",
@@ -178,6 +190,7 @@ const zhText: Record<string, string> = {
   "The current mock replan result did not provide route segments. Keep the active segment under manual review.":
     "当前模拟重规划结果未提供航段信息。请将当前活动航段保留在人工复核中。",
   "Replan Actions Timeline": "重规划动作时间线",
+  "Replan action sequence": "重规划动作序列",
   "No replan actions available": "无可用重规划动作",
   "The mock response returned no ordered action list. Keep this decision in manual review before execution.":
     "模拟响应未返回有序动作列表。执行前请保持人工复核。",
@@ -231,6 +244,10 @@ const zhText: Record<string, string> = {
   "No optimization recorded": "未记录优化建议",
   "No next-mission optimization was returned by the mock review.":
     "模拟复盘未返回下次任务优化建议。",
+  "No incident was injected in this mock mission review.":
+    "本次模拟任务复盘未注入异常。",
+  "No makeup flight is required by the current mock review.":
+    "当前模拟复盘无需补飞。",
   Nominal: "正常",
   Review: "复核",
   Attention: "注意",
@@ -341,6 +358,14 @@ const zhText: Record<string, string> = {
   "Airspace approval": "空域审批",
   "Launch point safety": "起降点安全",
   "Pilot readiness for manual takeover": "飞手人工接管准备",
+  "avoid pedestrian peak periods": "避开行人高峰时段",
+  "use conservative route": "使用保守航线",
+  building_facade_inspection: "建筑外立面巡检",
+  "mock temporary control buffer north-east of target block": "目标楼宇东北侧模拟临时管控缓冲区",
+  "Mock airspace data indicates flight is possible only with approval and a conservative altitude profile.":
+    "模拟空域数据表明，仅在完成审批并采用保守高度剖面时可以执行飞行。",
+  "Mock plan prioritizes approval, pedestrian separation, GPS confidence, and safe return margin over full single-flight coverage.":
+    "模拟方案优先考虑审批、行人隔离、GPS 置信度和安全返航余量，而不是追求单次飞行全覆盖。",
 
   wind_speed_spike: "风速突增",
   gps_confidence_drop: "GPS 置信度下降",
@@ -393,7 +418,9 @@ const zhText: Record<string, string> = {
   "record restricted area update": "记录限制区域更新",
   "request compliance review before makeup flight": "补飞前请求合规复核",
   "pause mission": "暂停任务",
+  "return to launch point": "返回起飞点",
   "preserve collected data": "保留已采集数据",
+  "generate makeup flight plan for uncovered facade zones": "为未覆盖外立面区域生成补飞计划",
   "request human review of unknown incident": "请求人工复核未知异常",
   "resume only after explicit confirmation": "仅在明确确认后恢复",
   "Observed wind condition exceeds the mission safety threshold, so coverage is deprioritized in favor of aircraft stability and pedestrian safety.":
@@ -428,6 +455,7 @@ const zhText: Record<string, string> = {
   "fly around the restricted area without review": "未经复核绕开限制区域飞行",
   "continue below the altitude limit": "在高度限制以下继续执行",
   "complete only the remaining short segment": "仅完成剩余短航段",
+  "continue with original plan": "继续原方案",
   "infer a new route without a known rule": "在没有已知规则时推断新航线",
   "current active segment": "当前活动航段",
   "planned uncovered facade zones outside initial mock coverage": "初始模拟覆盖外的计划未覆盖外立面区域",
@@ -449,6 +477,44 @@ const zhText: Record<string, string> = {
     "下次任务前比较计划覆盖、已完成覆盖和补飞区域。",
   "Move the next flight to a calmer wind window or split upper facade work.":
     "将下次飞行调整到风况更平稳的窗口，或拆分上部外立面作业。",
+  "Maintain conservative route settings and review whether 82% coverage is enough.":
+    "保持保守航线设置，并复核 82% 覆盖率是否满足任务要求。",
+  "Increase facade standoff distance in GPS-shadowed segments.":
+    "在 GPS 遮挡航段增加外立面安全距离。",
+  "Run data link checks before entering close-range facade segments.":
+    "进入近距离外立面航段前先执行数据链路检查。",
+  "Split the next mission earlier and reserve a larger return battery margin.":
+    "下次任务更早拆分，并预留更大的返航电量余量。",
+  "Schedule pedestrian-sensitive segments outside high crowd windows.":
+    "将对行人敏感的航段安排在人流低峰窗口。",
+  "Refresh airspace compliance data immediately before launch.":
+    "起飞前立即刷新空域合规数据。",
+  "Add deterministic replan rules for newly observed unknown incident types.":
+    "为新观察到的未知异常类型补充确定性重规划规则。",
+  "Wind speed exceeds the configured safe operating threshold.":
+    "风速超过已配置的安全作业阈值。",
+  "Pause mission and wait for safer wind conditions.":
+    "暂停任务，等待更安全的风况。",
+  "Battery level is not sufficient for safe mission execution and return.":
+    "电量不足以支持安全执行任务并返航。",
+  "Do not launch. Replace battery or split the mission.":
+    "不要起飞。更换电池或拆分任务。",
+  "GPS confidence is below the configured safe threshold.":
+    "GPS 置信度低于已配置的安全阈值。",
+  "Use conservative standoff route or request manual takeover readiness.":
+    "使用保守安全距离航线，或请求人工接管准备。",
+  "Video transmission latency exceeds the configured safe threshold.":
+    "图传延迟超过已配置的安全阈值。",
+  "Pause mission and restore data link quality before continuing.":
+    "暂停任务，恢复数据链路质量后再继续。",
+  "Crowd level blocks safe low-altitude operation.":
+    "当前人流等级阻断安全低空作业。",
+  "Pause mission or move to a safer time window.":
+    "暂停任务，或调整到更安全的时间窗口。",
+  "Airspace constraints indicate the mission is not flyable.":
+    "空域约束显示当前任务不可飞。",
+  "Do not launch. Request compliance review or choose a different plan.":
+    "不要起飞。请求合规复核或选择其他方案。",
 };
 
 export function t(locale: Locale, value: string): string {
@@ -456,13 +522,56 @@ export function t(locale: Locale, value: string): string {
     return value;
   }
 
-  return zhText[value] ?? value;
+  const trimmedValue = value.trim();
+  const normalizedValue = trimmedValue.replace(/\s+/g, " ");
+
+  return zhText[value] ?? zhText[trimmedValue] ?? zhText[normalizedValue] ?? value;
 }
 
 export function formatCheckEndpoint(locale: Locale, endpoint: string): string {
   return locale === "zh"
     ? `检查当前 API 地址：${endpoint}。`
     : `Check the configured API endpoint: ${endpoint}.`;
+}
+
+export function formatApiEndpointLabel(locale: Locale, endpoint: string): string {
+  if (endpoint !== "") {
+    return endpoint;
+  }
+
+  return t(locale, "Vite proxy -> 127.0.0.1:8000");
+}
+
+export function formatMoreCount(locale: Locale, count: number): string {
+  return locale === "zh" ? `还有 ${count} 项` : `+${count} more`;
+}
+
+export function formatIncidentObservation(
+  locale: Locale,
+  eventType: string,
+  observedValue: string,
+  threshold: string,
+): string {
+  if (locale === "zh") {
+    return `${t(locale, eventType)}：观测值 ${t(locale, observedValue)}，阈值 ${t(locale, threshold)}。`;
+  }
+
+  return `${eventType}: observed ${observedValue} against threshold ${threshold}.`;
+}
+
+export function formatRiskTriggerSummary(
+  locale: Locale,
+  incidentId: string,
+  eventType: string,
+  observedValue: string,
+  threshold: string,
+  decision: string,
+): string {
+  if (locale === "zh") {
+    return `${incidentId}：${t(locale, eventType)}触发，观测值 ${t(locale, observedValue)}，阈值 ${t(locale, threshold)}；决策=${t(locale, decision)}。`;
+  }
+
+  return `${incidentId}: ${eventType} observed ${observedValue} against threshold ${threshold}; decision=${decision}.`;
 }
 
 export type MissionConsoleCopy = {
@@ -547,7 +656,7 @@ export const missionConsoleCopy: Record<Locale, MissionConsoleCopy> = {
       scenario: "演示场景",
       scenarioValue: "深圳高层建筑",
       dataMode: "数据模式",
-      dataModeValue: "Mock / 仿真",
+      dataModeValue: "模拟 / 仿真",
       loop: "决策闭环",
       loopReady: "决策闭环已就绪",
       loopFailed: "决策闭环失败",

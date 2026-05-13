@@ -7,7 +7,8 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
-import type { MissionConsoleCopy } from "./i18n";
+import type { MissionConsoleCopy, Locale } from "./i18n";
+import { t } from "./i18n";
 import type { MissionCycleState } from "./types";
 import { badgeStyles, cn, panelStyles, textStyles } from "./uiTokens";
 
@@ -19,26 +20,11 @@ export type ConsoleView = {
 };
 
 export const consoleViews: ConsoleView[] = [
-  {
-    id: "task",
-    icon: ClipboardCheck,
-  },
-  {
-    id: "plan",
-    icon: Route,
-  },
-  {
-    id: "risk",
-    icon: AlertTriangle,
-  },
-  {
-    id: "incident",
-    icon: GitBranch,
-  },
-  {
-    id: "review",
-    icon: CheckCircle2,
-  },
+  { id: "task", icon: ClipboardCheck },
+  { id: "plan", icon: Route },
+  { id: "risk", icon: AlertTriangle },
+  { id: "incident", icon: GitBranch },
+  { id: "review", icon: CheckCircle2 },
 ];
 
 type WorkspaceCopy = MissionConsoleCopy["workspace"];
@@ -59,20 +45,28 @@ function getActiveViewStatus(
   return viewId === "task" ? copy.viewStatus.ready : copy.viewStatus.available;
 }
 
-function getActiveIncidentLabel(missionCycle: MissionCycleState, copy: WorkspaceCopy): string {
+function getActiveIncidentLabel(
+  missionCycle: MissionCycleState,
+  locale: Locale,
+  copy: WorkspaceCopy,
+): string {
   if (missionCycle.status !== "ready") {
     return copy.pendingIncident;
   }
 
-  return missionCycle.incidentEvent.event_type;
+  return t(locale, missionCycle.incidentEvent.event_type);
 }
 
-function getMissionObjectLabel(missionCycle: MissionCycleState, copy: WorkspaceCopy): string {
+function getMissionObjectLabel(
+  missionCycle: MissionCycleState,
+  locale: Locale,
+  copy: WorkspaceCopy,
+): string {
   if (missionCycle.status !== "ready") {
     return copy.fallbackObject;
   }
 
-  return missionCycle.plan.mission_task.operation_object;
+  return t(locale, missionCycle.plan.mission_task.operation_object);
 }
 
 function getMissionRiskSummary(missionCycle: MissionCycleState, copy: WorkspaceCopy): string {
@@ -90,11 +84,13 @@ function getMissionRiskSummary(missionCycle: MissionCycleState, copy: WorkspaceC
 export function MissionFlowSidebar({
   activeView,
   copy,
+  locale,
   missionCycle,
   onViewChange,
 }: {
   activeView: ConsoleViewId;
   copy: WorkspaceCopy;
+  locale: Locale;
   missionCycle: MissionCycleState;
   onViewChange: (viewId: ConsoleViewId) => void;
 }) {
@@ -105,7 +101,7 @@ export function MissionFlowSidebar({
         <p className="mt-2 text-sm font-semibold text-white">{copy.flowSubtitle}</p>
       </div>
 
-      <nav aria-label="Mission console sections" className="mt-4 grid gap-2">
+      <nav aria-label={t(locale, "Mission console sections")} className="mt-4 grid gap-2">
         {consoleViews.map((view) => {
           const Icon = view.icon;
           const isActive = activeView === view.id;
@@ -151,7 +147,7 @@ export function MissionFlowSidebar({
       <div className={cn(panelStyles.surfacePadded, "mt-4")}>
         <p className={textStyles.strongLabel}>{copy.currentFocus}</p>
         <p className="mt-2 break-words text-sm font-semibold text-white">
-          {getMissionObjectLabel(missionCycle, copy)}
+          {getMissionObjectLabel(missionCycle, locale, copy)}
         </p>
         <p className={cn(textStyles.subtle, "mt-2")}>
           {getMissionRiskSummary(missionCycle, copy)}
@@ -164,10 +160,12 @@ export function MissionFlowSidebar({
 export function ActiveViewHeader({
   activeView,
   copy,
+  locale,
   missionCycle,
 }: {
   activeView: ConsoleView;
   copy: WorkspaceCopy;
+  locale: Locale;
   missionCycle: MissionCycleState;
 }) {
   const activeViewCopy = copy.views[activeView.id];
@@ -190,7 +188,7 @@ export function ActiveViewHeader({
                 : badgeStyles.success,
           )}
         >
-          {missionCycle.status}
+          {t(locale, missionCycle.status)}
         </span>
       </div>
 
@@ -198,13 +196,13 @@ export function ActiveViewHeader({
         <div className={panelStyles.surfacePadded}>
           <p className={textStyles.strongLabel}>{copy.missionObject}</p>
           <p className="mt-2 break-words text-sm font-semibold text-white">
-            {getMissionObjectLabel(missionCycle, copy)}
+            {getMissionObjectLabel(missionCycle, locale, copy)}
           </p>
         </div>
         <div className={panelStyles.surfacePadded}>
           <p className={textStyles.strongLabel}>{copy.activeIncident}</p>
           <p className="mt-2 break-words text-sm font-semibold text-white">
-            {getActiveIncidentLabel(missionCycle, copy)}
+            {getActiveIncidentLabel(missionCycle, locale, copy)}
           </p>
         </div>
         <div className={panelStyles.surfacePadded}>

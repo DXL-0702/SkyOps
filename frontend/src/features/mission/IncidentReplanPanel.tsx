@@ -115,7 +115,7 @@ function ReplanActionsTimeline({
   return (
     <div>
       <SectionLabel label={t(locale, "Replan Actions Timeline")} />
-      <ol aria-label="Replan action sequence" className="mt-3 grid gap-0">
+      <ol aria-label={t(locale, "Replan action sequence")} className="mt-3 grid gap-0">
         {actions.map((action, index) => {
           const isLastStep = index === actions.length - 1;
 

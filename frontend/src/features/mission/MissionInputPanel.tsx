@@ -281,7 +281,7 @@ export function IncidentControlPanel({
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
                         <p className="break-words text-sm font-semibold text-white">
-                          {incident.event_type}
+                          {t(locale, incident.event_type)}
                         </p>
                         {isPending ? (
                           <span className={cn(badgeStyles.base, badgeStyles.warning)}>

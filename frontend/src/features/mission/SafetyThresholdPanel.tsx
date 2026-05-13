@@ -144,7 +144,7 @@ export function SafetyThresholdPanel({
   const thresholdItems: ThresholdItem[] = [
     {
       id: "wind",
-      label: "Wind Speed",
+      label: t(locale, "Wind Speed"),
       currentValue: `${environment.wind_speed_mps} m/s`,
       limitValue: `<= ${thresholds.max_wind_speed_mps} m/s`,
       status: getMaxLimitStatus(environment.wind_speed_mps, thresholds.max_wind_speed_mps),
@@ -153,7 +153,7 @@ export function SafetyThresholdPanel({
     },
     {
       id: "battery",
-      label: "Battery Reserve",
+      label: t(locale, "Battery Reserve"),
       currentValue: `${drone.battery_percent}%`,
       limitValue: `> ${thresholds.min_battery_percent}%`,
       status: getMinLimitStatus(drone.battery_percent, thresholds.min_battery_percent, 10),
@@ -162,7 +162,7 @@ export function SafetyThresholdPanel({
     },
     {
       id: "gps",
-      label: "GPS Confidence",
+      label: t(locale, "GPS Confidence"),
       currentValue: environment.gps_confidence.toFixed(2),
       limitValue: `>= ${thresholds.min_gps_confidence.toFixed(2)}`,
       status: getMinLimitStatus(environment.gps_confidence, thresholds.min_gps_confidence, 0.1),
@@ -171,7 +171,7 @@ export function SafetyThresholdPanel({
     },
     {
       id: "video",
-      label: "Video Latency",
+      label: t(locale, "Video Latency"),
       currentValue: `${drone.video_latency_ms} ms`,
       limitValue: `<= ${thresholds.max_video_latency_ms} ms`,
       status: getMaxLimitStatus(drone.video_latency_ms, thresholds.max_video_latency_ms),

@@ -316,12 +316,13 @@ export function MissionConsole() {
           </div>
         </header>
 
-        <StatusStrip copy={copy.status} health={health} missionCycle={missionCycle} />
+        <StatusStrip copy={copy.status} health={health} locale={locale} missionCycle={missionCycle} />
 
         <section className={layoutStyles.workspaceGrid}>
           <MissionFlowSidebar
             activeView={activeViewId}
             copy={copy.workspace}
+            locale={locale}
             missionCycle={missionCycle}
             onViewChange={setActiveViewId}
           />
@@ -329,6 +330,7 @@ export function MissionConsole() {
             <ActiveViewHeader
               activeView={activeView}
               copy={copy.workspace}
+              locale={locale}
               missionCycle={missionCycle}
             />
             {renderActiveView()}
