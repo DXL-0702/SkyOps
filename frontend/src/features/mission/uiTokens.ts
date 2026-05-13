@@ -11,9 +11,10 @@ export const visualDirection = {
 
 export const layoutStyles = {
   page: "min-h-screen bg-zinc-950 text-zinc-100",
-  shell: "mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-5 px-4 py-5 sm:px-6 lg:px-8",
+  shell: "mx-auto flex min-h-screen w-full max-w-[92rem] flex-col gap-5 px-4 py-5 sm:px-6 lg:px-8",
   header:
     "flex flex-col gap-4 border-b border-zinc-800 pb-5 lg:flex-row lg:items-center lg:justify-between",
+  workspaceGrid: "grid gap-5 lg:grid-cols-[17rem_minmax(0,1fr)]",
   primaryGrid: "grid gap-5 xl:grid-cols-[1.05fr_1.55fr_0.9fr]",
   secondaryGrid: "grid gap-5 lg:grid-cols-[1fr_1fr]",
   evidenceGrid: "grid gap-5 xl:grid-cols-[1.05fr_1fr_1fr]",

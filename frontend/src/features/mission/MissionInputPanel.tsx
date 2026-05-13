@@ -19,12 +19,17 @@ import {
 type MissionInputPanelProps = {
   missionCycle: MissionCycleState;
   taskInput: string;
+  isIncidentUpdating: boolean;
+  onRun: () => void;
+  onTaskInputChange: (value: string) => void;
+};
+
+type IncidentControlPanelProps = {
+  missionCycle: MissionCycleState;
   selectedIncident: IncidentEvent;
   isIncidentUpdating: boolean;
   incidentUpdateError: string | null;
   onIncidentSelect: (incidentEvent: IncidentEvent) => void;
-  onRun: () => void;
-  onTaskInputChange: (value: string) => void;
 };
 
 const missionPipeline = [
@@ -136,10 +141,7 @@ function MissionCycleStatusCard({
 export function MissionInputPanel({
   missionCycle,
   taskInput,
-  selectedIncident,
   isIncidentUpdating,
-  incidentUpdateError,
-  onIncidentSelect,
   onRun,
   onTaskInputChange,
 }: MissionInputPanelProps) {
@@ -156,6 +158,35 @@ export function MissionInputPanel({
         onChange={(event) => onTaskInputChange(event.target.value)}
         value={taskInput}
       />
+
+      <button
+        className={cn(buttonStyles.base, buttonStyles.primary, "mt-4 w-full")}
+        disabled={controlsDisabled}
+        onClick={onRun}
+        type="button"
+      >
+        <GitBranch aria-hidden="true" size={17} />
+        {isRunning ? "Demo Flow Running" : "Run All Demo Flow"}
+      </button>
+
+      <MissionCycleStatusCard missionCycle={missionCycle} onRun={onRun} />
+    </section>
+  );
+}
+
+export function IncidentControlPanel({
+  missionCycle,
+  selectedIncident,
+  isIncidentUpdating,
+  incidentUpdateError,
+  onIncidentSelect,
+}: IncidentControlPanelProps) {
+  const isRunning = missionCycle.status === "loading";
+  const controlsDisabled = isRunning || isIncidentUpdating;
+
+  return (
+    <section className={panelStyles.base}>
+      <PanelTitle icon={GitBranch} title="Incident Control" meta="Replan trigger" />
 
       <div className={cn(panelStyles.surfacePadded, "mt-4")}>
         <div className="flex flex-wrap items-start justify-between gap-3">
@@ -261,18 +292,6 @@ export function MissionInputPanel({
           </div>
         ) : null}
       </div>
-
-      <button
-        className={cn(buttonStyles.base, buttonStyles.primary, "mt-4 w-full")}
-        disabled={controlsDisabled}
-        onClick={onRun}
-        type="button"
-      >
-        <GitBranch aria-hidden="true" size={17} />
-        {isRunning ? "Demo Flow Running" : "Run All Demo Flow"}
-      </button>
-
-      <MissionCycleStatusCard missionCycle={missionCycle} onRun={onRun} />
 
       <div className={cn(panelStyles.surfacePadded, "mt-4")}>
         <div className="flex flex-wrap items-center justify-between gap-2">

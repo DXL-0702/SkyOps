@@ -14,9 +14,15 @@ import { BackendStatus } from "./BackendStatus";
 import { EnvironmentDronePanel } from "./EnvironmentDronePanel";
 import { HumanExplanationPanel } from "./HumanExplanationPanel";
 import { IncidentReplanPanel } from "./IncidentReplanPanel";
-import { MissionInputPanel } from "./MissionInputPanel";
+import { IncidentControlPanel, MissionInputPanel } from "./MissionInputPanel";
 import { MissionPlanPanel } from "./MissionPlanPanel";
 import { MissionReviewPanel } from "./MissionReviewPanel";
+import {
+  ActiveViewHeader,
+  MissionFlowSidebar,
+  consoleViews,
+  type ConsoleViewId,
+} from "./MissionWorkspaceChrome";
 import { RiskPanel } from "./RiskPanel";
 import { SafetyThresholdPanel } from "./SafetyThresholdPanel";
 import { StatusStrip } from "./StatusStrip";
@@ -50,8 +56,10 @@ export function MissionConsole() {
   const [taskInput, setTaskInput] = useState(DEFAULT_TASK_INPUT);
   const [selectedIncident, setSelectedIncident] = useState(incidentPresets[0].event);
   const [missionCycle, setMissionCycle] = useState<MissionCycleState>({ status: "loading" });
+  const [activeViewId, setActiveViewId] = useState<ConsoleViewId>("task");
   const [isIncidentUpdating, setIsIncidentUpdating] = useState(false);
   const [incidentUpdateError, setIncidentUpdateError] = useState<string | null>(null);
+  const activeView = consoleViews.find((view) => view.id === activeViewId) ?? consoleViews[0];
 
   function refreshBackendHealth() {
     setHealth({ status: "loading" });
@@ -176,6 +184,65 @@ export function MissionConsole() {
     }
   }
 
+  function renderActiveView() {
+    if (activeViewId === "task") {
+      return (
+        <section className={layoutStyles.fullWidthGrid}>
+          <MissionInputPanel
+            missionCycle={missionCycle}
+            taskInput={taskInput}
+            isIncidentUpdating={isIncidentUpdating}
+            onRun={() => void runAllDemoFlow()}
+            onTaskInputChange={setTaskInput}
+          />
+        </section>
+      );
+    }
+
+    if (activeViewId === "plan") {
+      return (
+        <section className={layoutStyles.fullWidthGrid}>
+          <MissionPlanPanel missionCycle={missionCycle} />
+          <section className={layoutStyles.secondaryGrid}>
+            <EnvironmentDronePanel missionCycle={missionCycle} />
+            <SafetyThresholdPanel missionCycle={missionCycle} />
+          </section>
+        </section>
+      );
+    }
+
+    if (activeViewId === "risk") {
+      return (
+        <section className={layoutStyles.fullWidthGrid}>
+          <RiskPanel missionCycle={missionCycle} />
+          <HumanExplanationPanel missionCycle={missionCycle} />
+        </section>
+      );
+    }
+
+    if (activeViewId === "incident") {
+      return (
+        <section className={layoutStyles.secondaryGrid}>
+          <IncidentControlPanel
+            missionCycle={missionCycle}
+            selectedIncident={selectedIncident}
+            isIncidentUpdating={isIncidentUpdating}
+            incidentUpdateError={incidentUpdateError}
+            onIncidentSelect={handleIncidentSelect}
+          />
+          <IncidentReplanPanel missionCycle={missionCycle} />
+        </section>
+      );
+    }
+
+    return (
+      <section className={layoutStyles.fullWidthGrid}>
+        <MissionReviewPanel missionCycle={missionCycle} />
+        <HumanExplanationPanel missionCycle={missionCycle} />
+      </section>
+    );
+  }
+
   return (
     <main className={layoutStyles.page}>
       <section className={layoutStyles.shell}>
@@ -197,32 +264,16 @@ export function MissionConsole() {
 
         <StatusStrip health={health} missionCycle={missionCycle} />
 
-        <section className={layoutStyles.primaryGrid}>
-          <MissionInputPanel
+        <section className={layoutStyles.workspaceGrid}>
+          <MissionFlowSidebar
+            activeView={activeViewId}
             missionCycle={missionCycle}
-            taskInput={taskInput}
-            selectedIncident={selectedIncident}
-            isIncidentUpdating={isIncidentUpdating}
-            incidentUpdateError={incidentUpdateError}
-            onIncidentSelect={handleIncidentSelect}
-            onRun={() => void runAllDemoFlow()}
-            onTaskInputChange={setTaskInput}
+            onViewChange={setActiveViewId}
           />
-
-          <MissionPlanPanel missionCycle={missionCycle} />
-
-          <RiskPanel missionCycle={missionCycle} />
-        </section>
-
-        <section className={layoutStyles.evidenceGrid}>
-          <EnvironmentDronePanel missionCycle={missionCycle} />
-          <IncidentReplanPanel missionCycle={missionCycle} />
-          <MissionReviewPanel missionCycle={missionCycle} />
-        </section>
-
-        <section className={layoutStyles.fullWidthGrid}>
-          <SafetyThresholdPanel missionCycle={missionCycle} />
-          <HumanExplanationPanel missionCycle={missionCycle} />
+          <div className="grid min-w-0 gap-5">
+            <ActiveViewHeader activeView={activeView} missionCycle={missionCycle} />
+            {renderActiveView()}
+          </div>
         </section>
       </section>
     </main>

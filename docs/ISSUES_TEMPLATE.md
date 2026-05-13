@@ -802,6 +802,8 @@ Phase 2 所有任务必须遵守：
 
 ### Issue P1-L-018: Demo Flow Polish For Competition Presentation
 
+**Status:** Done
+
 **Priority:** P1
 
 **Difficulty:** L
@@ -829,6 +831,15 @@ Phase 2 所有任务必须遵守：
 - 首屏即可完成主演示。
 - 文案简洁，不像说明书。
 - `npm run build` 通过。
+
+**Implementation Notes:**
+
+- 已将 Mission Console 从“所有面板同时铺开”调整为单页多视图工作台。
+- 新增左侧 Mission Flow 侧边栏，按 Task / Plan / Risk / Incident / Review 五个决策阶段组织功能模块。
+- 使用 `activeView` 在前端本地控制当前视图，不引入 React Router，不修改后端 API、数据模型或 orchestrator。
+- 已将任务输入与异常注入拆分为 `MissionInputPanel` 和 `IncidentControlPanel`，降低首屏信息密度。
+- 每个视图顶部展示当前阶段说明、mission object、active incident 和 risk focus，帮助用户理解当前工作上下文。
+- 当前演示流程聚焦“任务级自治与风险推演”：输入任务、查看方案、查看风险、注入异常、查看重规划、查看复盘。
 
 ---
 
