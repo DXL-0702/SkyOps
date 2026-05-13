@@ -20,6 +20,8 @@ type MissionInputPanelProps = {
   missionCycle: MissionCycleState;
   taskInput: string;
   selectedIncident: IncidentEvent;
+  isIncidentUpdating: boolean;
+  incidentUpdateError: string | null;
   onIncidentSelect: (incidentEvent: IncidentEvent) => void;
   onRun: () => void;
   onTaskInputChange: (value: string) => void;
@@ -135,11 +137,14 @@ export function MissionInputPanel({
   missionCycle,
   taskInput,
   selectedIncident,
+  isIncidentUpdating,
+  incidentUpdateError,
   onIncidentSelect,
   onRun,
   onTaskInputChange,
 }: MissionInputPanelProps) {
   const isRunning = missionCycle.status === "loading";
+  const controlsDisabled = isRunning || isIncidentUpdating;
 
   return (
     <section className={panelStyles.base}>
@@ -147,42 +152,116 @@ export function MissionInputPanel({
 
       <textarea
         className={formStyles.textarea}
-        disabled={isRunning}
+        disabled={controlsDisabled}
         onChange={(event) => onTaskInputChange(event.target.value)}
         value={taskInput}
       />
 
-      <div className="mt-4 grid grid-cols-3 gap-2">
-        {incidentPresets.map((preset) => {
-          const Icon = preset.icon;
-          const isActive = selectedIncident.event_type === preset.event.event_type;
-          return (
-            <button
-              className={cn(
-                buttonStyles.base,
-                buttonStyles.incident,
-                isActive ? buttonStyles.incidentActive : buttonStyles.incidentIdle,
-              )}
-              disabled={isRunning}
-              key={preset.event.event_type}
-              onClick={() => onIncidentSelect(preset.event)}
-              type="button"
-            >
-              <Icon aria-hidden="true" size={16} />
-              <span>{preset.label}</span>
-            </button>
-          );
-        })}
+      <div className={cn(panelStyles.surfacePadded, "mt-4")}>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <p className={textStyles.strongLabel}>Event Control Panel</p>
+            <p className={cn(textStyles.subtle, "mt-1")}>
+              Select one incident to inject, then synchronize replanning and review.
+            </p>
+          </div>
+          {isIncidentUpdating ? (
+            <span className={cn(badgeStyles.base, badgeStyles.warning)}>Updating</span>
+          ) : (
+            <DataSourceBadge sourceType={selectedIncident.source_type} label="Incident" />
+          )}
+        </div>
+
+        <div className="mt-4 grid gap-3">
+          {incidentPresets.map((preset) => {
+            const Icon = preset.icon;
+            const incident = preset.event;
+            const isActive = selectedIncident.id === incident.id;
+
+            return (
+              <button
+                aria-pressed={isActive}
+                className={cn(
+                  "w-full border p-4 text-left transition disabled:cursor-not-allowed disabled:opacity-60",
+                  isActive
+                    ? "border-teal-300 bg-teal-300/10 shadow-[inset_3px_0_0_rgba(94,234,212,0.85)]"
+                    : "border-zinc-800 bg-zinc-950/80 hover:border-zinc-600",
+                )}
+                disabled={controlsDisabled}
+                key={incident.id}
+                onClick={() => onIncidentSelect(incident)}
+                type="button"
+              >
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="flex min-w-0 items-start gap-3">
+                    <span
+                      className={cn(
+                        "mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center border",
+                        isActive
+                          ? "border-teal-300/50 bg-teal-300/15 text-teal-100"
+                          : "border-zinc-700 bg-zinc-900 text-zinc-300",
+                      )}
+                    >
+                      <Icon aria-hidden="true" size={17} />
+                    </span>
+                    <div className="min-w-0">
+                      <p className="break-words text-sm font-semibold text-white">
+                        {incident.event_type}
+                      </p>
+                      <p className={cn(textStyles.muted, "mt-1")}>{preset.label} incident</p>
+                    </div>
+                  </div>
+                  <span
+                    className={cn(
+                      badgeStyles.base,
+                      incident.severity === "critical" || incident.severity === "high"
+                        ? badgeStyles.danger
+                        : incident.severity === "medium"
+                          ? badgeStyles.warning
+                          : badgeStyles.success,
+                    )}
+                  >
+                    {incident.severity}
+                  </span>
+                </div>
+
+                <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                  <div className="border border-zinc-800 bg-zinc-900/60 px-3 py-2">
+                    <p className={textStyles.label}>Observed Value</p>
+                    <p className="mt-1 break-words text-sm font-semibold text-zinc-100">
+                      {incident.observed_value}
+                    </p>
+                  </div>
+                  <div className="border border-zinc-800 bg-zinc-900/60 px-3 py-2">
+                    <p className={textStyles.label}>Threshold</p>
+                    <p className="mt-1 break-words text-sm font-semibold text-zinc-100">
+                      {incident.threshold}
+                    </p>
+                  </div>
+                </div>
+
+                <p className={cn(textStyles.body, "mt-3")}>{incident.description}</p>
+              </button>
+            );
+          })}
+        </div>
+
+        {incidentUpdateError ? (
+          <div className={cn(stateStyles.failedSurface, "mt-4")} role="alert">
+            <p className="text-sm font-semibold text-red-50">Incident update unavailable</p>
+            <p className="mt-2 text-xs leading-5 text-red-50">{incidentUpdateError}</p>
+          </div>
+        ) : null}
       </div>
 
       <button
         className={cn(buttonStyles.base, buttonStyles.primary, "mt-4 w-full")}
-        disabled={isRunning}
+        disabled={controlsDisabled}
         onClick={onRun}
         type="button"
       >
         <GitBranch aria-hidden="true" size={17} />
-        {isRunning ? "Mission Loop Running" : "Run Mission Loop"}
+        {isRunning ? "Demo Flow Running" : "Run All Demo Flow"}
       </button>
 
       <MissionCycleStatusCard missionCycle={missionCycle} onRun={onRun} />
@@ -196,6 +275,7 @@ export function MissionInputPanel({
         <p className={cn(textStyles.subtle, "mt-1")}>
           {selectedIncident.observed_value} / {selectedIncident.threshold}
         </p>
+        <p className={cn(textStyles.subtle, "mt-2")}>{selectedIncident.description}</p>
       </div>
     </section>
   );
