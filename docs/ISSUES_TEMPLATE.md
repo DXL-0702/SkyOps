@@ -538,7 +538,7 @@ Phase 3 推荐最终形成：
 
 ### Issue P0-L-033: Define Evaluation Metric Contracts And Scoring Priority
 
-**Status:** Backlog
+**Status:** Done
 
 **Priority:** P0
 
@@ -578,6 +578,15 @@ Phase 3 推荐最终形成：
 - 指标口径写入代码注释或 docs。
 - 后续评分器能共享同一结果结构。
 - `uv run pytest` 通过。
+
+**Implementation Notes:**
+
+- 已新增 `backend/app/core/evaluation/contracts.py`，定义 Phase 3 指标合约、共享 scorer 输出字段和评分优先级。
+- 已新增 `docs/evaluation-metrics.md`，说明 Hard Constraint Pass Rate、Risk Recall、Plan Efficiency、Incident Response Score 和 Explainability Score 的计算口径。
+- 已明确硬约束是 blocking safety gate：禁飞区、审批、风速、电量、GPS、人流安全等硬约束失败时，总体评测失败，方案效率不得抵消安全失败。
+- 已明确 Phase 3 不引入 LLM judge，LLM 不能作为硬安全评分依据。
+- 已新增 `backend/tests/test_evaluation_contracts.py`，锁住指标覆盖、共享输出字段、安全优先级和禁止效率抵消硬约束失败。
+- 本 issue 不实现具体评分器，后续由 P1-M-034 到 P2-M-037 分别实现。
 
 ---
 
