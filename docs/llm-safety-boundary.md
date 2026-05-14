@@ -84,7 +84,12 @@ It defines:
 - `ReviewNarrativeDraft`
 - `LLMFailureMode`
 
-The contract intentionally avoids real provider implementation. A future
-`MockLLMProvider` or real provider must conform to this contract and preserve
-the same safety boundary.
+The deterministic mock provider is defined in:
 
+```text
+backend/app/integrations/llm/mock_provider.py
+```
+
+`MockLLMProvider` is used only to prove the adapter path is reserved for the
+competition demo and tests. A future real provider must conform to the same
+contract and preserve the same safety boundary.

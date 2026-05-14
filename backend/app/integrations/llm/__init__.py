@@ -9,6 +9,7 @@ from app.integrations.llm.contracts import (
     ReviewNarrativeDraft,
     TaskUnderstandingDraft,
 )
+from app.integrations.llm.mock_provider import MOCK_PROVIDER_NAME, MockLLMProvider
 
 __all__ = [
     "ConstraintQuestionDraft",
@@ -20,4 +21,6 @@ __all__ = [
     "LLMUsagePolicy",
     "ReviewNarrativeDraft",
     "TaskUnderstandingDraft",
+    "MOCK_PROVIDER_NAME",
+    "MockLLMProvider",
 ]

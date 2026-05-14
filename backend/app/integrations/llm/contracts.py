@@ -3,6 +3,8 @@ from typing import Any, Protocol
 
 from pydantic import BaseModel, Field, model_validator
 
+from app.core.models import DataSourceType
+
 
 class LLMDecisionBoundary(StrEnum):
     DRAFT = "draft"
@@ -69,6 +71,9 @@ class LLMUsagePolicy(BaseModel):
 
 class LLMDraftBase(BaseModel):
     boundary: LLMDecisionBoundary
+    source_type: DataSourceType = DataSourceType.MOCK
+    provider: str = Field(default="unassigned", min_length=1)
+    deterministic: bool = False
     is_final_decision: bool = False
     requires_rule_validation: bool = True
     requires_human_review: bool = False
@@ -147,4 +152,3 @@ class LLMProvider(Protocol):
         review_context: dict[str, Any],
     ) -> ReviewNarrativeDraft:
         """Draft review narrative after deterministic review data exists."""
-

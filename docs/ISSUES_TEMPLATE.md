@@ -1086,7 +1086,7 @@ Phase 4-lite 必须坚持：
 
 ### Issue P1-M-047: Implement Mock LLM Provider
 
-**Status:** Backlog
+**Status:** Done
 
 **Priority:** P1
 
@@ -1126,6 +1126,15 @@ Phase 4-lite 必须坚持：
 - mock provider 不依赖外部服务。
 - 单元测试覆盖正常输出和基本字段完整性。
 - `uv run pytest` 通过。
+
+**Implementation Notes:**
+
+- 已新增 `backend/app/integrations/llm/mock_provider.py`，实现确定性的 `MockLLMProvider`。
+- mock provider 覆盖 `parse_task`、`suggest_missing_constraints`、`generate_human_explanation` 和 `summarize_review` 四类输出。
+- 所有输出均标记 `source_type=mock`、`provider=mock`、`deterministic=true`，并保留 `draft`、`suggestion` 或 `explanation` 边界。
+- 输出安全说明明确 mock LLM 不批准飞行，必须经过确定性硬规则和人工复核。
+- 已新增 `backend/tests/test_mock_llm_provider.py`，覆盖稳定输出、缺失字段、约束问题、解释草稿和复盘摘要草稿。
+- 本 issue 不请求网络、不读取 API key、不新增真实 provider、不接入硬约束判断。
 
 ---
 

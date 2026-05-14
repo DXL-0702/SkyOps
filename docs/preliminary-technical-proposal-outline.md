@@ -61,10 +61,11 @@ Phase 4-lite 当前已完成：
 - LLM adapter contract。
 - LLM 安全边界文档。
 - LLM contract 基础安全边界测试。
+- MockLLMProvider。
+- Mock provider 基础输出稳定性测试。
 
 待 Phase 4-lite 后续补充：
 
-- MockLLMProvider。
 - Mock provider 与真实 provider 替换边界测试。
 - 技术方案中的 LLM 角色说明。
 
@@ -498,16 +499,19 @@ def test_phase_3_evaluation_dataset_has_task_autonomy_guardrails() -> None:
 - `LLMFailureMode`，覆盖超时、无效 JSON、安全边界冲突、缺少字段和 provider 不可用。
 - `docs/llm-safety-boundary.md`。
 - `backend/tests/test_llm_contracts.py` 基础安全边界测试。
+- `MockLLMProvider`，用于初赛 Demo 和测试展示 LLM 接口已预留但不调用真实模型。
+- `backend/tests/test_mock_llm_provider.py` 基础输出稳定性测试。
 
 建议最终方案引用：
 
 `backend/app/integrations/llm/contracts.py`
 
+`backend/app/integrations/llm/mock_provider.py`
+
 ### 9.3 Phase 4-lite 后续补充
 
 待完成后补：
 
-- `MockLLMProvider`。
 - Mock provider 与未来真实 provider 替换边界测试。
 
 建议核心表达：
@@ -655,7 +659,7 @@ Phase 4-lite 后续完成后补：
 
 - [x] LLM adapter contract 代码片段。
 - [x] LLM 安全边界文档。
-- [ ] MockLLMProvider 代码片段。
+- [x] MockLLMProvider 代码片段。
 - [ ] LLM 安全边界测试代码片段。
 - [ ] “为什么初赛不接真实 LLM”说明。
 - [ ] “LLM can suggest, but cannot approve flight.” 安全声明。
