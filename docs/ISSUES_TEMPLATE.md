@@ -1140,7 +1140,7 @@ Phase 4-lite 必须坚持：
 
 ### Issue P1-M-048: Add LLM Adapter Contract Tests
 
-**Status:** Backlog
+**Status:** Done
 
 **Priority:** P1
 
@@ -1171,6 +1171,15 @@ Phase 4-lite 必须坚持：
 - 测试能证明 LLM adapter 是辅助层，不是安全决策唯一依据。
 - 安全边界冲突有明确 failure reason。
 - `uv run pytest` 通过。
+
+**Implementation Notes:**
+
+- 已新增 `backend/tests/test_llm_adapter_contract_regression.py`，补充 LLM adapter 安全边界回归测试。
+- 覆盖 mock provider 四类输出的 schema、`mock` source、draft/suggestion/explanation 边界、非最终安全决策标记和规则校验要求。
+- 覆盖硬约束失败时 LLM 解释草稿不能改变 deterministic hard constraint 结果。
+- 覆盖危险 LLM 权限、无效最终决策输出、fallback failure reason 和人工复核要求。
+- 覆盖 prompt/response 层不泄漏 `OPENAI_API_KEY` 或 `SKYOPS_LLM_API_KEY` 等敏感配置。
+- 本 issue 不接真实 LLM、不做 LLM judge、不改变 mission planning/replan/review API contract。
 
 ---
 
