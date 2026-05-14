@@ -28,17 +28,36 @@ const zhText: Record<string, string> = {
   Endpoint: "接口地址",
   "Vite proxy -> 127.0.0.1:8000": "Vite 代理 -> 127.0.0.1:8000",
   "Mission console sections": "任务控制台分区",
+  "Competition demo flow": "竞赛演示流程",
+  "Competition Demo": "竞赛演示",
+  "Task-level autonomy in five steps": "五步展示任务级自治",
+  "Use this flow to show mission planning, risk simulation, incident replanning, and review without turning the product into image inspection.":
+    "使用该流程展示任务规划、风险推演、异常重规划和复盘，不把产品做成图像巡检工具。",
+  "Not image inspection": "不是图像巡检",
+  "Step": "步骤",
+  "Enter the natural-language mission.": "输入自然语言任务。",
+  "Review route, launch point, and safety thresholds.": "查看航线、起降点和安全阈值。",
+  "Inspect risks, evidence, and decision basis.": "检查风险、证据和决策依据。",
+  "Trigger a simulated exception and replan.": "注入模拟异常并重规划。",
+  "Close the loop with quality, gaps, and makeup flight needs.": "用质量、缺口和补飞需求形成闭环。",
 
-  "Mission Intake": "任务输入",
+  "Mission Task": "任务输入",
+  "Mission Task Source": "任务来源",
   "Natural language": "自然语言",
+  "Run Demo Flow": "运行演示流程",
   "Run All Demo Flow": "运行完整演示流程",
   "Demo Flow Running": "演示流程运行中",
   "Decision loop ready": "决策闭环已就绪",
+  "Plan ready": "方案已生成",
   "Explainable plan": "可解释方案",
+  "Plan, risk explanation, incident response, and review report are generated from mock mission data.":
+    "任务方案、风险解释、异常响应和复盘报告均由模拟任务数据生成。",
   "Plan, risk stack, incident response, and review summary are generated from mock mission data.":
     "任务方案、风险栈、异常处置和复盘摘要均由模拟任务数据生成。",
+  "Generating plan...": "正在生成方案...",
   "Mission decision loop running": "任务决策闭环运行中",
   "In progress": "进行中",
+  "Checking task, constraints, and risks.": "正在检查任务、约束和风险。",
   "SkyOps is turning the natural-language task into a constrained low-altitude operation plan.":
     "SkyOps 正在将自然语言任务转化为带约束的低空作业方案。",
   "Task parsing": "任务解析",
@@ -46,10 +65,13 @@ const zhText: Record<string, string> = {
   "Risk simulation": "风险推演",
   "Replan and review": "重规划与复盘",
   "Mission decision loop unavailable": "任务决策闭环不可用",
+  "Unable to generate plan.": "无法生成方案。",
   "Possible Causes": "可能原因",
   "Suggested Actions": "建议动作",
   "Retry Mission Loop": "重试任务闭环",
+  Retry: "重试",
   "Incident Control": "异常控制",
+  "Incident Injection": "异常注入",
   "Replan trigger": "重规划触发",
   "Event Control Panel": "事件控制面板",
   "Select one incident to inject, then synchronize replanning and review.":
@@ -60,12 +82,14 @@ const zhText: Record<string, string> = {
   "Observed Value": "观测值",
   Threshold: "阈值",
   "Incident update unavailable": "异常更新不可用",
+  "Unable to replan.": "无法重规划。",
+  "Inject an incident to view replanning.": "注入异常后查看重规划决策。",
   "Active Incident": "当前异常",
   "Mission Task Input": "任务描述",
 
   "Mission Plan": "任务方案",
+  Plan: "方案",
   Planning: "规划",
-  "Mission Task": "任务",
   Environment: "环境",
   Airspace: "空域",
   Drone: "设备",
@@ -110,6 +134,7 @@ const zhText: Record<string, string> = {
   "Link Quality": "链路质量",
 
   "Risk Stack": "风险栈",
+  "Risk Explanation": "风险解释",
   Explainable: "可解释",
   "Risk Assessment": "风险评估",
   "Sorted by severity": "按严重程度排序",
@@ -154,6 +179,7 @@ const zhText: Record<string, string> = {
     "当前筛选条件下没有风险项。完整风险评估仍可在其他严重等级中查看。",
   "Waiting for risk simulation results from the mission decision loop.":
     "正在等待任务决策闭环返回风险推演结果。",
+  "Generate a plan to view risk explanation.": "生成任务方案后查看风险解释。",
 
   "Simulated Sandbox": "仿真沙盘",
   "Mock Spatial Layer": "模拟空间层",
@@ -217,6 +243,7 @@ const zhText: Record<string, string> = {
     "图传延迟超过安全监控上限时，中止或暂停近距离作业。",
 
   "Incident Replanning": "异常重规划",
+  "Replan Decision": "重规划决策",
   "Replan Result": "重规划结果",
   "Decision Summary": "决策摘要",
   "Selected Decision": "已选择决策",
@@ -230,11 +257,11 @@ const zhText: Record<string, string> = {
   "The current mock replan result did not provide route segments. Keep the active segment under manual review.":
     "当前模拟重规划结果未提供航段信息。请将当前活动航段保留在人工复核中。",
   "Replan Actions Timeline": "重规划动作时间线",
+  "Action Timeline": "动作时间线",
   "Replan action sequence": "重规划动作序列",
   "No replan actions available": "无可用重规划动作",
   "The mock response returned no ordered action list. Keep this decision in manual review before execution.":
     "模拟响应未返回有序动作列表。执行前请保持人工复核。",
-  Step: "步骤",
   "Alternatives Considered": "已评估备选方案",
   "Rejected Alternatives": "已拒绝备选方案",
   "Not Recommended": "不推荐",
@@ -288,11 +315,13 @@ const zhText: Record<string, string> = {
     "本次模拟任务复盘未注入异常。",
   "No makeup flight is required by the current mock review.":
     "当前模拟复盘无需补飞。",
+  "Run review to view mission results.": "运行复盘后查看任务结果。",
   Nominal: "正常",
   Review: "复核",
   Attention: "注意",
 
   "Human Explanation": "决策解释",
+  "Decision Evidence": "决策证据",
   "Decision Basis": "决策依据",
   Inputs: "输入",
   "Not flight permission": "不是飞行许可",
@@ -313,6 +342,9 @@ const zhText: Record<string, string> = {
     "必须保留给人工安全或合规复核的事项。",
   "Waiting for facts, inferences, recommended actions, and human confirmation items.":
     "正在等待事实输入、模型推理、建议动作和人工确认项。",
+  "Generate a plan to view decision evidence.": "生成任务方案后查看决策证据。",
+  "Please retry or keep this task under manual review.":
+    "请重试，或将该任务保持在人工复核中。",
 
   "Mission decision loop is running.": "任务决策闭环运行中。",
   "Mission data unavailable.": "任务数据不可用。",

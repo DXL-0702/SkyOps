@@ -40,7 +40,7 @@ export function MissionPlanPanel({
         <DataSourceBadge
           locale={locale}
           sourceType={plan.mission_task.source_type}
-          label="Mission Task"
+          label="Mission Task Source"
         />
         <DataSourceBadge
           locale={locale}

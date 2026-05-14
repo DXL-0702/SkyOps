@@ -57,7 +57,7 @@ function MissionCycleStatusCard({
       <div className={cn(stateStyles.readySurface, "mt-4")}>
         <div className="flex flex-wrap items-center justify-between gap-2">
           <p className="text-sm font-semibold text-teal-50">
-            {t(locale, "Decision loop ready")}
+            {t(locale, "Plan ready")}
           </p>
           <span className={cn(badgeStyles.base, badgeStyles.success)}>
             {t(locale, "Explainable plan")}
@@ -66,7 +66,7 @@ function MissionCycleStatusCard({
         <p className="mt-2 text-xs leading-5 text-teal-100/80">
           {t(
             locale,
-            "Plan, risk stack, incident response, and review summary are generated from mock mission data.",
+            "Plan, risk explanation, incident response, and review report are generated from mock mission data.",
           )}
         </p>
       </div>
@@ -78,7 +78,7 @@ function MissionCycleStatusCard({
       <div className={cn(stateStyles.loadingSurface, "mt-4")} aria-live="polite">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <p className="text-sm font-semibold text-white">
-            {t(locale, "Mission decision loop running")}
+            {t(locale, "Generating plan...")}
           </p>
           <span className={cn(badgeStyles.base, badgeStyles.neutral)}>
             {t(locale, "In progress")}
@@ -87,7 +87,7 @@ function MissionCycleStatusCard({
         <p className={cn(textStyles.subtle, "mt-2")}>
           {t(
             locale,
-            "SkyOps is turning the natural-language task into a constrained low-altitude operation plan.",
+            "Checking task, constraints, and risks.",
           )}
         </p>
         <div className="mt-4 grid gap-2 sm:grid-cols-2">
@@ -106,7 +106,7 @@ function MissionCycleStatusCard({
     <div className={cn(stateStyles.failedSurface, "mt-4")} aria-live="polite">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-sm font-semibold text-red-50">
-          {t(locale, "Mission decision loop unavailable")}
+          {t(locale, "Unable to generate plan.")}
         </p>
         <span className={cn(badgeStyles.base, badgeStyles.danger)}>
           {t(locale, "Manual review")}
@@ -158,7 +158,7 @@ function MissionCycleStatusCard({
         type="button"
       >
         <RotateCw aria-hidden="true" size={15} />
-        {t(locale, "Retry Mission Loop")}
+        {t(locale, "Retry")}
       </button>
     </div>
   );
@@ -179,7 +179,7 @@ export function MissionInputPanel({
     <section className={panelStyles.base}>
       <PanelTitle
         icon={Activity}
-        title={t(locale, "Mission Intake")}
+        title={t(locale, "Mission Task")}
         meta={t(locale, "Natural language")}
       />
 
@@ -201,7 +201,7 @@ export function MissionInputPanel({
         type="button"
       >
         <GitBranch aria-hidden="true" size={17} />
-        {t(locale, isRunning ? "Demo Flow Running" : "Run All Demo Flow")}
+        {t(locale, isRunning ? "Generating plan..." : "Run Demo Flow")}
       </button>
 
       <MissionCycleStatusCard locale={locale} missionCycle={missionCycle} onRun={onRun} />
@@ -224,7 +224,7 @@ export function IncidentControlPanel({
     <section className={panelStyles.base}>
       <PanelTitle
         icon={GitBranch}
-        title={t(locale, "Incident Control")}
+        title={t(locale, "Incident Injection")}
         meta={t(locale, "Replan trigger")}
       />
 
@@ -336,7 +336,7 @@ export function IncidentControlPanel({
         {incidentUpdateError ? (
           <div className={cn(stateStyles.failedSurface, "mt-4")} role="alert">
             <p className="text-sm font-semibold text-red-50">
-              {t(locale, "Incident update unavailable")}
+              {t(locale, "Unable to replan.")}
             </p>
             <p className="mt-2 text-xs leading-5 text-red-50">{t(locale, incidentUpdateError)}</p>
           </div>

@@ -51,7 +51,7 @@ Phase 2 可视化 Demo 除以下保留项外，均视为已完成并归档：
 
 ### Issue P1-L-018: Demo Flow Polish For Competition Presentation
 
-**Status:** Retained
+**Status:** Completed
 
 **Priority:** P1
 
@@ -87,11 +87,17 @@ Phase 2 可视化 Demo 除以下保留项外，均视为已完成并归档：
 - mock/simulated 数据标识仍然清楚。
 - `npm run build` 通过。
 
+**Implementation Notes:**
+
+- 保留现有 Mission Operations Console 信息架构，不采用 PR #52 的页面结构重写。
+- 在状态条下方增加轻量竞赛演示流程条，联动现有侧边栏视图：任务输入、任务方案、风险解释、异常注入、复盘报告。
+- 演示文案继续强调任务级自治与风险推演，不把产品表述成图像缺陷识别工具。
+
 ---
 
 ### Issue P2-S-023: Copywriting Polish
 
-**Status:** Backlog
+**Status:** Completed
 
 **Priority:** P2
 
@@ -124,6 +130,12 @@ Phase 2 可视化 Demo 除以下保留项外，均视为已完成并归档：
 - 中文界面中关键 UI 不出现裸露英文。
 - 英文界面表达专业、克制、面向低空作业运营。
 - `npm run build` 通过。
+
+**Implementation Notes:**
+
+- 保留并延续既有 `i18n.ts` 优化，只补充缺失映射、清理重复 key 和统一关键面板标题。
+- 统一前端核心演示文案：`Mission Task`、`Risk Explanation`、`Decision Evidence`、`Incident Injection`、`Replan Decision`、`Action Timeline`、`Review Report`。
+- loading、failed、empty 状态文案改为更短的演示语言，并保留人工复核和 mock/simulated data 提示。
 
 ---
 
