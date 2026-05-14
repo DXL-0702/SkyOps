@@ -128,6 +128,7 @@ function EvidenceList({ evidence, locale }: { evidence: string[]; locale: Locale
       {hiddenCount > 0 ? (
         <button
           aria-expanded={isExpanded}
+          aria-label={t(locale, isExpanded ? "Show less evidence" : "Show more evidence")}
           className={cn(buttonStyles.base, buttonStyles.compact, "w-fit px-2.5")}
           onClick={() => setIsExpanded((current) => !current)}
           type="button"

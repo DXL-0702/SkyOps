@@ -111,7 +111,7 @@ export function MissionFlowSidebar({
             <button
               aria-current={isActive ? "page" : undefined}
               className={cn(
-                "w-full border p-3 text-left transition",
+                "w-full border p-3 text-left transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-300",
                 isActive
                   ? "border-teal-300 bg-teal-300/10 text-teal-50 shadow-[inset_3px_0_0_rgba(94,234,212,0.85)]"
                   : "border-zinc-800 bg-zinc-950/70 text-zinc-400 hover:border-zinc-600 hover:text-zinc-100",

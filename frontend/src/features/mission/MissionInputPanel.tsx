@@ -183,9 +183,13 @@ export function MissionInputPanel({
         meta={t(locale, "Natural language")}
       />
 
+      <label className={cn(textStyles.strongLabel, "mt-4 block")} htmlFor="mission-task-input">
+        {t(locale, "Mission Task Input")}
+      </label>
       <textarea
         className={formStyles.textarea}
         disabled={controlsDisabled}
+        id="mission-task-input"
         onChange={(event) => onTaskInputChange(event.target.value)}
         value={taskInput}
       />
@@ -256,7 +260,7 @@ export function IncidentControlPanel({
               <button
                 aria-pressed={isActive}
                 className={cn(
-                  "w-full border p-4 text-left transition disabled:cursor-not-allowed disabled:opacity-60",
+                  "w-full border p-4 text-left transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-300 disabled:cursor-not-allowed disabled:opacity-60",
                   isActive
                     ? "border-teal-300 bg-teal-300/10 shadow-[inset_3px_0_0_rgba(94,234,212,0.85)]"
                     : "border-zinc-800 bg-zinc-950/80 hover:border-zinc-600",

@@ -23,7 +23,7 @@ function getSourceTone(sourceType: DataSourceType): string {
 
 export function DataSourceBadge({ sourceType, label, locale = "en" }: DataSourceBadgeProps) {
   return (
-    <span className={cn(badgeStyles.base, getSourceTone(sourceType), "whitespace-nowrap")}>
+    <span className={cn(badgeStyles.base, getSourceTone(sourceType), "break-words leading-4")}>
       {label ? `${t(locale, label)}: ` : ""}
       {t(locale, sourceType.toUpperCase())}
     </span>

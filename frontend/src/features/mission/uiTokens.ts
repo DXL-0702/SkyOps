@@ -10,10 +10,11 @@ export const visualDirection = {
 } as const;
 
 export const layoutStyles = {
-  page: "min-h-screen bg-zinc-950 text-zinc-100",
-  shell: "mx-auto flex min-h-screen w-full max-w-[92rem] flex-col gap-5 px-4 py-5 sm:px-6 lg:px-8",
+  page: "min-h-screen overflow-x-hidden bg-zinc-950 text-zinc-100",
+  shell:
+    "mx-auto flex min-h-screen w-full max-w-[92rem] min-w-0 flex-col gap-5 px-4 py-5 sm:px-6 lg:px-8",
   header:
-    "flex flex-col gap-4 border-b border-zinc-800 pb-5 lg:flex-row lg:items-center lg:justify-between",
+    "flex min-w-0 flex-col gap-4 border-b border-zinc-800 pb-5 lg:flex-row lg:items-center lg:justify-between",
   workspaceGrid: "grid gap-5 lg:grid-cols-[17rem_minmax(0,1fr)]",
   primaryGrid: "grid gap-5 xl:grid-cols-[1.05fr_1.55fr_0.9fr]",
   secondaryGrid: "grid gap-5 lg:grid-cols-[1fr_1fr]",
@@ -23,13 +24,14 @@ export const layoutStyles = {
 } as const;
 
 export const panelStyles = {
-  base: "border border-zinc-800 bg-zinc-900/70 p-5",
-  statusTile: "flex min-h-20 items-center gap-3 border border-zinc-800 bg-zinc-900/70 p-4",
-  surface: "border border-zinc-800 bg-zinc-950/70",
-  surfacePadded: "border border-zinc-800 bg-zinc-950/70 p-4",
-  textSurface: "border border-zinc-800 bg-zinc-950/70 p-4 text-sm leading-6 text-zinc-300",
+  base: "min-w-0 border border-zinc-800 bg-zinc-900/70 p-4 sm:p-5",
+  statusTile: "flex min-h-20 min-w-0 items-center gap-3 border border-zinc-800 bg-zinc-900/70 p-4",
+  surface: "min-w-0 border border-zinc-800 bg-zinc-950/70",
+  surfacePadded: "min-w-0 border border-zinc-800 bg-zinc-950/70 p-4",
+  textSurface:
+    "min-w-0 border border-zinc-800 bg-zinc-950/70 p-4 text-sm leading-6 text-zinc-300",
   interactiveSurface:
-    "border border-zinc-800 bg-zinc-950 text-zinc-300 transition hover:border-zinc-600",
+    "min-w-0 border border-zinc-800 bg-zinc-950 text-zinc-300 transition hover:border-zinc-600",
 } as const;
 
 export const textStyles = {
@@ -43,7 +45,7 @@ export const textStyles = {
 } as const;
 
 export const badgeStyles = {
-  base: "border px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.14em]",
+  base: "inline-flex max-w-full items-center border px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.14em]",
   brand: "border-teal-400/40 bg-teal-400/10 text-teal-200",
   mock: "border-amber-400/40 bg-amber-400/10 text-amber-200",
   neutral: "border-zinc-700 bg-zinc-950 text-zinc-400",
@@ -59,12 +61,13 @@ export const bannerStyles = {
 } as const;
 
 export const buttonStyles = {
-  base: "flex h-11 items-center justify-center gap-2 text-sm transition disabled:cursor-not-allowed disabled:opacity-50",
-  primary: "bg-teal-300 px-4 font-semibold text-zinc-950 hover:bg-teal-200",
-  incident: "border px-2 font-medium",
+  base:
+    "flex min-w-0 items-center justify-center gap-2 text-sm transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-300 disabled:cursor-not-allowed disabled:opacity-50",
+  primary: "min-h-11 bg-teal-300 px-4 py-2 font-semibold text-zinc-950 hover:bg-teal-200",
+  incident: "min-h-11 border px-2 py-2 font-medium",
   incidentActive: "border-teal-300 bg-teal-300/15 text-teal-100",
   incidentIdle: "border-zinc-800 bg-zinc-950 text-zinc-300 hover:border-zinc-600",
-  filter: "h-9 border px-3 text-xs font-semibold uppercase tracking-[0.12em]",
+  filter: "min-h-9 border px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em]",
   filterActive: "border-teal-300 bg-teal-300/15 text-teal-100",
   filterIdle: "border-zinc-800 bg-zinc-950 text-zinc-400 hover:border-zinc-600 hover:text-zinc-200",
   compact:
@@ -72,24 +75,25 @@ export const buttonStyles = {
 } as const;
 
 export const stateStyles = {
-  loadingSurface: "border border-zinc-800 bg-zinc-950/70 p-4",
-  emptySurface: "border border-dashed border-zinc-800 bg-zinc-950/60 p-4",
-  failedSurface: "border border-red-400/40 bg-red-400/10 p-4",
-  readySurface: "border border-teal-400/40 bg-teal-400/10 p-4",
+  loadingSurface: "min-w-0 border border-zinc-800 bg-zinc-950/70 p-4",
+  emptySurface: "min-w-0 border border-dashed border-zinc-800 bg-zinc-950/60 p-4",
+  failedSurface: "min-w-0 border border-red-400/40 bg-red-400/10 p-4",
+  readySurface: "min-w-0 border border-teal-400/40 bg-teal-400/10 p-4",
   pipelineItem:
-    "flex items-center gap-2 border border-zinc-800 bg-zinc-950/70 px-3 py-2 text-xs text-zinc-300",
+    "flex min-w-0 items-center gap-2 border border-zinc-800 bg-zinc-950/70 px-3 py-2 text-xs text-zinc-300",
 } as const;
 
 export const metricStyles = {
-  card: "border border-zinc-800 bg-zinc-950/70 p-4",
-  compactCard: "border border-zinc-800 bg-zinc-950/70 p-3",
+  card: "min-w-0 border border-zinc-800 bg-zinc-950/70 p-4",
+  compactCard: "min-w-0 border border-zinc-800 bg-zinc-950/70 p-3",
   value: "mt-2 break-words text-sm font-semibold leading-5 text-white",
 } as const;
 
 export const listStyles = {
-  item: "flex items-start gap-2 border border-zinc-800 bg-zinc-950/70 px-3 py-2 text-sm leading-5 text-zinc-300",
+  item:
+    "flex min-w-0 items-start gap-2 overflow-hidden border border-zinc-800 bg-zinc-950/70 px-3 py-2 text-sm leading-5 text-zinc-300",
   numberedItem:
-    "flex items-center gap-3 border border-zinc-800 bg-zinc-950/70 px-3 py-2 text-sm text-zinc-300",
+    "flex min-w-0 items-start gap-3 overflow-hidden border border-zinc-800 bg-zinc-950/70 px-3 py-2 text-sm leading-5 text-zinc-300",
   number:
     "flex h-6 w-6 items-center justify-center bg-teal-300/15 text-xs font-semibold text-teal-200",
   dot: "mt-2 h-1.5 w-1.5 shrink-0 bg-teal-300",
@@ -123,7 +127,7 @@ export const iconBoxStyles = {
 
 export const formStyles = {
   textarea:
-    "mt-4 min-h-36 w-full resize-none border border-zinc-800 bg-zinc-950 p-4 text-sm leading-6 text-zinc-100 outline-none transition focus:border-teal-400",
+    "mt-3 min-h-36 w-full resize-none border border-zinc-800 bg-zinc-950 p-4 text-sm leading-6 text-zinc-100 outline-none transition focus:border-teal-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-300",
 } as const;
 
 export const commandLayerStyles = {

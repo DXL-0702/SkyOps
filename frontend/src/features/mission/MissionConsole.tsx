@@ -24,7 +24,9 @@ import {
   type ConsoleViewId,
 } from "./MissionWorkspaceChrome";
 import { RiskPanel } from "./RiskPanel";
+import { RiskChartsPanel } from "./RiskChartsPanel";
 import { SafetyThresholdPanel } from "./SafetyThresholdPanel";
+import { SandboxMapPanel } from "./SandboxMapPanel";
 import { StatusStrip } from "./StatusStrip";
 import { DataSourceBadge } from "./components/DataSourceBadge";
 import { formatCheckEndpoint, missionConsoleCopy, type Locale } from "./i18n";
@@ -249,6 +251,7 @@ export function MissionConsole() {
       return (
         <section className={layoutStyles.fullWidthGrid}>
           <MissionPlanPanel locale={locale} missionCycle={missionCycle} />
+          <SandboxMapPanel locale={locale} missionCycle={missionCycle} />
           <section className={layoutStyles.secondaryGrid}>
             <EnvironmentDronePanel locale={locale} missionCycle={missionCycle} />
             <SafetyThresholdPanel locale={locale} missionCycle={missionCycle} />
@@ -261,6 +264,7 @@ export function MissionConsole() {
       return (
         <section className={layoutStyles.fullWidthGrid}>
           <RiskPanel locale={locale} missionCycle={missionCycle} />
+          <RiskChartsPanel locale={locale} missionCycle={missionCycle} />
           <HumanExplanationPanel locale={locale} missionCycle={missionCycle} />
         </section>
       );
@@ -285,6 +289,7 @@ export function MissionConsole() {
     return (
       <section className={layoutStyles.fullWidthGrid}>
         <MissionReviewPanel locale={locale} missionCycle={missionCycle} />
+        <RiskChartsPanel locale={locale} missionCycle={missionCycle} variant="review" />
         <HumanExplanationPanel locale={locale} missionCycle={missionCycle} />
       </section>
     );
