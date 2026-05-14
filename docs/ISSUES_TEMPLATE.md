@@ -1,808 +1,57 @@
-# SkyOps Agent Phase 2 Issues Backlog
+# SkyOps Agent Active Issues Backlog
 
-本文件用于将 Phase 2 可视化 Demo 的开发任务拆分为可执行 issues，供组长分配给自己和组员。每个 issue 都应保持小范围、可验证、可 code review，并可直接复制到 GitHub Issues。
+本文件用于维护 SkyOps Agent 当前阶段的可执行开发任务，供组长分配给自己和组员。历史 Phase 2 任务已完成归档；当前只保留必要的 Phase 2 尾项，并正式进入 Phase 3：评测集与指标开发。初赛前追加一个轻量 Phase 4-lite，用于定义 LLM 接口和 Agent 安全边界，不接入真实 LLM。
 
 ## 使用规则
 
-- **P0**：阻塞后续开发或影响整体架构，优先由组长完成。
-- **P1**：核心 Demo 功能，优先完成。
-- **P2**：体验增强或展示增强，不阻塞主链路。
-- **Difficulty S**：适合代码基础较弱组员，在明确边界下完成。
-- **Difficulty M**：适合有一定前端/TypeScript 基础的成员。
-- **Difficulty L**：涉及页面结构、状态流、核心组件边界或产品判断，建议组长完成。
-- **Owner Suggestion: Leader**：影响整体架构、页面信息架构、API 调用边界或核心状态流，由组长完成。
-- **Owner Suggestion: Member**：局部组件、样式、展示字段、mock 说明、文档和测试，可分配给组员。
+- **P0**：阻塞后续开发、影响评测架构或数据契约，优先由组长完成。
+- **P1**：Phase 3 核心能力，优先完成。
+- **P2**：体验增强、展示增强或非阻塞补充。
+- **Difficulty S**：边界清晰，适合组员在明确说明下完成。
+- **Difficulty M**：需要一定 Python/TypeScript/测试经验，适合拆给组员并由组长 review。
+- **Difficulty L**：涉及 schema、评测口径、执行链路、报告结构或页面信息架构，建议组长完成。
+- **Owner Suggestion: Leader**：影响整体架构、数据模型、评测指标、API/CLI 形态或前端信息架构，由组长完成。
+- **Owner Suggestion: Member**：局部场景数据、测试用例、展示字段、文档和样式，可分配给组员。
 
-Phase 2 所有任务必须遵守：
+所有 issue 必须遵守：
 
-- 页面是低空作业调度台，不做营销 landing page。
-- 第一屏应能输入任务、查看方案、注入异常、查看重规划和复盘摘要。
-- mock/simulated 数据必须清晰标注。
-- 不修改后端 API contract；如确需修改，必须由组长单独开 issue。
-- 不引入大型 UI 框架；样式使用 Tailwind CSS。
-- 不引入真实地图、真实无人机、真实空域或真实天气 API。
-- 关键决策必须展示原因、触发条件或人工复核要求。
+- SkyOps Agent 是低空作业任务自治与风险推演系统，不是缺陷识别工具。
+- mock/simulated 数据必须清晰标注，不伪装成真实数据。
+- Phase 3 评测不得依赖实时外部 API、真实无人机、真实地图、真实空域或真实天气。
+- 评测逻辑必须可重复运行、可解释、可定位失败原因。
+- 硬约束和安全余量优先级高于方案效率。
+- Phase 4-lite 只定义 LLM adapter contract、mock provider 和安全边界，不接入真实 LLM API。
+- LLM 输出只能作为任务解析、约束补齐、解释生成和报告润色草稿，不能覆盖硬约束、安全规则或合规判断。
+- 不得修改后端 API contract、公共模型字段、orchestrator 调用顺序或安全规则格式，除非该 issue 明确标注由组长负责。
+- 组员 PR 不应混入无关格式化、架构重排或依赖新增。
 
-## Phase 2.0 已完成：前端 API Contract 对齐
+## Phase 2 收口状态
 
-### Issue P0-L-001: Frontend Mission API Contracts
+Phase 2 可视化 Demo 除以下保留项外，均视为已完成并归档：
 
-**Status:** Done
+- `P1-L-018: Demo Flow Polish For Competition Presentation`
+- `P2-S-023: Copywriting Polish`
 
-**Priority:** P0
+已完成归档范围包括：
 
-**Difficulty:** M
+- 前端 API contract 对齐。
+- Mission Operations Console 基础界面。
+- 组件拆分与 UI tokens。
+- 任务方案、环境设备、安全阈值、风险栈、解释、异常重规划、复盘报告。
+- Header 中英文切换。
+- 响应式布局与基础可访问性。
+- 简化沙盘地图面板。
+- Recharts 风险小图表。
 
-**Owner Suggestion:** Leader
-
-**Goal:** 对齐 Phase 1 后端接口，封装前端 API client 和 TypeScript 类型。
-
-**Scope:**
-
-- 新增统一 API request helper。
-- 定义 mission planning / replan / review response 类型。
-- 封装：
-  - `createMissionPlan`
-  - `createReplanDecision`
-  - `createMissionReview`
-- 保留 `VITE_API_BASE_URL` 覆盖能力。
-
-**Acceptance Criteria:**
-
-- `npm run build` 通过。
-- 前端类型覆盖 `/missions/plan`、`/missions/replan`、`/missions/review`。
-- 不修改后端接口。
+后续不再围绕已完成 Phase 2 任务开新 PR，除非是明确 bugfix 或组长指定的展示优化。
 
 ---
 
-## Phase 2.1 已完成：调度台基础布局
-
-### Issue P0-L-002: Mission Operations Console First Screen
-
-**Status:** Done
-
-**Priority:** P0
-
-**Difficulty:** L
-
-**Owner Suggestion:** Leader
-
-**Goal:** 建立第一版可操作低空作业调度台页面。
-
-**Scope:**
-
-- 顶部状态栏。
-- 任务自然语言输入区。
-- 异常注入按钮。
-- 任务方案摘要。
-- 风险面板。
-- 异常重规划面板。
-- 任务复盘面板。
-- Vite dev proxy 配置。
-
-**Acceptance Criteria:**
-
-- 第一屏可以看见主要调度台模块。
-- 点击异常按钮可重新调用 replan/review。
-- 页面明确显示 mock/simulated 数据状态。
-- `npm run build` 通过。
-
----
-
-## Phase 2.2：组件拆分与视觉系统定调
-
-### Issue P0-L-003: Split Mission Console Into Feature Components
-
-**Status:** Done
-
-**Priority:** P0
-
-**Difficulty:** L
-
-**Owner Suggestion:** Leader
-
-**Depends On:** P0-L-002
-
-**Goal:** 将当前较大的 `App.tsx` 拆分为清晰组件，建立 Phase 2 后续开发边界。
-
-**Scope:**
-
-- 新增目录：
-  - `frontend/src/features/mission/`
-  - `frontend/src/features/mission/components/`
-- 拆分组件：
-  - `MissionConsole.tsx`
-  - `MissionInputPanel.tsx`
-  - `MissionPlanPanel.tsx`
-  - `RiskPanel.tsx`
-  - `IncidentReplanPanel.tsx`
-  - `MissionReviewPanel.tsx`
-  - `StatusStrip.tsx`
-- 拆分共享 UI：
-  - `PanelTitle.tsx`
-  - `Metric.tsx`
-  - `ProgressMetric.tsx`
-  - `ActionList.tsx`
-  - `RiskBadge.tsx`
-  - `PanelFallback.tsx`
-
-**Out of Scope:**
-
-- 不改变 UI 行为。
-- 不改变 API 调用逻辑。
-- 不做大规模视觉重设计。
-
-**Acceptance Criteria:**
-
-- `App.tsx` 只负责渲染 `MissionConsole`。
-- 每个面板组件职责清晰。
-- `npm run build` 通过。
-- 没有改变现有调度台功能。
-
----
-
-### Issue P0-L-004: Define Phase 2 Visual Direction And UI Tokens
-
-**Status:** Done
-
-**Priority:** P0
-
-**Difficulty:** L
-
-**Owner Suggestion:** Leader
-
-**Depends On:** P0-L-003
-
-**Goal:** 明确 Phase 2 Demo 的视觉方向和基础 UI tokens，避免组员各自写出不一致样式。
-
-**Scope:**
-
-- 明确整体风格：
-  - 低空运营调度台。
-  - 专业、克制、可读。
-  - 保留深色基底，但避免过重“科幻 HUD”。
-- 定义颜色使用：
-  - neutral/zinc 作为背景。
-  - teal 表示正常/可执行。
-  - amber 表示警告/需要关注。
-  - red 表示高风险/禁止/人工接管。
-- 定义组件基础样式：
-  - panel
-  - button
-  - badge
-  - metric card
-  - list item
-  - progress bar
-- 在代码中形成简单可复用 className 常量或组件 props。
-
-**Out of Scope:**
-
-- 不引入设计系统库。
-- 不引入 CSS-in-JS。
-- 不引入大型 UI 框架。
-
-**Acceptance Criteria:**
-
-- 主要面板视觉风格统一。
-- 风险等级颜色一致。
-- mock/simulated 标识样式统一。
-- `npm run build` 通过。
-
-**Implementation Notes:**
-
-- Phase 2 UI 定调为：专业低空运营调度台为主体，选择性引入城市低空指挥中心的空间态势感。
-- 已新增 `frontend/src/features/mission/uiTokens.ts`，集中管理 operational tokens、risk semantic tokens 和 command-layer tokens。
-- 后续局部组件、沙盘、航线、风险区域、异常重规划展示应优先复用这些 tokens，不要各自临时定义颜色体系。
-
----
-
-### Issue P1-M-005: Improve Loading And Error States
-
-**Status:** Done
-
-**Priority:** P1
-
-**Difficulty:** M
-
-**Owner Suggestion:** Member
-
-**Depends On:** P0-L-003
-
-**Goal:** 将后端未启动、接口失败、任务运行中等状态设计成专业调度台的可恢复状态，而不是让 Demo 看起来像页面坏掉。状态文案必须服务低空作业任务自治场景：说明当前卡在哪一步、风险是什么、用户下一步能做什么。
-
-**Scope:**
-
-- 改进 backend offline 显示：
-  - 明确说明当前无法连接任务推演后端。
-  - 保留页面主体布局，不出现空白屏或崩溃感。
-  - 显示 backend endpoint，例如 `127.0.0.1:8000` 或当前配置的 API base URL。
-- 改进 mission cycle loading 状态：
-  - 展示任务正在经历的阶段，例如任务解析、约束检查、风险推演、方案生成。
-  - 禁用重复提交，避免连续触发多个任务请求。
-  - 保留已有任务结果或显示稳定 skeleton，不让布局大幅跳动。
-- 改进 mission cycle failed 状态：
-  - 使用面向用户的安全文案，不直接暴露 `Failed to fetch`、HTTP 原始错误、stack trace 或开发调试信息。
-  - 明确区分“事实状态”“可能原因”“建议动作”。
-  - 不伪造任务结果，不把失败状态包装成成功方案。
-- 显示用户可执行动作：
-  - 启动后端。
-  - 检查 API 地址。
-  - 重新运行任务。
-  - 在风险不确定时建议人工复核或暂停执行。
-- loading / failed / offline 状态应沿用 `uiTokens.ts` 中的视觉 token，不临时新增另一套颜色体系。
-- 如果需要展示调试信息，只能使用折叠的开发辅助区域，并且默认不面向普通用户展示。
-
-**Out of Scope:**
-
-- 不修改后端 API contract。
-- 不新增错误上报服务。
-- 不引入 toast/message UI 框架。
-- 不新增全局状态管理库。
-
-**Acceptance Criteria:**
-
-- 后端未启动时页面仍然美观、可读。
-- mission cycle 运行中有明确、稳定、不跳动的 loading 状态。
-- mission cycle 失败时显示安全、可执行、非技术堆栈式错误文案。
-- 失败状态提供 retry 或重新运行入口。
-- 错误状态不伪造 mock 结果，也不暗示系统已经完成风险推演。
-- 错误信息不会撑破布局。
-- 状态文案体现 SkyOps Agent 是“低空作业任务自治与风险推演”系统，而不是普通聊天或表单工具。
-- `npm run build` 通过。
-
-**Implementation Notes:**
-
-- 已优化 `BackendStatus`，后端离线时展示面向调度台用户的安全说明、API endpoint 和人工复核提示，不再直接暴露原始 fetch 错误。
-- 已在 `MissionInputPanel` 增加 mission cycle 状态卡，覆盖 ready / loading / failed 三种状态。
-- loading 状态展示任务解析、约束推理、风险推演、重规划复盘等阶段，并禁用重复提交和异常按钮。
-- failed 状态区分失败事实、可能原因和建议动作，提供 retry 入口，并明确不生成可用飞行建议。
-- 已扩展 `PanelFallback` 和 `uiTokens.ts` 的状态样式，保证各面板 loading / failed 表达一致。
-
----
-
-### Issue P1-S-006: Standardize Mock Data Badges
-
-**Status:** Done
-
-**Priority:** P1
-
-**Difficulty:** S
-
-**Owner Suggestion:** Member
-
-**Depends On:** P0-L-003
-
-**Goal:** 所有 mock/simulated 数据展示都带明确标识，符合项目安全边界。
-
-**Scope:**
-
-- 增加 `DataSourceBadge` 组件。
-- 在以下区域展示数据来源：
-  - mission task
-  - environment state
-  - airspace constraint
-  - drone state
-  - incident event
-  - review result
-- badge 文案可使用：
-  - `MOCK`
-  - `SIMULATED`
-  - `REAL`，但 Phase 2 不应出现真实数据。
-
-**Acceptance Criteria:**
-
-- 页面中所有核心数据区域均能看到数据来源。
-- mock 数据不会被误认为真实数据。
-- `npm run build` 通过。
-
-**Implementation Notes:**
-
-- 已新增 `DataSourceBadge` 组件，统一展示 `MOCK` / `SIMULATED` / `REAL` 数据来源。
-- 已在任务方案、环境、空域、设备、异常事件、风险推演、重规划和复盘区域标注数据来源。
-- Phase 2 当前不展示真实数据；如后续接入真实数据，必须继续使用同一 badge 机制区分来源。
-
----
-
-## Phase 2.3：任务规划展示细化
-
-### Issue P1-M-007: Mission Plan Detail Panel
-
-**Status:** Done
-
-**Priority:** P1
-
-**Difficulty:** M
-
-**Owner Suggestion:** Member
-
-**Depends On:** P0-L-003
-
-**Goal:** 将任务方案从摘要升级为可解释的规划详情。
-
-**Scope:**
-
-- 展示：
-  - 作业对象。
-  - 作业区域。
-  - 作业目标。
-  - 推荐时间窗口。
-  - 起降点。
-  - 航线策略。
-  - 飞行分段。
-  - 预计覆盖率。
-  - 预计时长。
-- 起降点需要展示：
-  - name
-  - description
-  - safety_notes
-
-**Acceptance Criteria:**
-
-- 用户能从面板理解任务为什么这样规划。
-- 长文本不会溢出。
-- `npm run build` 通过。
-
-**Implementation Notes:**
-
-- `MissionPlanPanel` 已展示作业对象、作业区域、风险偏好、作业目标、推荐时间窗口、航线策略、起降点、安全说明、飞行分段、预计覆盖率和预计时长。
-- 起降点展示包含 `name`、`description` 和 `safety_notes`。
-- 长文本使用 `break-words`、`leading-*` 和网格布局控制，避免撑破面板。
-
----
-
-### Issue P1-M-008: Environment And Drone State Panel
-
-**Status:** Done
-
-**Priority:** P1
-
-**Difficulty:** M
-
-**Owner Suggestion:** Member
-
-**Depends On:** P0-L-003
-
-**Goal:** 展示环境状态和设备状态，让用户看到规划依据。
-
-**Scope:**
-
-- 环境状态：
-  - weather_summary
-  - wind_speed_mps
-  - visibility_level
-  - crowd_level
-  - gps_quality
-  - gps_confidence
-  - data_confidence
-- 设备状态：
-  - drone_id
-  - model
-  - battery_percent
-  - estimated_endurance_minutes
-  - return_to_home_battery_threshold
-  - payloads
-  - link_quality
-  - video_latency_ms
-  - available_for_mission
-
-**Acceptance Criteria:**
-
-- 环境和设备状态可扫描。
-- 关键风险指标有颜色或图标提示。
-- `npm run build` 通过。
-
-**Implementation Notes:**
-
-- 已新增 `EnvironmentDronePanel`，集中展示环境状态和设备状态。
-- 环境侧展示天气、风速、能见度、人流、GPS 质量、GPS 置信度和数据置信度。
-- 设备侧展示无人机编号、机型、电量、续航、返航电量阈值、载荷、链路质量、图传延迟和任务可用性。
-- GPS 置信度、数据置信度、人流、链路质量和图传延迟使用风险颜色/徽标提示。
-
----
-
-### Issue P1-M-009: Safety Thresholds And Abort Conditions Panel
-
-**Status:** Done
-
-**Priority:** P1
-
-**Difficulty:** M
-
-**Owner Suggestion:** Member
-
-**Depends On:** P0-L-003
-
-**Goal:** 单独展示安全阈值和中止条件，强化“可解释安全决策”。
-
-**Scope:**
-
-- 展示 safety_thresholds：
-  - max_wind_speed_mps
-  - min_battery_percent
-  - min_gps_confidence
-  - max_video_latency_ms
-- 展示 abort_conditions。
-- 每个阈值显示简短解释。
-
-**Acceptance Criteria:**
-
-- 用户能明确看到任务中止条件。
-- 阈值展示和风险颜色一致。
-- `npm run build` 通过。
-
-**Implementation Notes:**
-
-- 已新增 `SafetyThresholdPanel`，单独展示安全阈值和中止条件。
-- 阈值状态使用 `WITHIN LIMIT` / `WATCH` / `TRIGGERED`：teal 表示安全余量，amber 表示接近阈值，red 表示已触发。
-- 未触发的 abort condition 使用中性规则承载层和 `ABORT RULE` 标签，避免把规则说明误读为当前告警。
-- 当前阈值状态基于环境/设备状态与 `mission_plan.safety_thresholds` 的展示层比较，不替代后端硬安全规则。
-
----
-
-## Phase 2.4：风险与解释面板
-
-### Issue P1-M-010: Risk Stack Filtering And Grouping
-
-**Status:** Done
-
-**Priority:** P1
-
-**Difficulty:** M
-
-**Owner Suggestion:** Member
-
-**Depends On:** P0-L-003
-
-**Goal:** 将风险面板从普通风险列表升级为“任务级自治决策风险栈”。用户应能快速看出哪些风险会阻断任务、哪些风险需要人工确认、哪些风险可以通过保守航线/改时间/补飞等方式缓解。
-
-**Scope:**
-
-- 按 risk_level 分组或排序，高风险优先：
-  - critical
-  - high
-  - medium
-  - low
-- 增加风险等级 filter 控件：
-  - All
-  - Critical
-  - High
-  - Medium
-  - Low
-- 展示每个风险项的关键字段：
-  - category
-  - description
-  - trigger_condition
-  - mitigation
-  - evidence
-  - requires_human_confirmation
-- 对 `requires_human_confirmation` 做清晰标注：
-  - 需要人工确认的风险必须明显可见。
-  - 不需要人工确认的风险也应避免被误读为“无风险”，可使用较弱提示展示其自动处理状态。
-- 展示风险与任务决策的关系：
-  - 是否影响 recommended_time_window。
-  - 是否影响 route_strategy。
-  - 是否触发 safety_thresholds 或 abort_conditions。
-  - 是否可能导致 replan、return-to-home、pause、manual takeover 或 supplement flight。
-- 空结果状态要清楚说明当前 filter 下没有对应风险，而不是让用户误以为系统没有风险评估能力。
-- 风险颜色必须复用 `uiTokens.ts` 的 risk semantic tokens：
-  - critical / high 使用 red 系。
-  - medium 使用 amber 系。
-  - low 使用 teal 或 neutral 系，按现有 token 执行。
-- 列表应保持扫描效率：不要把所有字段做成大段散文。
-
-**Out of Scope:**
-
-- 不修改后端风险模型字段。
-- 不新增风险等级枚举。
-- 不在前端重新实现硬安全规则。
-- 不引入图表库或复杂风险树可视化；风险树展示留给后续任务。
-
-**Acceptance Criteria:**
-
-- 高风险项优先显示。
-- 人工确认项清晰标注。
-- 用户能一眼区分阻断型风险、警告型风险和可监控风险。
-- 风险项至少展示触发条件、缓解动作和证据来源。
-- filter 有可用的空状态。
-- filter 不破坏布局。
-- 风险颜色与 P1-M-009 的安全阈值颜色保持一致。
-- 面板表达的是任务自治与风险推演，不是缺陷识别结果列表。
-- `npm run build` 通过。
-
-**Implementation Notes:**
-
-- 已将 `RiskPanel` 从普通列表升级为任务级风险栈，按 `critical -> high -> medium -> low` 排序。
-- 已增加 All / Critical / High / Medium / Low 筛选控件和空结果状态。
-- 每个风险项展示 category、trigger condition、description、mitigation、evidence、human confirmation 和 decision impact。
-- 风险卡片和风险徽章统一复用 `uiTokens.ts` 中的 red / amber / teal / zinc 语义色，和 `SafetyThresholdPanel` 的安全阈值颜色保持一致。
-- decision impact 为前端解释层基于现有风险字段推导，不修改后端风险模型，也不替代硬安全规则。
-
----
-
-### Issue P1-M-011: Human Explanation Panel
-
-**Status:** Done
-
-**Priority:** P1
-
-**Difficulty:** M
-
-**Owner Suggestion:** Member
-
-**Depends On:** P0-L-003
-
-**Goal:** 将后端 `human_explanation` 展示为“事实输入 / 模型推理 / 建议动作 / 人工确认”四块。
-
-**Scope:**
-
-- 展示：
-  - facts
-  - inferences
-  - recommended_actions
-  - human_confirmation_required
-- 区分四类信息的视觉层级。
-- 强调这不是自动飞行许可。
-
-**Acceptance Criteria:**
-
-- 用户能区分事实、推理、建议和人工确认。
-- 列表为空时有稳定占位。
-- `npm run build` 通过。
-
-**Implementation Notes:**
-
-- 已新增 `HumanExplanationPanel`，展示 `human_explanation` 中的 facts、inferences、recommended_actions 和 human_confirmation_required。
-- 四类信息分别使用事实输入、模型推理、建议动作、人工确认的视觉层级，便于用户区分事实、推理和建议。
-- 面板顶部明确标注 `Not flight permission`，强调解释内容只用于决策辅助和复盘，不替代空域审批、现场安全责任或人工放飞确认。
-- 空列表会显示稳定占位，避免误以为空白区域是渲染异常。
-- 已接入 `MissionConsole` 的 full-width 区域，保持与 `SafetyThresholdPanel` 同一信息层级。
-
----
-
-### Issue P2-S-012: Risk Evidence Display Polish
-
-**Status:** Done
-
-**Priority:** P2
-
-**Difficulty:** S
-
-**Owner Suggestion:** Member
-
-**Depends On:** P1-M-010
-
-**Goal:** 美化 risk evidence 展示，避免长列表显得杂乱。
-
-**Scope:**
-
-- evidence 最多默认展示 2 条。
-- 超过 2 条时显示 “+N more”。
-- 可用简单展开/收起。
-
-**Acceptance Criteria:**
-
-- 长 evidence 不撑破卡片。
-- 展开/收起逻辑简单稳定。
-- `npm run build` 通过。
-
-**Implementation Notes:**
-
-- 已新增 risk evidence 折叠展示，默认最多展示 2 条 evidence。
-- 超过 2 条时显示 `+N more`，并支持展开后 `Show less` 收起。
-- Evidence 文本使用 `min-w-0`、`overflow-hidden` 和 `break-words`，避免长文本撑破风险卡片。
-- 空 evidence 会显示稳定占位，避免误认为渲染异常。
-- 展开/收起按钮复用既有 compact button token，保持与 Phase 2 控件样式一致。
-
----
-
-## Phase 2.5：异常注入与重规划展示
-
-### Issue P1-L-013: Incident Control Panel Interaction Flow
-
-**Status:** Done
-
-**Priority:** P1
-
-**Difficulty:** L
-
-**Owner Suggestion:** Leader
-
-**Depends On:** P0-L-003
-
-**Goal:** 设计并实现更清晰的异常注入交互流程。
-
-**Scope:**
-
-- 将异常按钮从普通按钮升级为事件控制面板。
-- 每个异常显示：
-  - event_type
-  - observed_value
-  - threshold
-  - severity
-  - description
-- 点击异常后：
-  - 更新 active incident。
-  - 调用 replan。
-  - 调用 review。
-  - 保持当前 mission plan。
-- 支持 “Run All Demo Flow”。
-
-**Acceptance Criteria:**
-
-- 用户能清楚知道当前注入了什么异常。
-- 异常切换后重规划和复盘同步更新。
-- `npm run build` 通过。
-
-**Implementation Notes:**
-
-- 已将异常注入按钮升级为 Event Control Panel。
-- 每个异常卡片展示 `event_type`、`observed_value`、`threshold`、`severity` 和 `description`。
-- 点击异常后会更新 active incident，并调用 replan 与 review；当当前任务方案已 ready 时，会保留现有 mission plan，只同步替换 replan/review。
-- 已保留 `Run All Demo Flow`，用于完整执行 plan、replan、review 流程。
-- 异常更新中会禁用重复操作并展示 updating 状态。
-- 如果异常更新失败，会保留上一组 mission plan 和 active incident，并提示人工复核。
-
----
-
-### Issue P1-M-014: Replan Decision Detail Panel
-
-**Status:** Done
-
-**Priority:** P1
-
-**Difficulty:** M
-
-**Owner Suggestion:** Member
-
-**Depends On:** P1-L-013
-
-**Goal:** 细化重规划决策展示，让用户理解为什么暂停、返航、绕行或人工接管。
-
-**Scope:**
-
-- 展示：
-  - decision
-  - actions
-  - affected_segments
-  - makeup_flight_required
-  - human_takeover_required
-  - reason
-  - alternatives_considered
-- rejected alternatives 必须明确显示为 rejected。
-
-**Acceptance Criteria:**
-
-- 决策原因清楚可读。
-- rejected alternatives 不会被误解为推荐方案。
-- `npm run build` 通过。
-
-**Implementation Notes:**
-
-- 已在 `IncidentReplanPanel` 中展示 decision、reason、actions、affected_segments、makeup_flight_required、human_takeover_required 和 alternatives_considered。
-- `makeup_flight_required` 与 `human_takeover_required` 使用 Required / Not Required 文案，避免布尔值过于工程化。
-- rejected alternatives 使用红色风险语义、Rejected 标识和 Not Recommended 标签，避免被误读为推荐备选方案。
-- 当 affected segments 或 alternatives 为空时，展示稳定空状态，并提示需要人工复核。
-
----
-
-### Issue P2-M-015: Replan Timeline Visualization
-
-**Status:** Done
-
-**Priority:** P2
-
-**Difficulty:** M
-
-**Owner Suggestion:** Member
-
-**Depends On:** P1-M-014
-
-**Goal:** 使用简单时间线展示异常发生后的处置顺序。
-
-**Scope:**
-
-- 将 replan actions 渲染为纵向 timeline。
-- 每一步包含图标和动作名称。
-- 不引入动画库。
-
-**Acceptance Criteria:**
-
-- 时间线在桌面和移动端均可读。
-- actions 为空时有占位。
-- `npm run build` 通过。
-
-**Implementation Notes:**
-
-- 已将 replan actions 渲染为纵向 timeline，每一步包含图标、步骤编号和动作名称。
-- Timeline 使用现有 Tailwind 与 UI token 实现，未引入动画库或新依赖。
-- actions 为空时使用统一 `EmptyState` 展示，不再复用 loading 样式。
-- Timeline 加入 `aria-label`，便于后续无障碍检查。
-
----
-
-## Phase 2.6：复盘报告展示
-
-### Issue P1-M-016: Mission Review Report Panel
-
-**Status:** Done
-
-**Priority:** P1
-
-**Difficulty:** M
-
-**Owner Suggestion:** Member
-
-**Depends On:** P0-L-003
-
-**Goal:** 将复盘结果整理为可展示的报告面板。
-
-**Scope:**
-
-- 展示：
-  - completion_rate
-  - data_quality_score
-  - risk_trigger_log
-  - uncovered_areas
-  - makeup_flight_plan
-  - human_review_checklist
-  - next_mission_optimizations
-- 完成度和数据质量使用进度条或仪表式展示。
-
-**Acceptance Criteria:**
-
-- 用户能看出任务完成情况和补飞建议。
-- 风险触发记录清晰。
-- `npm run build` 通过。
-
-**Implementation Notes:**
-
-- 已在 `MissionReviewPanel` 中展示 completion_rate、data_quality_score、risk_trigger_log、uncovered_areas、makeup_flight_plan、human_review_checklist 和 next_mission_optimizations。
-- 完成度和数据质量使用 `ProgressMetric` 展示，并根据数值显示 Nominal / Review / Attention 状态。
-- 复盘面板保留 mock 数据标识，明确当前输出来自演示数据而非真实飞行结论。
-- 补飞建议、风险触发记录和人工复核清单均以可扫描列表呈现，服务“闭环复盘”定位。
-
----
-
-### Issue P2-S-017: Review Empty State And No-Incident State
-
-**Status:** Done
-
-**Priority:** P2
-
-**Difficulty:** S
-
-**Owner Suggestion:** Member
-
-**Depends On:** P1-M-016
-
-**Goal:** 优化无异常复盘或字段为空时的展示。
-
-**Scope:**
-
-- 当 `incident_events` 为空时展示稳定文案。
-- 当 `uncovered_areas` 为空时展示 “No uncovered area”。
-- 当 `makeup_flight_plan` 为空时展示 “No makeup flight required”。
-
-**Acceptance Criteria:**
-
-- 空状态不显得像 bug。
-- 文案不误导用户以为任务真实完成。
-- `npm run build` 通过。
-
-**Implementation Notes:**
-
-- 已新增通用 `EmptyState` 组件，统一处理复盘与重规划中的空状态。
-- 无 incident、无 risk trigger、无 uncovered area、无 makeup flight plan 时均展示稳定文案。
-- 空状态文案明确限定为 mock review 结果，不暗示真实任务已经完成或已获得合规放行。
-- Review summary badge 在无异常场景显示 `No Incident Injected`，避免把无异常误读成真实安全背书。
-
----
-
-## Phase 2.7：演示流与响应式优化
+## Phase 2 保留项
 
 ### Issue P1-L-018: Demo Flow Polish For Competition Presentation
 
-**Status:** Done
+**Status:** Retained
 
 **Priority:** P1
 
@@ -810,40 +59,242 @@ Phase 2 所有任务必须遵守：
 
 **Owner Suggestion:** Leader
 
-**Depends On:** P1-L-013, P1-M-016
+**Depends On:** Phase 2 completed console
 
-**Goal:** 整理比赛演示用的主流程，让评委能在 1-2 分钟内看懂产品本体。
+**Goal:** 保留并维护比赛演示主流程，确保评委能在 1-2 分钟内看懂产品本体。
 
 **Scope:**
 
-- 明确演示步骤：
+- 演示流程必须保持清晰：
   1. 输入自然语言任务。
   2. 生成任务方案。
   3. 查看风险解释。
   4. 注入异常。
   5. 查看重规划。
   6. 查看复盘与补飞计划。
-- 增加当前流程步骤指示。
-- 强调产品定位：任务级自治与风险推演，不是缺陷识别工具。
+- 继续强调产品定位：任务级自治与风险推演，不是缺陷识别工具。
+- 如 Phase 3 增加评测入口，不得破坏当前主 Demo 首屏理解成本。
+
+**Out of Scope:**
+
+- 不重新设计整套前端信息架构。
+- 不引入真实地图或真实无人机接口。
+- 不把 Demo 改成营销 landing page。
 
 **Acceptance Criteria:**
 
-- 首屏即可完成主演示。
-- 文案简洁，不像说明书。
+- 主 Demo 流程仍可从界面顺畅演示。
+- mock/simulated 数据标识仍然清楚。
 - `npm run build` 通过。
-
-**Implementation Notes:**
-
-- 已将 Mission Console 从“所有面板同时铺开”调整为单页多视图工作台。
-- 新增左侧 Mission Flow 侧边栏，按 Task / Plan / Risk / Incident / Review 五个决策阶段组织功能模块。
-- 使用 `activeView` 在前端本地控制当前视图，不引入 React Router，不修改后端 API、数据模型或 orchestrator。
-- 已将任务输入与异常注入拆分为 `MissionInputPanel` 和 `IncidentControlPanel`，降低首屏信息密度。
-- 每个视图顶部展示当前阶段说明、mission object、active incident 和 risk focus，帮助用户理解当前工作上下文。
-- 当前演示流程聚焦“任务级自治与风险推演”：输入任务、查看方案、查看风险、注入异常、查看重规划、查看复盘。
 
 ---
 
-### Issue P1-M-019: Responsive Layout Pass
+### Issue P2-S-023: Copywriting Polish
+
+**Status:** Backlog
+
+**Priority:** P2
+
+**Difficulty:** S
+
+**Owner Suggestion:** Member
+
+**Depends On:** P1-L-018
+
+**Goal:** 统一页面中英文文案，使其专业、简洁、可演示。
+
+**Scope:**
+
+- 统一面板标题。
+- 统一按钮文案。
+- 统一 empty/loading/error 文案。
+- 检查中文模式下是否仍有未映射英文 UI。
+- 避免长篇功能说明。
+- 避免“无人机缺陷识别系统”等错误产品定位。
+
+**Out of Scope:**
+
+- 不修改后端 mock 数据原文。
+- 不引入 i18n 框架或新依赖。
+- 不改变页面结构。
+
+**Acceptance Criteria:**
+
+- 文案不超过必要长度。
+- 中文界面中关键 UI 不出现裸露英文。
+- 英文界面表达专业、克制、面向低空作业运营。
+- `npm run build` 通过。
+
+---
+
+# Phase 3: Evaluation Dataset And Metrics
+
+Phase 3 的目标是把 SkyOps Agent 的任务级自治能力变成可量化、可回归、可复盘的评测结果。测试对象不是无人机硬件，也不是 CV 缺陷识别，而是 Agent 在复杂约束下的任务决策能力。
+
+Phase 3 推荐最终形成：
+
+- 可重复运行的 `EvaluationCase` 数据集。
+- 可稳定输出的 `EvaluationResult`。
+- 硬约束通过率、风险识别召回率、方案效率、异常处置得分、可解释性得分。
+- JSON 测试报告。
+- 可选前端评测摘要面板。
+
+## Phase 3.0：评测契约与数据基线
+
+### Issue P0-L-024: Define EvaluationCase And EvaluationResult Schema
+
+**Status:** Done
+
+**Priority:** P0
+
+**Difficulty:** L
+
+**Owner Suggestion:** Leader
+
+**Goal:** 定义 Phase 3 评测集的核心数据结构，作为后续所有评测数据、评分器和报告的契约。
+
+**Scope:**
+
+- 定义 `EvaluationCase` schema，至少包含：
+  - `case_id`
+  - `title`
+  - `scenario_type`
+  - `raw_user_input`
+  - `environment_state`
+  - `airspace_constraint`
+  - `drone_state`
+  - `incident_events`
+  - `expected_hard_constraints`
+  - `expected_risks`
+  - `expected_response_behaviors`
+  - `baseline_plan`
+  - `tags`
+  - `source_type`
+- 定义 `EvaluationResult` schema，至少包含：
+  - `case_id`
+  - `passed`
+  - `scores`
+  - `hard_constraint_results`
+  - `risk_recall_results`
+  - `incident_response_results`
+  - `explainability_results`
+  - `failure_reasons`
+  - `generated_at`
+- 明确哪些字段是事实输入、哪些是期望答案、哪些是评分输出。
+- 明确 JSON/YAML 文件组织方式。
+
+**Out of Scope:**
+
+- 不一次性实现全部评分器。
+- 不修改现有 `/missions/plan`、`/missions/replan`、`/missions/review` API contract。
+- 不新增数据库。
+
+**Acceptance Criteria:**
+
+- schema 可被 Pydantic v2 校验。
+- 至少有 1 个最小 `EvaluationCase` fixture 能通过校验。
+- 字段命名与现有 mission models 保持风格一致。
+- `uv run pytest` 通过。
+
+**Implementation Notes:**
+
+- 已新增 `backend/app/core/models/evaluation.py`，定义 `EvaluationCase`、`EvaluationResult`、`EvaluationScores`、`MetricScore`、期望硬约束、期望风险、期望异常响应和 baseline plan 等模型。
+- `EvaluationCase` 复用现有 `EnvironmentState`、`AirspaceConstraint`、`DroneState`、`IncidentEvent`、`MissionPlan` 等核心模型，不修改现有 mission API contract。
+- 已新增最小 smoke fixture：`backend/app/data/evaluation/smoke_highrise_nominal.yaml`，用于验证 Phase 3 评测数据形态。
+- 已新增 `backend/tests/test_evaluation_models.py`，覆盖 fixture 校验、Phase 3 禁止 case/result/nested sources 使用 `source_type: real`、`EvaluationResult.generated_at` 时区字段。
+- 本 issue 不包含 dataset loader、评分器、runner 或前端展示，这些继续由后续 Phase 3 issue 跟进。
+
+---
+
+### Issue P0-M-025: Create Evaluation Dataset Loader
+
+**Status:** Done
+
+**Priority:** P0
+
+**Difficulty:** M
+
+**Owner Suggestion:** Leader
+
+**Depends On:** P0-L-024
+
+**Goal:** 建立评测数据加载器，让后续 30-50 个场景可以稳定加载、校验和枚举。
+
+**Scope:**
+
+- 在既定目录下加载评测用例文件。
+- 支持按 `case_id` 加载单个用例。
+- 支持加载全部用例。
+- 校验重复 `case_id`。
+- 对不存在、格式错误、schema 不匹配给出明确错误。
+- 增加 loader 单元测试。
+
+**Out of Scope:**
+
+- 不实现评分逻辑。
+- 不接外部数据源。
+- 不改变现有 scenario loader 的行为，除非组长确认合并抽象。
+
+**Acceptance Criteria:**
+
+- 可加载 1 个示例 case。
+- 未知 case id 返回稳定异常。
+- 重复 case id 能被测试捕获。
+- `uv run pytest` 通过。
+
+**Implementation Notes:**
+
+- 已新增 `backend/app/data/evaluation/loader.py` 和 `backend/app/data/evaluation/__init__.py`，建立独立 evaluation dataset loader。
+- loader 支持加载全部 fixtures、加载全部 `EvaluationCase`、按 `case_id` 加载单个 fixture 或 case。
+- 已定义稳定异常：dataset 目录不存在、case id 不存在、重复 case id、YAML 非 mapping、schema 校验失败。
+- loader 支持测试传入临时目录，便于后续评测数据 PR 验证重复 id 和坏数据。
+- 已新增 `backend/tests/test_evaluation_loader.py`，覆盖默认 smoke case、单 case 加载、未知 id、重复 id、格式错误、schema 错误和缺失目录。
+- 本 issue 不包含评分器、runner、报告生成或现有 scenario loader 抽象合并。
+
+---
+
+### Issue P1-S-026: Add Evaluation Smoke Cases
+
+**Status:** Backlog
+
+**Priority:** P1
+
+**Difficulty:** S
+
+**Owner Suggestion:** Member
+
+**Depends On:** P0-L-024, P0-M-025
+
+**Goal:** 先添加 3-5 个最小 smoke cases，用于验证评测数据结构和 loader 可用。
+
+**Scope:**
+
+- 添加 3-5 个简单评测场景。
+- 场景应覆盖：
+  - 正常建筑外立面任务。
+  - 风速接近阈值任务。
+  - 电量接近安全返航阈值任务。
+- 每个 case 必须包含自然语言任务、环境、空域、设备、期望硬约束。
+- 标注 `mock` 或 `simulated`。
+
+**Out of Scope:**
+
+- 不追求 30-50 个完整场景。
+- 不写评分器。
+
+**Acceptance Criteria:**
+
+- 所有 smoke cases 可被 loader 加载。
+- 所有 smoke cases 通过 schema 校验。
+- `uv run pytest` 通过。
+
+---
+
+## Phase 3.1：评测场景数据集
+
+### Issue P1-M-027: Add Normal Operation Evaluation Cases
+
+**Status:** Backlog
 
 **Priority:** P1
 
@@ -851,35 +302,165 @@ Phase 2 所有任务必须遵守：
 
 **Owner Suggestion:** Member
 
-**Depends On:** P0-L-003
+**Depends On:** P1-S-026
 
-**Goal:** 检查并优化桌面、笔记本、平板和手机宽度下的布局。
+**Goal:** 增加一组正常低风险任务，用作 Agent 基准表现评测。
 
 **Scope:**
 
-- 检查宽度：
-  - 1440px
-  - 1280px
-  - 1024px
-  - 768px
-  - 390px
-- 修复：
-  - 文本溢出。
-  - 按钮挤压。
-  - 卡片高度跳动。
-  - 风险标签换行难看。
-- 保持首屏尽量可扫描。
+- 添加 5 个正常任务评测 case。
+- 至少覆盖：
+  - 高层建筑外立面巡检。
+  - 园区光伏巡检。
+  - 工地安全巡查。
+  - 园区安防巡逻。
+  - 低空测绘或城市治理巡查。
+- 每个 case 应包含明确的期望硬约束和期望风险点。
 
 **Acceptance Criteria:**
 
-- 移动端无明显横向滚动。
-- 按钮文字不溢出。
-- 长 decision 文本可换行。
-- `npm run build` 通过。
+- 新增 case 均可被 loader 加载。
+- case 不依赖真实 API。
+- 不出现缺陷识别模型输出作为核心评测目标。
+- `uv run pytest` 通过。
 
 ---
 
-### Issue P2-M-020: Accessibility And Keyboard Interaction Pass
+### Issue P1-M-028: Add Weather GPS And Crowd Risk Evaluation Cases
+
+**Status:** Backlog
+
+**Priority:** P1
+
+**Difficulty:** M
+
+**Owner Suggestion:** Member
+
+**Depends On:** P1-S-026
+
+**Goal:** 增加天气、GPS 和人流相关高风险场景，用于评估风险识别和保守决策能力。
+
+**Scope:**
+
+- 添加 5 个风险场景。
+- 至少覆盖：
+  - 风速超过阈值。
+  - 阵风接近阈值。
+  - GPS 置信度下降。
+  - 建筑峡谷导致导航风险。
+  - 人流聚集或低空悬停风险。
+- 每个 case 都应配置 `expected_risks`。
+
+**Acceptance Criteria:**
+
+- Agent 应能识别主要风险点。
+- case 中硬约束和风险点可被评分器引用。
+- `uv run pytest` 通过。
+
+---
+
+### Issue P1-M-029: Add Airspace And Compliance Evaluation Cases
+
+**Status:** Backlog
+
+**Priority:** P1
+
+**Difficulty:** M
+
+**Owner Suggestion:** Member
+
+**Depends On:** P1-S-026
+
+**Goal:** 增加禁飞区、限飞区、审批和临时管控相关场景，确保合规约束优先。
+
+**Scope:**
+
+- 添加 5 个空域合规场景。
+- 至少覆盖：
+  - 禁飞区不可飞。
+  - 限飞区需要审批。
+  - 临时管控区更新。
+  - 高度限制与任务目标冲突。
+  - 合规信息不足，需要人工复核。
+- 每个 case 都要明确 `expected_hard_constraints`。
+
+**Acceptance Criteria:**
+
+- 不允许 case 期望中出现绕过禁飞区、忽略审批等行为。
+- 合规风险必须可解释。
+- `uv run pytest` 通过。
+
+---
+
+### Issue P1-M-030: Add Drone Battery Payload And Link Evaluation Cases
+
+**Status:** Backlog
+
+**Priority:** P1
+
+**Difficulty:** M
+
+**Owner Suggestion:** Member
+
+**Depends On:** P1-S-026
+
+**Goal:** 增加设备、电量、载荷和图传相关场景，用于评估任务拆分、返航和降级决策。
+
+**Scope:**
+
+- 添加 5 个设备状态场景。
+- 至少覆盖：
+  - 电量不足。
+  - 返航余量不足。
+  - 续航无法一次完成任务。
+  - 图传延迟过高。
+  - 载荷不满足任务要求。
+- 每个 case 应包含期望的安全动作，例如拆分任务、返航、补飞或人工接管。
+
+**Acceptance Criteria:**
+
+- 设备约束不得被方案效率覆盖。
+- 需要补飞的 case 必须明确未覆盖区域或补飞触发条件。
+- `uv run pytest` 通过。
+
+---
+
+### Issue P1-M-031: Add Incident Injection Evaluation Cases
+
+**Status:** Backlog
+
+**Priority:** P1
+
+**Difficulty:** M
+
+**Owner Suggestion:** Member
+
+**Depends On:** P1-S-026
+
+**Goal:** 增加异常事件注入场景，用于评估异常重规划能力。
+
+**Scope:**
+
+- 添加 5 个异常注入 case。
+- 至少覆盖：
+  - 风速突增。
+  - GPS 置信度下降。
+  - 图传延迟增加。
+  - 电量跌破安全返航阈值。
+  - 人群聚集或临时空域限制。
+- 每个 case 应包含 `expected_response_behaviors`，例如暂停、返航、绕行、补飞、人工接管。
+
+**Acceptance Criteria:**
+
+- 每个 incident case 都能调用现有 replan 逻辑。
+- 期望动作必须安全保守。
+- `uv run pytest` 通过。
+
+---
+
+### Issue P2-M-032: Add Multi-Domain Expansion Evaluation Cases
+
+**Status:** Backlog
 
 **Priority:** P2
 
@@ -887,65 +468,224 @@ Phase 2 所有任务必须遵守：
 
 **Owner Suggestion:** Member
 
-**Depends On:** P1-M-019
+**Depends On:** P1-M-027, P1-M-028, P1-M-029, P1-M-030, P1-M-031
 
-**Goal:** 做基础可访问性检查，避免 Demo 页面难以键盘操作。
+**Goal:** 扩展评测集场景覆盖，证明产品不局限于建筑外立面巡检。
 
 **Scope:**
 
-- 所有按钮可通过键盘 focus。
-- focus 状态可见。
-- icon-only 元素必须有文本或 aria-label。
-- 色彩不能作为唯一风险提示。
-- 表单输入有可理解 label。
+- 新增 10-20 个扩展 case。
+- 建议覆盖：
+  - 应急救援。
+  - 消防巡查。
+  - 城市治理。
+  - 园区物流配送。
+  - 夜间安防巡逻。
+  - 台风前工地安全巡查。
+- 保持任务级自治视角，不把评测目标写成缺陷识别准确率。
 
 **Acceptance Criteria:**
 
-- 键盘 Tab 顺序基本合理。
-- 没有只有图标无语义的关键按钮。
-- `npm run build` 通过。
+- 总评测集规模达到 30-50 个 case。
+- 至少覆盖 4 类低空作业业务场景。
+- 所有 case 可重复运行并通过 schema 校验。
 
 ---
 
-### Issue P2-S-020A: Header Language Toggle
+## Phase 3.2：评分指标实现
 
-**Status:** Done
+### Issue P0-L-033: Define Evaluation Metric Contracts And Scoring Priority
 
-**Priority:** P2
+**Status:** Backlog
 
-**Difficulty:** S
+**Priority:** P0
+
+**Difficulty:** L
 
 **Owner Suggestion:** Leader
 
-**Depends On:** P1-L-018
+**Depends On:** P0-L-024
 
-**Goal:** 在顶部增加轻量中英文切换，让比赛演示和 GitHub 展示更易读。
+**Goal:** 明确 Phase 3 各项指标的计算口径和安全优先级，避免组员各自实现不一致评分逻辑。
 
 **Scope:**
 
-- 增加 `ZH / EN` 分段切换按钮。
-- 默认中文。
-- 翻译顶部标题、状态摘要、工作台导航和阶段说明。
-- 后端返回的 mock 任务数据、风险描述、复盘内容先保持原文。
-- 暂不实现深浅色主题切换。
+- 定义总分结构和单项指标字段。
+- 明确硬约束优先级：
+  - 违反禁飞、审批、风速、电量、人流安全等硬约束时，方案效率不得弥补安全失败。
+- 明确每个评分器输出：
+  - score
+  - passed
+  - matched_items
+  - missing_items
+  - failure_reasons
+- 明确指标包括：
+  - Hard Constraint Pass Rate
+  - Risk Recall
+  - Plan Efficiency
+  - Incident Response Score
+  - Explainability Score
+
+**Out of Scope:**
+
+- 不实现所有评分器。
+- 不引入 LLM judge。
 
 **Acceptance Criteria:**
 
-- 切换语言不会重新请求后端或重置 mission cycle。
-- 不引入 i18n 框架或新依赖。
-- `npm run build` 通过。
-
-**Implementation Notes:**
-
-- 已在 Mission Console 顶部加入 `ZH / EN` 切换控件。
-- UI shell 默认中文，可切换英文；业务数据和 mock API response 保持原始内容。
-- 主题切换暂缓，继续保持当前深色低空指挥台视觉基调。
+- 指标口径写入代码注释或 docs。
+- 后续评分器能共享同一结果结构。
+- `uv run pytest` 通过。
 
 ---
 
-## Phase 2.8：可选增强，不阻塞主 Demo
+### Issue P1-M-034: Implement Hard Constraint Pass Rate
 
-### Issue P2-L-021: Simplified Sandbox Map Panel
+**Status:** Backlog
+
+**Priority:** P1
+
+**Difficulty:** M
+
+**Owner Suggestion:** Member
+
+**Depends On:** P0-L-033
+
+**Goal:** 自动评估 Agent 方案是否违反硬约束。
+
+**Scope:**
+
+- 检查是否违反：
+  - 禁飞区或不可飞空域。
+  - 未满足审批要求。
+  - 超风速阈值。
+  - 电量低于安全返航余量。
+  - GPS 置信度低于安全阈值但仍建议近距离自主飞行。
+  - 人流高风险区域低空悬停。
+- 输出每条硬约束的 pass/fail 和原因。
+
+**Acceptance Criteria:**
+
+- 至少覆盖已有安全规则中的核心硬约束。
+- fail 时能指出违反字段和原因。
+- 单元测试覆盖 pass 和 fail 场景。
+- `uv run pytest` 通过。
+
+---
+
+### Issue P1-M-035: Implement Risk Recall Metric
+
+**Status:** Backlog
+
+**Priority:** P1
+
+**Difficulty:** M
+
+**Owner Suggestion:** Member
+
+**Depends On:** P0-L-033, P1-M-028
+
+**Goal:** 自动评估 Agent 是否识别出评测 case 中埋设的关键风险点。
+
+**Scope:**
+
+- 从 `EvaluationCase.expected_risks` 读取期望风险。
+- 从 mission plan response 的 `risks` 读取实际风险。
+- 支持基于风险类别、触发条件、风险等级的匹配。
+- 输出：
+  - recalled risks
+  - missing risks
+  - unexpected risks
+  - recall score
+
+**Acceptance Criteria:**
+
+- 至少覆盖风速、GPS、人流、空域、电量、图传六类风险。
+- missing risk 能清楚指出 case id 和缺失项。
+- 单元测试覆盖全召回、部分召回、零召回。
+- `uv run pytest` 通过。
+
+---
+
+### Issue P1-M-036: Implement Incident Response Score
+
+**Status:** Backlog
+
+**Priority:** P1
+
+**Difficulty:** M
+
+**Owner Suggestion:** Member
+
+**Depends On:** P0-L-033, P1-M-031
+
+**Goal:** 自动评估突发事件发生后，Agent 的重规划动作是否符合期望安全行为。
+
+**Scope:**
+
+- 从 `expected_response_behaviors` 读取期望动作。
+- 检查 replan decision 是否包含：
+  - 暂停任务。
+  - 返航或返回待命点。
+  - 切换保守航线。
+  - 保留已采集数据。
+  - 生成补飞计划。
+  - 请求人工接管或人工复核。
+- 输出动作匹配结果和缺失动作。
+
+**Acceptance Criteria:**
+
+- 至少覆盖 5 类异常事件。
+- 对高风险事件，继续原方案应判为失败。
+- 单元测试覆盖安全动作匹配与危险动作失败。
+- `uv run pytest` 通过。
+
+---
+
+### Issue P2-M-037: Implement Explainability Score
+
+**Status:** Backlog
+
+**Priority:** P2
+
+**Difficulty:** M
+
+**Owner Suggestion:** Member
+
+**Depends On:** P0-L-033
+
+**Goal:** 自动检查关键决策是否具备基本解释字段，避免输出只有结论没有依据。
+
+**Scope:**
+
+- 检查 `human_explanation` 是否区分：
+  - fact inputs
+  - model inferences
+  - recommended actions
+  - human confirmation required
+- 检查关键决策是否说明：
+  - 为什么不建议某个时间飞。
+  - 为什么需要拆分任务。
+  - 为什么触发返航。
+  - 为什么需要补飞。
+- 输出缺失解释字段和基础得分。
+
+**Out of Scope:**
+
+- 不使用 LLM judge 判断解释质量。
+- 不做语义相似度复杂评分。
+
+**Acceptance Criteria:**
+
+- 空解释或只有结论的输出会被扣分。
+- 每个失败项能定位到缺失字段。
+- `uv run pytest` 通过。
+
+---
+
+### Issue P2-L-038: Implement Plan Efficiency Metric
+
+**Status:** Backlog
 
 **Priority:** P2
 
@@ -953,62 +693,215 @@ Phase 2 所有任务必须遵守：
 
 **Owner Suggestion:** Leader
 
-**Depends On:** P1-M-007, P1-L-013
+**Depends On:** P0-L-033
 
-**Goal:** 用简化沙盘展示建筑、起降点、航线、风险区，不接真实地图 SDK。
+**Goal:** 在不牺牲安全的前提下，评估任务方案的效率。
 
 **Scope:**
 
-- 使用 HTML/CSS/SVG 或简单 div 布局绘制 mock 沙盘。
-- 展示：
-  - building facade
-  - launch point
-  - route segments
-  - restricted zone
-  - crowd zone
-  - GPS weak zone
-- 明确标注 simulated sandbox。
+- 与 `baseline_plan` 比较：
+  - 预计飞行时间。
+  - 任务拆分次数。
+  - 覆盖率。
+  - 补飞面积或未覆盖区域。
+  - 人工介入次数。
+  - 安全余量。
+- 当硬约束失败时，效率分不得掩盖安全失败。
+- 输出效率评分和权衡解释。
 
 **Out of Scope:**
 
-- 不接 Mapbox、AMap、高德、OSM 等真实地图 SDK。
-- 不做真实坐标计算。
+- 不追求复杂路径优化算法。
+- 不引入真实地图路线计算。
 
 **Acceptance Criteria:**
 
-- 沙盘能辅助理解路线和风险。
-- 页面明确显示 simulated/mock。
-- `npm run build` 通过。
+- 至少能对已有 mock mission plan 计算基础效率分。
+- 能解释“更慢但更安全”的方案为什么可接受。
+- `uv run pytest` 通过。
 
 ---
 
-### Issue P2-M-022: Risk Mini Charts With Recharts
+## Phase 3.3：评测运行器与报告
 
-**Priority:** P2
+### Issue P1-L-039: Implement Evaluation Runner
+
+**Status:** Backlog
+
+**Priority:** P1
+
+**Difficulty:** L
+
+**Owner Suggestion:** Leader
+
+**Depends On:** P0-M-025, P1-M-034, P1-M-035
+
+**Goal:** 实现可重复运行的评测执行器，把 evaluation cases 跑过现有 mission planning / replanning / review 逻辑。
+
+**Scope:**
+
+- 支持运行单个 case。
+- 支持运行全部 cases。
+- 调用现有 deterministic orchestrator。
+- 组合各评分器输出 `EvaluationResult`。
+- 失败时保留 case id、阶段、失败原因。
+
+**Out of Scope:**
+
+- 不接真实外部 API。
+- 不修改现有 HTTP API contract。
+- 不引入 Celery、Redis 或任务队列。
+
+**Acceptance Criteria:**
+
+- 可在测试中运行 smoke cases。
+- 输出稳定 `EvaluationResult`。
+- 重复运行结果一致。
+- `uv run pytest` 通过。
+
+---
+
+### Issue P1-M-040: Generate Evaluation Report JSON
+
+**Status:** Backlog
+
+**Priority:** P1
 
 **Difficulty:** M
 
 **Owner Suggestion:** Member
 
-**Depends On:** P1-M-010
+**Depends On:** P1-L-039
 
-**Goal:** 使用已有 Recharts 依赖展示简单风险统计，不新增依赖。
+**Goal:** 生成整体评测报告 JSON，便于后续前端展示和比赛演示。
 
 **Scope:**
 
-- 风险等级数量柱状图或环形图。
-- 复盘完成度/数据质量简图。
-- 图表必须有文字 fallback。
+- 汇总所有 case 的结果。
+- 输出整体指标：
+  - case_count
+  - passed_count
+  - failed_count
+  - hard_constraint_pass_rate
+  - risk_recall_avg
+  - incident_response_avg
+  - explainability_avg
+- 输出失败 case 列表和原因。
+- 明确报告数据为 mock/simulated evaluation。
 
 **Acceptance Criteria:**
 
-- 图表不喧宾夺主。
-- 数据来自当前 API response。
+- JSON 结构稳定。
+- report 中包含每个 case 的简要结果。
+- 单元测试覆盖报告汇总。
+- `uv run pytest` 通过。
+
+---
+
+### Issue P2-M-041: Add Evaluation CLI Entry
+
+**Status:** Backlog
+
+**Priority:** P2
+
+**Difficulty:** M
+
+**Owner Suggestion:** Leader
+
+**Depends On:** P1-L-039, P1-M-040
+
+**Goal:** 提供一个轻量命令入口，方便组长和组员本地运行评测。
+
+**Scope:**
+
+- 支持运行全部评测。
+- 支持按 case id 运行。
+- 支持输出 JSON 到指定路径。
+- 命令示例写入文档。
+
+**Out of Scope:**
+
+- 不引入 Typer/Click 等新依赖，除非组长批准。
+- 不做复杂命令行交互。
+
+**Acceptance Criteria:**
+
+- 本地命令可运行。
+- 错误 case id 有明确提示。
+- `uv run pytest` 通过。
+
+---
+
+### Issue P2-M-042: Add Evaluation Summary Panel
+
+**Status:** Backlog
+
+**Priority:** P2
+
+**Difficulty:** M
+
+**Owner Suggestion:** Leader
+
+**Depends On:** P1-M-040
+
+**Goal:** 在前端增加轻量评测摘要展示，让 Demo 不只展示单任务，也能展示 Agent 的可量化能力。
+
+**Scope:**
+
+- 展示整体通过率。
+- 展示硬约束通过率、风险召回率、异常处置得分、可解释性得分。
+- 展示失败 case 简表。
+- 明确标注 evaluation report 来自 mock/simulated dataset。
+
+**Out of Scope:**
+
+- 不引入新图表库。
+- 不改变主 Mission Console 演示路径。
+- 不新增真实后端 API，除非组长单独开 issue。
+
+**Acceptance Criteria:**
+
+- 页面展示不干扰 Phase 2 主演示。
+- 指标含义清晰、不过度营销。
 - `npm run build` 通过。
 
 ---
 
-### Issue P2-S-023: Copywriting Polish
+## Phase 3.4：测试、文档与演示收口
+
+### Issue P1-M-043: Add Evaluation Regression Tests
+
+**Status:** Backlog
+
+**Priority:** P1
+
+**Difficulty:** M
+
+**Owner Suggestion:** Member
+
+**Depends On:** P1-L-039
+
+**Goal:** 为评测 runner、评分器和数据集增加回归测试，避免后续改动破坏评测可信度。
+
+**Scope:**
+
+- 测试 loader。
+- 测试每个评分器。
+- 测试 runner 汇总结果。
+- 测试典型失败 case 的 failure reasons。
+- 确保评测不依赖随机数或实时外部接口。
+
+**Acceptance Criteria:**
+
+- `uv run pytest` 稳定通过。
+- 失败 case 能定位原因。
+- 测试名称清晰，方便组员理解。
+
+---
+
+### Issue P2-S-044: Document Evaluation Dataset Authoring Guide
+
+**Status:** Backlog
 
 **Priority:** P2
 
@@ -1016,22 +909,266 @@ Phase 2 所有任务必须遵守：
 
 **Owner Suggestion:** Member
 
-**Depends On:** P1-L-018
+**Depends On:** P0-L-024, P1-S-026
 
-**Goal:** 统一页面英文文案，使其专业、简洁、可演示。
+**Goal:** 编写评测用例编写指南，方便组员持续补充场景。
 
 **Scope:**
 
-- 统一面板标题。
-- 统一按钮文案。
-- 统一 empty/loading/error 文案。
-- 避免长篇功能说明。
+- 说明 case 字段含义。
+- 给出一个正常任务示例。
+- 给出一个高风险任务示例。
+- 说明 mock/simulated 标注要求。
+- 说明不要把缺陷识别准确率作为评测目标。
 
 **Acceptance Criteria:**
 
-- 文案不超过必要长度。
-- 不出现“无人机缺陷识别系统”类错误定位。
-- `npm run build` 通过。
+- 新组员能按文档补充一个合法 case。
+- 文档与实际 schema 字段一致。
+- 不出现与 AGENTS.md 冲突的开发建议。
+
+---
+
+### Issue P2-S-045: Update Demo Script With Evaluation Story
+
+**Status:** Backlog
+
+**Priority:** P2
+
+**Difficulty:** S
+
+**Owner Suggestion:** Member
+
+**Depends On:** P1-M-040, P2-M-042
+
+**Goal:** 更新比赛演示脚本，把 Phase 3 评测能力讲清楚。
+
+**Scope:**
+
+- 说明单任务 Demo 展示 Agent 如何决策。
+- 说明评测集展示 Agent 能力如何量化。
+- 解释硬约束通过率、风险召回率、异常处置得分和可解释性得分。
+- 保持文案简洁，不写成技术论文。
+
+**Acceptance Criteria:**
+
+- 演示脚本可在 2-3 分钟内讲完。
+- 不承诺真实飞行许可或替代人工安全责任人。
+- 保持产品定位：低空作业任务自治与风险推演。
+
+---
+
+# Phase 4-lite: LLM Interface Preview
+
+Phase 4-lite 是初赛前的轻量架构补充，目标是证明 SkyOps Agent 具备接入 LLM 的清晰边界和可扩展路径，但不在初赛 Demo 中接入真实 LLM。
+
+Phase 4-lite 必须坚持：
+
+- 不调用真实 LLM API。
+- 不保存或提交 API key。
+- 不引入 LangChain、LangGraph、Celery、Redis 等复杂编排框架。
+- 不让 LLM 单独决定飞行许可、禁飞区、风速中止、电量返航、人流安全等硬安全规则。
+- LLM 输出必须是 draft / suggestion / explanation，不是最终安全结论。
+- 真实 LLM 后续可替换 `MockLLMProvider`，但硬约束仍由显式规则和评测系统约束。
+
+## Phase 4-lite.0：LLM 合同与安全边界
+
+### Issue P0-L-046: Define LLM Adapter Contract And Safety Boundary
+
+**Status:** Backlog
+
+**Priority:** P0
+
+**Difficulty:** L
+
+**Owner Suggestion:** Leader
+
+**Depends On:** P0-L-024, P0-L-033
+
+**Goal:** 定义 LLM 在 SkyOps Agent 中能做什么、不能做什么，以及未来真实 LLM 接入必须遵守的 adapter contract。
+
+**Scope:**
+
+- 定义 `LLMProvider` 或等价 adapter contract。
+- 建议能力边界：
+  - `parse_task(raw_user_input, context) -> TaskUnderstandingDraft`
+  - `suggest_missing_constraints(task, context) -> ConstraintQuestionDraft`
+  - `generate_human_explanation(decision_context) -> ExplanationDraft`
+  - `summarize_review(review_context) -> ReviewNarrativeDraft`
+- 明确所有 LLM 输出必须标记为 draft/suggestion。
+- 明确 LLM 不允许：
+  - 直接批准飞行。
+  - 覆盖禁飞区、审批、风速、电量、人流等硬约束。
+  - 在信息不足时给出冒险执行建议。
+  - 绕过人工安全负责人或法规审批。
+- 明确 LLM 接入后的失败降级策略：
+  - 超时。
+  - 无效 JSON。
+  - 安全边界冲突。
+  - 缺少必要字段。
+- 在文档中说明为什么初赛 Demo 使用 mock LLM 而不接真实 LLM。
+
+**Out of Scope:**
+
+- 不接真实 OpenAI、通义、智谱或本地模型。
+- 不写 prompt 长文案库。
+- 不改变现有 mission planning/replan/review API contract。
+- 不让 LLM 进入硬安全规则执行链路。
+
+**Acceptance Criteria:**
+
+- LLM adapter contract 清晰、可测试、可替换。
+- 安全边界文档明确写出 “LLM can suggest, but cannot approve flight.”
+- 后续真实 LLM provider 可在不改 orchestrator 主流程的前提下替换 mock provider。
+- `uv run pytest` 通过。
+
+---
+
+### Issue P1-M-047: Implement Mock LLM Provider
+
+**Status:** Backlog
+
+**Priority:** P1
+
+**Difficulty:** M
+
+**Owner Suggestion:** Member
+
+**Depends On:** P0-L-046
+
+**Goal:** 实现一个确定性的 `MockLLMProvider`，用于 Demo 和测试展示 LLM 接口已预留，但不调用真实模型。
+
+**Scope:**
+
+- 实现 mock provider。
+- 返回稳定结构化结果。
+- 所有输出标记：
+  - `source_type: mock`
+  - `provider: mock`
+  - `deterministic: true`
+- 覆盖至少：
+  - 任务解析草稿。
+  - 缺失约束提示草稿。
+  - 决策解释草稿。
+  - 复盘摘要草稿。
+- 在输出中明确不包含飞行许可或安全放行结论。
+
+**Out of Scope:**
+
+- 不请求网络。
+- 不读取 API key。
+- 不新增真实 provider。
+- 不把 mock LLM 输出接入硬约束判断。
+
+**Acceptance Criteria:**
+
+- mock provider 输出稳定。
+- mock provider 不依赖外部服务。
+- 单元测试覆盖正常输出和基本字段完整性。
+- `uv run pytest` 通过。
+
+---
+
+### Issue P1-M-048: Add LLM Adapter Contract Tests
+
+**Status:** Backlog
+
+**Priority:** P1
+
+**Difficulty:** M
+
+**Owner Suggestion:** Member
+
+**Depends On:** P0-L-046, P1-M-047
+
+**Goal:** 为 LLM adapter contract 和 mock provider 增加测试，确保未来接真实 LLM 时不会破坏安全边界。
+
+**Scope:**
+
+- 测试 mock provider 输出 schema。
+- 测试所有输出均标记为 mock/draft/suggestion。
+- 测试 LLM 输出不能覆盖硬约束结果。
+- 测试无效 LLM 输出会触发人工复核或降级策略。
+- 测试 prompt/response 层不包含真实 API key 或敏感配置。
+
+**Out of Scope:**
+
+- 不测试真实 LLM 质量。
+- 不做 LLM judge。
+- 不做语义相似度评分。
+
+**Acceptance Criteria:**
+
+- 测试能证明 LLM adapter 是辅助层，不是安全决策唯一依据。
+- 安全边界冲突有明确 failure reason。
+- `uv run pytest` 通过。
+
+---
+
+### Issue P2-S-049: Document LLM Role In Technical Proposal
+
+**Status:** Backlog
+
+**Priority:** P2
+
+**Difficulty:** S
+
+**Owner Suggestion:** Member
+
+**Depends On:** P0-L-046, P1-M-047
+
+**Goal:** 为初赛技术方案准备 LLM 角色说明，解释为什么当前 Demo 不接真实 LLM，但已经具备 Agent/LLM 扩展能力。
+
+**Scope:**
+
+- 写清楚三层智能架构：
+  - Deterministic Safety Layer：显式硬约束、安全规则、合规规则、阈值判断。
+  - Agent Reasoning Layer：任务理解、多源约束推理、风险推演、任务规划、异常重规划、闭环复盘。
+  - LLM Assistance Layer：自然语言解析、主动澄清、解释生成、复盘报告润色。
+- 写清楚初赛 Demo 使用 `MockLLMProvider` 的原因：
+  - 保证可复现。
+  - 避免 API key 和网络依赖。
+  - 避免把安全判断交给不稳定输出。
+- 写清楚未来可接入真实 LLM 的位置和限制。
+- 写清楚 “LLM 增强交互和解释，规则与评测约束安全决策”。
+
+**Acceptance Criteria:**
+
+- 技术方案文字能让评委理解项目具备 Agent 扩展能力。
+- 不夸大真实 LLM 接入状态。
+- 不承诺系统可以替代法规审批或人工安全责任人。
+- 文案不把 SkyOps Agent 说成传统无人机缺陷识别工具。
+
+---
+
+### Issue P2-S-050: Update Demo Script With LLM Boundary Story
+
+**Status:** Backlog
+
+**Priority:** P2
+
+**Difficulty:** S
+
+**Owner Suggestion:** Member
+
+**Depends On:** P2-S-045, P2-S-049
+
+**Goal:** 更新比赛演示脚本，把 LLM 接口预留和安全边界讲成一句评委能听懂的话。
+
+**Scope:**
+
+- 在 Demo 脚本中补充：
+  - 当前演示使用 deterministic rules 和 mock data 保证稳定。
+  - LLM adapter 已预留，用于任务解析、约束补齐和解释生成。
+  - 硬安全规则不会交给 LLM 单独决定。
+  - 未来可替换真实 LLM provider。
+- 控制在 20-30 秒讲述长度。
+
+**Acceptance Criteria:**
+
+- 讲述简洁，不像技术论文。
+- 不让评委误以为系统已经接入真实 LLM。
+- 不让评委误以为 LLM 可以批准飞行。
 
 ---
 
@@ -1039,54 +1176,88 @@ Phase 2 所有任务必须遵守：
 
 ### 组长优先完成
 
-1. P0-L-003: Split Mission Console Into Feature Components
-2. P0-L-004: Define Phase 2 Visual Direction And UI Tokens
-3. P1-L-013: Incident Control Panel Interaction Flow
-4. P1-L-018: Demo Flow Polish For Competition Presentation
-5. P2-L-021: Simplified Sandbox Map Panel
+1. P0-L-024: Define EvaluationCase And EvaluationResult Schema
+2. P0-M-025: Create Evaluation Dataset Loader
+3. P0-L-033: Define Evaluation Metric Contracts And Scoring Priority
+4. P1-L-039: Implement Evaluation Runner
+5. P0-L-046: Define LLM Adapter Contract And Safety Boundary
+6. P2-L-038: Implement Plan Efficiency Metric
+7. P2-M-042: Add Evaluation Summary Panel
 
 ### 组员 A 可优先完成
 
-1. P1-S-006: Standardize Mock Data Badges
-2. P1-M-007: Mission Plan Detail Panel
-3. P1-M-009: Safety Thresholds And Abort Conditions Panel
-4. P2-S-017: Review Empty State And No-Incident State
-5. P2-S-023: Copywriting Polish
+1. P2-S-023: Copywriting Polish
+2. P1-S-026: Add Evaluation Smoke Cases
+3. P1-M-027: Add Normal Operation Evaluation Cases
+4. P1-M-028: Add Weather GPS And Crowd Risk Evaluation Cases
+5. P1-M-047: Implement Mock LLM Provider
+6. P2-S-044: Document Evaluation Dataset Authoring Guide
 
 ### 组员 B 可优先完成
 
-1. P1-M-005: Improve Loading And Error States
-2. P1-M-008: Environment And Drone State Panel
-3. P1-M-010: Risk Stack Filtering And Grouping
-4. P1-M-014: Replan Decision Detail Panel
-5. P1-M-019: Responsive Layout Pass
+1. P1-M-029: Add Airspace And Compliance Evaluation Cases
+2. P1-M-030: Add Drone Battery Payload And Link Evaluation Cases
+3. P1-M-031: Add Incident Injection Evaluation Cases
+4. P1-M-035: Implement Risk Recall Metric
+5. P1-M-036: Implement Incident Response Score
+6. P1-M-048: Add LLM Adapter Contract Tests
 
 ### 暂不建议分配给组员的任务
 
-- 涉及页面整体结构调整的任务。
-- 涉及 API contract 修改的任务。
-- 涉及后端模型或 orchestrator 调整的任务。
-- 涉及 Phase 3 评测指标定义的任务。
+- 评测 schema 的最终设计。
+- 总分口径、安全优先级和指标权重。
+- 评测 runner 的执行链路。
+- 前端评测入口的信息架构。
+- LLM adapter 的最终安全边界。
+- 真实 LLM provider 接入。
+- 任何 API contract 或公共 Pydantic 模型破坏性变更。
 
 ## 每个 Issue 的 PR 要求
 
 每个 issue 对应 PR 必须包含：
 
 - 改动范围说明。
-- 截图或界面说明。
-- 自测命令：
+- 自测命令。
+- 若涉及后端：
+
+```bash
+cd backend
+uv run pytest
+uv run ruff check .
+```
+
+- 若涉及前端：
 
 ```bash
 cd frontend
 npm run build
 ```
 
-- 如果涉及后端联调，说明后端启动命令：
+- 若涉及评测数据，必须说明：
+  - 新增 case 数量。
+  - 覆盖的低空作业场景。
+  - 是否包含异常事件。
+  - 使用的是 mock/simulated data。
+- 若涉及评分器，必须说明：
+  - 评分输入字段。
+  - pass/fail 规则。
+  - failure reasons 示例。
+- 若涉及 LLM adapter，必须说明：
+  - 是否调用真实 LLM API。
+  - 输出是否为 draft/suggestion。
+  - 如何避免覆盖硬约束和安全规则。
+  - 失败或信息不足时如何降级到人工复核。
+- 不包含无关格式化、无关重构或未批准依赖。
 
-```bash
-cd backend
-uv run uvicorn app.main:app --reload
+## 建议提交信息格式
+
+commit message 使用英文，建议格式：
+
+```text
+feat(evaluation): define evaluation case schema
+feat(evaluation): add weather risk evaluation cases
+feat(evaluation): implement hard constraint scoring
+docs(evaluation): add dataset authoring guide
+feat(llm): define mock provider contract
+docs(llm): describe agent safety boundary
 ```
-
-- 明确说明是否使用 mock/simulated data。
-- 不包含无关格式化或无关重构。
