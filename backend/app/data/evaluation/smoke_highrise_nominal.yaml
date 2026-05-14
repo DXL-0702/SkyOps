@@ -1,0 +1,111 @@
+evaluation_case:
+  case_id: eval-smoke-highrise-nominal
+  title: Nominal high-rise facade evaluation smoke case
+  scenario_type: building_facade_inspection
+  raw_user_input: 明天上午巡检南山区一栋180米高办公楼外立面，重点排查幕墙裂缝和脱落风险，尽量减少对行人的影响。
+  environment_state:
+    source_type: mock
+    weather_summary: Simulated partly cloudy morning with moderate wind.
+    wind_speed_mps: 5.2
+    visibility_level: good
+    crowd_level: medium
+    gps_quality: partial urban canyon risk near the building facade
+    gps_confidence: 0.72
+    data_confidence: 0.72
+  airspace_constraint:
+    source_type: mock
+    is_flyable: true
+    approval_required: true
+    restricted_zones:
+      - mock temporary control buffer north-east of target block
+    altitude_limit_m: 120
+    compliance_risk_level: medium
+    explanation: >
+      Mock airspace data indicates flight is possible only with approval and a
+      conservative altitude profile.
+  drone_state:
+    source_type: mock
+    drone_id: mock-drone-m30t-01
+    model: DJI Matrice class mock platform
+    battery_percent: 86
+    estimated_endurance_minutes: 32
+    return_to_home_battery_threshold: 30
+    payloads:
+      - zoom camera
+      - wide camera
+    link_quality: low
+    video_latency_ms: 180
+    available_for_mission: true
+  incident_events: []
+  expected_hard_constraints:
+    - id: hard-airspace-approval
+      description: Approval is required before execution in the mock airspace constraint.
+      must_pass: true
+      rule_ref: require_approval_when_needed
+      severity: medium
+    - id: hard-safe-return-battery
+      description: Battery must preserve safe return-to-home margin.
+      must_pass: true
+      rule_ref: min_battery_percent
+      severity: high
+  expected_risks:
+    - id: expected-wind-gust
+      category: weather
+      trigger_condition: wind_speed_mps >= 8.0
+      minimum_risk_level: medium
+      must_recall: true
+    - id: expected-gps-shadow
+      category: navigation
+      trigger_condition: gps_confidence < 0.65
+      minimum_risk_level: high
+      must_recall: true
+  expected_response_behaviors: []
+  baseline_plan:
+    expected_duration_minutes: 24
+    expected_coverage_percent: 82
+    task_split_count: 2
+    manual_intervention_count: 1
+    safety_margin_notes:
+      - approval required before takeoff
+      - conservative standoff near GPS-risk area
+  tags:
+    - smoke
+    - building_facade_inspection
+    - shenzhen_low_altitude_economy
+  source_type: mock
+baseline_mission_plan:
+  mission_id: mission-shenzhen-nanshan-highrise-demo
+  recommended_time_window: 09:45-11:15 simulated local time
+  launch_landing_points:
+    - id: llp-south-plaza-buffer
+      name: South plaza buffer point
+      description: Mock launch point away from pedestrian peak flow.
+      safety_notes:
+        - keep pedestrian separation
+        - manual confirmation required before takeoff
+  route_strategy: >
+    Two-segment conservative vertical facade scan with increased standoff
+    distance near GPS-risk area.
+  flight_segments:
+    - south facade lower segment
+    - south facade upper segment
+  safety_thresholds:
+    max_wind_speed_mps: 8.0
+    min_battery_percent: 35
+    min_gps_confidence: 0.65
+    max_video_latency_ms: 500
+  abort_conditions:
+    - wind_speed_mps >= 8.0
+    - battery_percent <= 35
+    - gps_confidence < 0.65
+    - crowd_level == high
+  contingency_plan:
+    - pause mission
+    - return to launch point
+    - preserve collected data
+    - generate makeup flight plan for uncovered facade zones
+  expected_coverage_percent: 82
+  estimated_duration_minutes: 24
+  explanation: >
+    Mock plan prioritizes approval, pedestrian separation, GPS confidence, and
+    safe return margin over full single-flight coverage.

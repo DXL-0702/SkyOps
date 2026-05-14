@@ -6,6 +6,19 @@ from app.core.models.common import (
 )
 from app.core.models.drone import DroneState
 from app.core.models.environment import EnvironmentState
+from app.core.models.evaluation import (
+    BaselinePlan,
+    EvaluationCase,
+    EvaluationCaseFixture,
+    EvaluationItemResult,
+    EvaluationMetricName,
+    EvaluationResult,
+    EvaluationScores,
+    ExpectedHardConstraint,
+    ExpectedResponseBehavior,
+    ExpectedRisk,
+    MetricScore,
+)
 from app.core.models.incident import IncidentEvent, ReplanDecision
 from app.core.models.mission import MissionTask
 from app.core.models.planning import LaunchLandingPoint, MissionPlan, SafetyThresholds
@@ -17,15 +30,25 @@ __all__ = [
     "DataSourceType",
     "DroneState",
     "EnvironmentState",
+    "BaselinePlan",
+    "EvaluationCase",
+    "EvaluationCaseFixture",
+    "EvaluationItemResult",
+    "EvaluationMetricName",
+    "EvaluationResult",
+    "EvaluationScores",
     "Explanation",
+    "ExpectedHardConstraint",
+    "ExpectedResponseBehavior",
+    "ExpectedRisk",
     "IncidentEvent",
     "LaunchLandingPoint",
     "MissionPlan",
     "MissionReview",
     "MissionTask",
+    "MetricScore",
     "ReplanDecision",
     "RiskItem",
     "RiskLevel",
     "SafetyThresholds",
 ]
-
