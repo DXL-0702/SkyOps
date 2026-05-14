@@ -1,5 +1,6 @@
 from collections.abc import Iterable, Sequence
 
+from app.core.evaluation.contracts import get_metric_contract
 from app.core.models import (
     BaselinePlan,
     EvaluationCase,
@@ -37,9 +38,11 @@ ACTION_ALIASES = {
         "safe standby",
         "slow",
         "standoff",
+        "increase standoff",
+        "waypoint",
     },
     "preserve_data": {"preserve", "collected data", "imagery", "telemetry"},
-    "makeup_flight": {"makeup", "unfinished", "uncovered", "retry"},
+    "makeup_flight": {"makeup", "unfinished", "uncovered", "retry", "skipped"},
     "human_review": {
         "human",
         "manual",
@@ -382,10 +385,15 @@ def score_evaluation_case(
         explainability_metric,
         efficiency_metric,
     ]
+    blocking_metrics = [
+        metric
+        for metric in metric_scores
+        if get_metric_contract(metric.metric).blocks_overall_pass
+    ]
 
     return EvaluationResult(
         case_id=evaluation_case.case_id,
-        passed=all(metric.passed for metric in metric_scores),
+        passed=all(metric.passed for metric in blocking_metrics),
         scores=EvaluationScores(
             hard_constraint_pass_rate=hard_score,
             risk_recall=risk_score,
@@ -400,7 +408,7 @@ def score_evaluation_case(
         explainability_results=explainability_results,
         failure_reasons=[
             reason
-            for metric in metric_scores
+            for metric in blocking_metrics
             for reason in metric.failure_reasons
         ],
         source_type=evaluation_case.source_type,
@@ -520,6 +528,8 @@ def _action_is_present(
                 return True
             if alias_key == "human_review" and decision.human_takeover_required:
                 return True
+            if _has_action_semantics(alias_key, decision, text):
+                return True
             return any(alias in text for alias in ACTION_ALIASES[alias_key])
 
     expected_tokens = _meaningful_tokens(normalized_action)
@@ -537,16 +547,56 @@ def _action_alias_key(action: str) -> str | None:
         return "return"
     if any(
         token in action
-        for token in ("avoid", "conservative", "standoff", "degraded", "reroute", "route")
+        for token in (
+            "avoid",
+            "conservative",
+            "degrade",
+            "standoff",
+            "slow",
+            "reroute",
+            "route",
+        )
     ):
         return "conservative_route"
-    if any(token in action for token in ("preserve", "data", "imagery", "telemetry")):
+    if any(token in action for token in ("preserve", "data", "imagery", "telemetry", "record")):
         return "preserve_data"
-    if any(token in action for token in ("makeup", "unfinished", "uncovered")):
+    if any(token in action for token in ("makeup", "unfinished", "uncovered", "skipped")):
         return "makeup_flight"
     if any(token in action for token in ("human", "manual", "pilot", "confirmation", "review")):
         return "human_review"
     return None
+
+
+def _has_action_semantics(alias_key: str, decision: ReplanDecision, text: str) -> bool:
+    match alias_key:
+        case "conservative_route":
+            return _contains_any(
+                text,
+                (
+                    "increase standoff",
+                    "wide-standoff",
+                    "safe standby",
+                    "conservative waypoint",
+                    "degraded",
+                    "degrade",
+                    "reroute",
+                    "avoid close",
+                ),
+            )
+        case "preserve_data":
+            return _contains_any(
+                text,
+                ("record unfinished", "record restricted", "preserve completed"),
+            )
+        case "makeup_flight":
+            return decision.makeup_flight_required or _contains_any(
+                text,
+                ("mark low-confidence", "record unfinished", "skipped", "schedule makeup"),
+            )
+        case "human_review":
+            return decision.human_takeover_required
+        case _:
+            return False
 
 
 def _explanation_field_result(field_name: str, values: Sequence[str]) -> EvaluationItemResult:

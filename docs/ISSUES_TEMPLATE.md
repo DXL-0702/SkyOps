@@ -592,7 +592,7 @@ Phase 3 推荐最终形成：
 
 ### Issue P1-M-034: Implement Hard Constraint Pass Rate
 
-**Status:** Backlog
+**Status:** Done
 
 **Priority:** P1
 
@@ -626,7 +626,7 @@ Phase 3 推荐最终形成：
 
 ### Issue P1-M-035: Implement Risk Recall Metric
 
-**Status:** Backlog
+**Status:** Done
 
 **Priority:** P1
 
@@ -660,7 +660,7 @@ Phase 3 推荐最终形成：
 
 ### Issue P1-M-036: Implement Incident Response Score
 
-**Status:** Backlog
+**Status:** Done
 
 **Priority:** P1
 
@@ -695,7 +695,7 @@ Phase 3 推荐最终形成：
 
 ### Issue P2-M-037: Implement Explainability Score
 
-**Status:** Backlog
+**Status:** Done
 
 **Priority:** P2
 
@@ -736,7 +736,7 @@ Phase 3 推荐最终形成：
 
 ### Issue P2-L-038: Implement Plan Efficiency Metric
 
-**Status:** Backlog
+**Status:** Done
 
 **Priority:** P2
 

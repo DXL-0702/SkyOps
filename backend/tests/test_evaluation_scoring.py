@@ -125,7 +125,7 @@ def make_good_explanation() -> Explanation:
     )
 
 
-def test_issue_40_hard_constraint_scoring_passes_nominal_case() -> None:
+def test_p1_m_034_hard_constraint_scoring_passes_nominal_case() -> None:
     fixture = load_evaluation_case_fixture("eval-smoke-highrise-nominal")
 
     score, results, metric = score_hard_constraints(
@@ -138,7 +138,7 @@ def test_issue_40_hard_constraint_scoring_passes_nominal_case() -> None:
     assert all(result.passed for result in results)
 
 
-def test_issue_40_hard_constraint_scoring_reports_failed_fields_and_reasons() -> None:
+def test_p1_m_034_hard_constraint_scoring_reports_failed_fields_and_reasons() -> None:
     fixture = load_evaluation_case_fixture("eval-high-risk-wind-exceeds-threshold")
 
     score, results, metric = score_hard_constraints(
@@ -154,7 +154,7 @@ def test_issue_40_hard_constraint_scoring_reports_failed_fields_and_reasons() ->
     assert any("Wind speed exceeds" in reason for reason in metric.failure_reasons)
 
 
-def test_issue_41_risk_recall_scores_full_partial_and_zero_recall() -> None:
+def test_p1_m_035_risk_recall_scores_full_partial_and_zero_recall() -> None:
     evaluation_case = make_six_risk_case()
     full_risks = make_full_risk_recall_items()
 
@@ -187,11 +187,13 @@ def test_issue_41_risk_recall_scores_full_partial_and_zero_recall() -> None:
     assert len([result for result in zero_results if not result.passed]) == 6
 
 
-def test_issue_42_incident_response_scores_safe_replan_for_multiple_events() -> None:
+def test_p1_m_036_incident_response_scores_safe_replan_for_five_event_types() -> None:
     for case_id in (
         "eval-incident-wind-speed-spike",
         "eval-incident-battery-below-rth-threshold",
         "eval-incident-crowd-gathering-route",
+        "eval-incident-gps-confidence-drop",
+        "eval-incident-video-latency-increase",
     ):
         fixture = load_evaluation_case_fixture(case_id)
         incident = fixture.evaluation_case.incident_events[0]
@@ -207,7 +209,7 @@ def test_issue_42_incident_response_scores_safe_replan_for_multiple_events() -> 
         assert all(result.passed for result in results)
 
 
-def test_issue_42_high_risk_event_fails_when_decision_continues_original_plan() -> None:
+def test_p1_m_036_high_risk_event_fails_when_decision_continues_original_plan() -> None:
     fixture = load_evaluation_case_fixture("eval-incident-wind-speed-spike")
     incident = fixture.evaluation_case.incident_events[0]
     unsafe_decision = ReplanDecision(
@@ -232,7 +234,7 @@ def test_issue_42_high_risk_event_fails_when_decision_continues_original_plan() 
     assert "unsafe_continue" in results[0].reason
 
 
-def test_issue_43_explainability_scores_complete_and_empty_explanations() -> None:
+def test_p2_m_037_explainability_scores_complete_and_empty_explanations() -> None:
     fixture = load_evaluation_case_fixture("eval-incident-wind-speed-spike")
     incident = fixture.evaluation_case.incident_events[0]
     decision = build_replan_decision(incident, fixture.baseline_mission_plan)
@@ -262,7 +264,7 @@ def test_issue_43_explainability_scores_complete_and_empty_explanations() -> Non
     assert all(result.reason for result in good_results + empty_results)
 
 
-def test_issue_44_plan_efficiency_scores_baseline_and_caps_unsafe_plan() -> None:
+def test_p2_l_038_plan_efficiency_scores_baseline_and_caps_unsafe_plan() -> None:
     fixture = load_evaluation_case_fixture("eval-smoke-highrise-nominal")
 
     safe_score, safe_metric = score_plan_efficiency(
@@ -284,7 +286,7 @@ def test_issue_44_plan_efficiency_scores_baseline_and_caps_unsafe_plan() -> None
     assert any("cannot offset" in reason for reason in unsafe_metric.failure_reasons)
 
 
-def test_issue_44_plan_efficiency_accepts_slower_conservative_plan_with_explanation() -> None:
+def test_p2_l_038_plan_efficiency_accepts_slower_conservative_plan_with_explanation() -> None:
     fixture = load_evaluation_case_fixture("eval-smoke-highrise-nominal")
     slower_plan = fixture.baseline_mission_plan.model_copy(
         update={
@@ -334,3 +336,19 @@ def test_score_evaluation_case_returns_existing_evaluation_result_shape() -> Non
     assert result.scores.hard_constraint_pass_rate == 1
     assert result.scores.risk_recall == 1
     assert {metric.metric for metric in result.metric_scores} == set(EvaluationMetricName)
+
+
+def test_score_evaluation_case_blocks_overall_pass_only_on_safety_gate() -> None:
+    fixture = load_evaluation_case_fixture("eval-smoke-highrise-nominal")
+
+    result = score_evaluation_case(
+        evaluation_case=fixture.evaluation_case,
+        mission_plan=fixture.baseline_mission_plan,
+        risks=[],
+        human_explanation=Explanation(),
+    )
+
+    assert result.passed is True
+    assert result.scores.hard_constraint_pass_rate == 1
+    assert result.scores.risk_recall == 0
+    assert result.failure_reasons == []
