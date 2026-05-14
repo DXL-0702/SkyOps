@@ -7,6 +7,14 @@ from app.core.evaluation.contracts import (
     get_metric_contract,
     list_metric_contracts,
 )
+from app.core.evaluation.scoring import (
+    score_evaluation_case,
+    score_explainability,
+    score_hard_constraints,
+    score_incident_response,
+    score_plan_efficiency,
+    score_risk_recall,
+)
 
 __all__ = [
     "EVALUATION_SCORING_POLICY",
@@ -16,4 +24,10 @@ __all__ = [
     "EvaluationScoringPolicy",
     "get_metric_contract",
     "list_metric_contracts",
+    "score_evaluation_case",
+    "score_explainability",
+    "score_hard_constraints",
+    "score_incident_response",
+    "score_plan_efficiency",
+    "score_risk_recall",
 ]
