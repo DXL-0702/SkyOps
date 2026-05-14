@@ -1026,7 +1026,7 @@ Phase 4-lite 必须坚持：
 
 ### Issue P0-L-046: Define LLM Adapter Contract And Safety Boundary
 
-**Status:** Backlog
+**Status:** Done
 
 **Priority:** P0
 
@@ -1072,6 +1072,15 @@ Phase 4-lite 必须坚持：
 - 安全边界文档明确写出 “LLM can suggest, but cannot approve flight.”
 - 后续真实 LLM provider 可在不改 orchestrator 主流程的前提下替换 mock provider。
 - `uv run pytest` 通过。
+
+**Implementation Notes:**
+
+- 已新增 `backend/app/integrations/llm/contracts.py`，定义 `LLMProvider` adapter contract、LLM draft models、失败模式和使用安全策略。
+- 已新增 `docs/llm-safety-boundary.md`，明确 “LLM can suggest, but cannot approve flight.”。
+- 已明确 LLM 输出只能是 `draft`、`suggestion` 或 `explanation`，必须经过确定性规则校验，不是最终安全结论。
+- 已通过 `LLMUsagePolicy` 禁止 LLM 批准飞行、覆盖硬约束、绕过人工复核或修改安全阈值。
+- 已新增 `backend/tests/test_llm_contracts.py`，覆盖安全边界、输出标记、失败模式和 provider protocol。
+- 本 issue 不实现 mock provider，不接真实 LLM，不改变 mission planning/replan/review API contract。
 
 ---
 

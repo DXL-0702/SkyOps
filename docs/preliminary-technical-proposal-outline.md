@@ -2,7 +2,7 @@
 
 > 本文档是初赛技术方案的施工图，不是最终提交版。
 >
-> 当前版本只基于仓库中已经完成或正在开发的内容组织材料。Phase 3 剩余评分器与 Phase 4-lite LLM 接口边界完成后，应再次更新本 outline，再扩写为最终 PDF 技术方案。
+> 当前版本只基于仓库中已经完成或正在开发的内容组织材料。Phase 3 剩余评分器与 Phase 4-lite mock provider / LLM 角色说明完成后，应再次更新本 outline，再扩写为最终 PDF 技术方案。
 
 ## 0. 写作原则
 
@@ -56,11 +56,16 @@
 - Evaluation report JSON。
 - 评测结果汇总截图或表格。
 
-待 Phase 4-lite 完成后补充：
+Phase 4-lite 当前已完成：
 
 - LLM adapter contract。
+- LLM 安全边界文档。
+- LLM contract 基础安全边界测试。
+
+待 Phase 4-lite 后续补充：
+
 - MockLLMProvider。
-- LLM 安全边界测试。
+- Mock provider 与真实 provider 替换边界测试。
 - 技术方案中的 LLM 角色说明。
 
 ## 1. 项目背景与问题定义
@@ -483,15 +488,27 @@ def test_phase_3_evaluation_dataset_has_task_autonomy_guardrails() -> None:
 当前版本优先完成可验证的任务自治闭环：任务解析、约束建模、硬规则评估、任务规划、异常重规划、复盘报告和评测合约。由于低空作业涉及安全与合规，系统不将 LLM 作为硬安全判断的唯一依据。
 ```
 
-### 9.2 Phase 4-lite 完成后补充
+### 9.2 当前已完成
+
+已完成：
+
+- `LLMProvider` adapter contract。
+- `TaskUnderstandingDraft`、`ConstraintQuestionDraft`、`ExplanationDraft`、`ReviewNarrativeDraft`。
+- `LLMUsagePolicy`，禁止 LLM 批准飞行、覆盖硬约束、绕过人工复核或修改安全阈值。
+- `LLMFailureMode`，覆盖超时、无效 JSON、安全边界冲突、缺少字段和 provider 不可用。
+- `docs/llm-safety-boundary.md`。
+- `backend/tests/test_llm_contracts.py` 基础安全边界测试。
+
+建议最终方案引用：
+
+`backend/app/integrations/llm/contracts.py`
+
+### 9.3 Phase 4-lite 后续补充
 
 待完成后补：
 
-- `LLMProvider` 或等价 adapter contract。
 - `MockLLMProvider`。
-- LLM 输出类型：draft / suggestion / explanation。
-- LLM 失败降级策略。
-- LLM 安全边界测试。
+- Mock provider 与未来真实 provider 替换边界测试。
 
 建议核心表达：
 
@@ -499,7 +516,7 @@ def test_phase_3_evaluation_dataset_has_task_autonomy_guardrails() -> None:
 LLM can suggest, but cannot approve flight.
 ```
 
-### 9.3 LLM 能做什么
+### 9.4 LLM 能做什么
 
 - 自然语言任务理解。
 - 缺失约束补全建议。
@@ -507,7 +524,7 @@ LLM can suggest, but cannot approve flight.
 - 复盘报告润色。
 - 人机交互体验增强。
 
-### 9.4 LLM 不能做什么
+### 9.5 LLM 不能做什么
 
 - 不能绕过禁飞区。
 - 不能忽略审批。
@@ -608,7 +625,7 @@ LLM can suggest, but cannot approve flight.
 优先完成：
 
 1. Phase 3 评分器和 runner。
-2. Phase 4-lite LLM adapter contract 与 mock provider。
+2. Phase 4-lite mock provider 与 LLM contract tests。
 3. Demo 流程收口。
 4. 技术方案最终版。
 5. Demo 视频或演示说明。
@@ -634,9 +651,10 @@ Phase 3 完成后补：
 - [ ] 最新测试结果。
 - [ ] 评测指标结果表。
 
-Phase 4-lite 完成后补：
+Phase 4-lite 后续完成后补：
 
-- [ ] LLM adapter contract 代码片段。
+- [x] LLM adapter contract 代码片段。
+- [x] LLM 安全边界文档。
 - [ ] MockLLMProvider 代码片段。
 - [ ] LLM 安全边界测试代码片段。
 - [ ] “为什么初赛不接真实 LLM”说明。
@@ -678,4 +696,3 @@ SkyOps Agent：面向低空作业的任务级自治与风险推演智能体
 | 评测 loader | `backend/app/data/evaluation/loader.py` | 证明评测数据可稳定加载和校验 |
 | 评测 guardrail | `backend/tests/test_evaluation_loader.py` | 证明测试约束项目方向和数据质量 |
 | 前端控制台 | `frontend/src/features/mission/` | 证明 Demo 可视化体验已实现 |
-
