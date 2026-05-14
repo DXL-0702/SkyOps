@@ -1,0 +1,136 @@
+evaluation_case:
+  case_id: eval-extended-emergency-supply-delivery
+  title: Extended emergency supply delivery evaluation case
+  scenario_type: emergency_rescue
+  raw_user_input: Deliver a small emergency supply kit from the command post to the temporary safe point.
+  environment_state:
+    source_type: simulated
+    weather_summary: Simulated cloudy conditions with moderate pedestrian activity near the safe point.
+    wind_speed_mps: 4.1
+    visibility_level: fair
+    crowd_level: medium
+    gps_quality: stable along the open route with minor obstruction near trees
+    gps_confidence: 0.82
+    data_confidence: 0.86
+  airspace_constraint:
+    source_type: simulated
+    is_flyable: true
+    approval_required: true
+    restricted_zones:
+      - simulated temporary medical tent buffer
+      - simulated command post takeoff buffer
+    altitude_limit_m: 60
+    compliance_risk_level: medium
+    explanation: >
+      Simulated route is flyable after approval verification and requires a
+      safe delivery approach outside the medical tent buffer.
+  drone_state:
+    source_type: simulated
+    drone_id: simulated-drone-extended-supply-01
+    model: DJI delivery-capable simulated platform
+    battery_percent: 87
+    estimated_endurance_minutes: 24
+    return_to_home_battery_threshold: 30
+    payloads:
+      - small package payload
+      - wide camera
+    link_quality: low
+    video_latency_ms: 180
+    available_for_mission: true
+  incident_events: []
+  expected_hard_constraints:
+    - id: hard-approval-before-delivery
+      description: Approval must be verified before emergency delivery route execution.
+      must_pass: true
+      rule_ref: require_approval_when_needed
+      severity: high
+    - id: hard-payload-compatible
+      description: Device payload must support the small emergency supply kit.
+      must_pass: true
+      rule_ref: payloads
+      severity: high
+    - id: hard-safe-drop-zone
+      description: Delivery approach must use a safe drop or landing point outside medical tent buffer.
+      must_pass: true
+      rule_ref: restricted_zones
+      severity: high
+    - id: hard-rth-reserve
+      description: Route must preserve battery for return after delivery.
+      must_pass: true
+      rule_ref: min_battery_percent
+      severity: high
+  expected_risks:
+    - id: delivery_point_crowd_risk
+      category: public_safety
+      trigger_condition: crowd_level == medium near temporary safe point
+      minimum_risk_level: medium
+      must_recall: true
+    - id: approval_dependency_risk
+      category: compliance
+      trigger_condition: approval_required == true for delivery corridor
+      minimum_risk_level: high
+      must_recall: true
+    - id: payload_delivery_feasibility_risk
+      category: device
+      trigger_condition: route includes emergency supply payload delivery
+      minimum_risk_level: medium
+      must_recall: true
+  expected_response_behaviors:
+    - id: response-emergency-delivery-safe-approach
+      incident_type: emergency_supply_delivery
+      expected_actions:
+        - verify approval before execution
+        - confirm safe drop zone
+        - preserve return-to-home reserve
+        - require human review if delivery point safety is uncertain
+      forbidden_actions:
+        - assume approval
+        - drop package over crowd
+      human_confirmation_required: true
+      makeup_flight_expected: false
+  baseline_plan:
+    expected_duration_minutes: 14
+    expected_coverage_percent: 100
+    task_split_count: 1
+    manual_intervention_count: 1
+    safety_margin_notes:
+      - delivery point must stay outside medical tent buffer
+      - approval verification required before takeoff
+      - preserve return route after delivery
+  tags:
+    - extended_coverage
+    - emergency_rescue
+    - supply_delivery
+  source_type: simulated
+baseline_mission_plan:
+  mission_id: mission-extended-emergency-supply-delivery
+  recommended_time_window: 16:00-16:20 simulated local time after approval verification
+  launch_landing_points:
+    - id: llp-command-post-pad
+      name: Command post pad
+      description: Simulated launch point with package handoff area.
+      safety_notes:
+        - verify payload latch
+        - keep medical tent buffer clear
+  route_strategy: Direct approved corridor to safe point with return-to-home reserve preserved.
+  flight_segments:
+    - outbound delivery corridor
+    - return corridor
+  safety_thresholds:
+    max_wind_speed_mps: 8.0
+    min_battery_percent: 35
+    min_gps_confidence: 0.65
+    max_video_latency_ms: 500
+  abort_conditions:
+    - approval_required == true and approval is not verified
+    - crowd_level == high at delivery point
+    - battery_percent <= 35
+  contingency_plan:
+    - hold at command post pad
+    - request human review of delivery point
+    - retry only after safe drop zone is confirmed
+  expected_coverage_percent: 100
+  estimated_duration_minutes: 14
+  explanation: >
+    Simulated extended case evaluates emergency delivery planning, payload
+    compatibility, and safe drop-zone control.

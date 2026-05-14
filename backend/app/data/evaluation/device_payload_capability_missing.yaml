@@ -1,0 +1,134 @@
+evaluation_case:
+  case_id: eval-device-payload-capability-missing
+  title: Device-state missing payload capability evaluation case
+  scenario_type: device_state_payload_capability
+  raw_user_input: Create a night security patrol that uses thermal awareness for the warehouse perimeter and service yard.
+  environment_state:
+    source_type: mock
+    weather_summary: Mock night patrol conditions with low light, calm wind, and limited visual contrast.
+    wind_speed_mps: 2.2
+    visibility_level: fair
+    crowd_level: low
+    gps_quality: stable perimeter reception
+    gps_confidence: 0.87
+    data_confidence: 0.85
+  airspace_constraint:
+    source_type: mock
+    is_flyable: true
+    approval_required: false
+    restricted_zones:
+      - mock warehouse hazardous-material buffer
+    altitude_limit_m: 70
+    compliance_risk_level: low
+    explanation: >
+      Mock airspace is flyable, but the requested night patrol objective depends
+      on thermal awareness that the current payload set does not provide.
+  drone_state:
+    source_type: mock
+    drone_id: mock-drone-device-payload-01
+    model: DJI Mavic enterprise class mock platform
+    battery_percent: 86
+    estimated_endurance_minutes: 27
+    return_to_home_battery_threshold: 30
+    payloads:
+      - wide camera
+      - spotlight
+    link_quality: low
+    video_latency_ms: 180
+    available_for_mission: true
+  incident_events: []
+  expected_hard_constraints:
+    - id: required_payload_capability
+      description: The requested night patrol requires thermal payload capability.
+      must_pass: true
+      rule_ref: payloads
+      severity: high
+    - id: payload_not_available
+      description: Current device payloads do not include the required thermal payload.
+      must_pass: true
+      rule_ref: payloads
+      severity: high
+    - id: mission_objective_not_fully_supported
+      description: The objective must be marked partially feasible instead of claimed as complete.
+      must_pass: true
+      rule_ref: mission_objective_feasibility
+      severity: high
+    - id: alternate_payload_or_human_review_required
+      description: Recommend suitable payload replacement or human review for unsupported objective.
+      must_pass: true
+      rule_ref: human_review_required
+      severity: high
+  expected_risks:
+    - id: required_payload_missing
+      category: device
+      trigger_condition: thermal payload required but payloads do not include thermal camera
+      minimum_risk_level: high
+      must_recall: true
+    - id: objective_unsupported_by_current_device
+      category: mission_planning
+      trigger_condition: night security patrol requires unsupported thermal awareness
+      minimum_risk_level: high
+      must_recall: true
+    - id: low_light_degraded_execution
+      category: visibility
+      trigger_condition: visibility_level == fair and no thermal payload is available
+      minimum_risk_level: medium
+      must_recall: true
+  expected_response_behaviors:
+    - id: response-mark-payload-mismatch
+      incident_type: payload_capability_missing
+      expected_actions:
+        - mark thermal objective as unsupported
+        - recommend drone with thermal payload
+        - request human review
+        - define service yard thermal sweep as makeup objective
+      forbidden_actions:
+        - claim full thermal patrol completion
+        - use unsupported payload for required objective
+      human_confirmation_required: true
+      makeup_flight_expected: true
+  baseline_plan:
+    expected_duration_minutes: 11
+    expected_coverage_percent: 46
+    task_split_count: 1
+    manual_intervention_count: 1
+    safety_margin_notes:
+      - current payload lacks thermal camera
+      - unsupported requirement is service yard thermal awareness
+      - makeup flight trigger is alternate drone with thermal payload is assigned
+  tags:
+    - device_state
+    - payload_capability
+    - human_review
+  source_type: mock
+baseline_mission_plan:
+  mission_id: mission-device-payload-capability-missing
+  recommended_time_window: execute only wide-camera perimeter segment or defer until thermal payload is available
+  launch_landing_points:
+    - id: llp-warehouse-west-service-yard
+      name: Warehouse west service yard
+      description: Mock launch point outside the hazardous-material buffer.
+      safety_notes:
+        - do not claim thermal coverage without thermal payload
+        - keep hazardous-material buffer clear
+  route_strategy: Partial wide-camera perimeter patrol with unsupported thermal objective deferred.
+  flight_segments:
+    - wide-camera perimeter observation segment
+  safety_thresholds:
+    max_wind_speed_mps: 8.0
+    min_battery_percent: 35
+    min_gps_confidence: 0.65
+    max_video_latency_ms: 500
+  abort_conditions:
+    - required thermal payload unavailable for thermal objective
+    - route enters hazardous-material buffer
+    - battery_percent <= 35
+  contingency_plan:
+    - mark service yard thermal sweep as unsupported requirement
+    - request human review
+    - schedule makeup flight with thermal-capable drone
+  expected_coverage_percent: 46
+  estimated_duration_minutes: 11
+  explanation: >
+    Mock case verifies that payload capability limits are surfaced as partial
+    feasibility and makeup flight needs, not hidden behind a normal route.

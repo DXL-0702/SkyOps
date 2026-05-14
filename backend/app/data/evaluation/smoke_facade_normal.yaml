@@ -1,0 +1,117 @@
+evaluation_case:
+  case_id: eval-smoke-facade-normal
+  title: Normal building facade inspection smoke case
+  scenario_type: building_facade_inspection
+  raw_user_input: Inspect the north facade of Building A and generate a safe low-altitude flight plan.
+  environment_state:
+    source_type: mock
+    weather_summary: Simulated clear morning with light wind and good visibility.
+    wind_speed_mps: 3.4
+    visibility_level: good
+    crowd_level: low
+    gps_quality: stable open-sky reception around the inspection corridor
+    gps_confidence: 0.91
+    data_confidence: 0.9
+  airspace_constraint:
+    source_type: mock
+    is_flyable: true
+    approval_required: false
+    restricted_zones:
+      - mock school playground no-fly buffer west of Building A
+    altitude_limit_m: 90
+    compliance_risk_level: low
+    explanation: >
+      Mock airspace allows the facade inspection if the route remains inside
+      the building boundary and avoids the school buffer.
+  drone_state:
+    source_type: mock
+    drone_id: mock-drone-facade-01
+    model: DJI Matrice class mock platform
+    battery_percent: 88
+    estimated_endurance_minutes: 34
+    return_to_home_battery_threshold: 30
+    payloads:
+      - zoom camera
+      - wide camera
+    link_quality: low
+    video_latency_ms: 120
+    available_for_mission: true
+  incident_events: []
+  expected_hard_constraints:
+    - id: hard-max-altitude
+      description: Flight altitude must stay at or below the 90 m mock ceiling.
+      must_pass: true
+      rule_ref: altitude_limit_m
+      severity: high
+    - id: hard-route-boundary
+      description: Route must remain inside the Building A inspection boundary.
+      must_pass: true
+      rule_ref: mission_boundary
+      severity: high
+    - id: hard-safety-distance
+      description: Maintain safe standoff from the facade and pedestrian areas.
+      must_pass: true
+      rule_ref: minimum_safety_distance
+      severity: high
+    - id: hard-no-fly-zone-avoidance
+      description: Avoid the mock school playground no-fly buffer.
+      must_pass: true
+      rule_ref: restricted_zones
+      severity: high
+  expected_risks:
+    - id: expected-pedestrian-buffer-awareness
+      category: public_safety
+      trigger_condition: facade route operates near pedestrian areas
+      minimum_risk_level: low
+      must_recall: true
+    - id: expected-school-buffer-awareness
+      category: airspace
+      trigger_condition: restricted_zones include mock school playground no-fly buffer
+      minimum_risk_level: low
+      must_recall: true
+  expected_response_behaviors: []
+  baseline_plan:
+    expected_duration_minutes: 18
+    expected_coverage_percent: 90
+    task_split_count: 1
+    manual_intervention_count: 0
+    safety_margin_notes:
+      - remain below 90 m altitude ceiling
+      - avoid west-side school buffer
+  tags:
+    - smoke
+    - building_facade_inspection
+    - normal_conditions
+  source_type: mock
+baseline_mission_plan:
+  mission_id: mission-smoke-facade-normal
+  recommended_time_window: 09:00-09:30 simulated local time
+  launch_landing_points:
+    - id: llp-building-a-south
+      name: Building A south service area
+      description: Mock launch point outside the pedestrian walkway.
+      safety_notes:
+        - keep launch area clear
+        - verify no pedestrians enter the takeoff buffer
+  route_strategy: One-pass north facade scan with fixed standoff and no west-side buffer entry.
+  flight_segments:
+    - north facade horizontal scan
+  safety_thresholds:
+    max_wind_speed_mps: 8.0
+    min_battery_percent: 35
+    min_gps_confidence: 0.65
+    max_video_latency_ms: 500
+  abort_conditions:
+    - wind_speed_mps >= 8.0
+    - battery_percent <= 35
+    - gps_confidence < 0.65
+    - route enters restricted_zones
+  contingency_plan:
+    - pause mission
+    - climb only within altitude ceiling if needed for clearance
+    - return to launch point
+  expected_coverage_percent: 90
+  estimated_duration_minutes: 18
+  explanation: >
+    Mock plan verifies the nominal evaluation structure with altitude, route,
+    safety distance, and no-fly-zone constraints.

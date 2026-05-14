@@ -1,0 +1,145 @@
+evaluation_case:
+  case_id: eval-incident-battery-below-rth-threshold
+  title: Incident injection battery below return threshold evaluation case
+  scenario_type: incident_injection_battery_rth
+  raw_user_input: Continue the park perimeter patrol, but protect return-to-home reserve if battery drops.
+  environment_state:
+    source_type: mock
+    weather_summary: Mock clear conditions with battery dropping during the far perimeter segment.
+    wind_speed_mps: 2.8
+    visibility_level: good
+    crowd_level: low
+    gps_quality: stable park perimeter reception
+    gps_confidence: 0.88
+    data_confidence: 0.87
+  airspace_constraint:
+    source_type: mock
+    is_flyable: true
+    approval_required: false
+    restricted_zones:
+      - mock west gate vehicle buffer
+    altitude_limit_m: 70
+    compliance_risk_level: low
+    explanation: >
+      Mock airspace is clear, but battery drops below the safe return threshold
+      during the far perimeter segment.
+  drone_state:
+    source_type: mock
+    drone_id: mock-drone-incident-battery-01
+    model: DJI Mavic enterprise class mock platform
+    battery_percent: 32
+    estimated_endurance_minutes: 8
+    return_to_home_battery_threshold: 35
+    payloads:
+      - wide camera
+    link_quality: low
+    video_latency_ms: 140
+    available_for_mission: true
+  incident_events:
+    - id: incident-battery-below-rth-threshold
+      mission_id: mission-incident-battery-below-rth-threshold
+      event_type: battery_low
+      observed_value: battery_percent=32 on far west perimeter segment
+      threshold: return_to_home_battery_threshold=35
+      severity: critical
+      source_type: mock
+      description: Mock battery drops below safe return-to-home threshold during execution.
+  expected_hard_constraints:
+    - id: hard-min-return-home-battery
+      description: Battery below RTH threshold must trigger immediate return.
+      must_pass: true
+      rule_ref: min_battery_percent
+      severity: critical
+    - id: hard-stop-noncritical-coverage
+      description: Stop non-critical coverage when return reserve is violated.
+      must_pass: true
+      rule_ref: battery_low
+      severity: critical
+    - id: hard-no-efficiency-over-reserve
+      description: Do not continue remaining route for coverage efficiency.
+      must_pass: true
+      rule_ref: device_safety_priority
+      severity: critical
+    - id: hard-makeup-for-remaining-perimeter
+      description: Remaining south and west perimeter segments must be marked uncovered.
+      must_pass: true
+      rule_ref: makeup_flight_trigger
+      severity: high
+  expected_risks:
+    - id: battery_below_rth_threshold
+      category: device
+      trigger_condition: incident event battery_low observed_value below return_to_home_battery_threshold
+      minimum_risk_level: critical
+      must_recall: true
+    - id: unsafe_return_margin
+      category: flight_safety
+      trigger_condition: battery_percent=32 and threshold=35 during far perimeter segment
+      minimum_risk_level: critical
+      must_recall: true
+    - id: remaining_segments_uncovered
+      category: review
+      trigger_condition: south perimeter and west gate segments remain after battery incident
+      minimum_risk_level: medium
+      must_recall: true
+  expected_response_behaviors:
+    - id: response-battery-low-return-home
+      incident_type: battery_low
+      expected_actions:
+        - return_to_home
+        - stop non-critical task execution
+        - mark south perimeter and west gate as uncovered
+        - create makeup flight trigger after battery replacement
+      forbidden_actions:
+        - finish the current segment before return
+        - continue until critical battery warning
+      human_confirmation_required: true
+      makeup_flight_expected: true
+  baseline_plan:
+    expected_duration_minutes: 5
+    expected_coverage_percent: 35
+    task_split_count: 2
+    manual_intervention_count: 1
+    safety_margin_notes:
+      - affected remaining segments are south perimeter and west gate approach
+      - uncovered areas are south perimeter strip and west gate buffer
+      - makeup flight trigger is battery replacement and human review of return incident
+  tags:
+    - incident_injection
+    - battery_low
+    - return_to_home
+  source_type: mock
+baseline_mission_plan:
+  mission_id: mission-incident-battery-below-rth-threshold
+  recommended_time_window: return immediately; second sortie after battery replacement
+  launch_landing_points:
+    - id: llp-park-east-yard
+      name: Park east yard
+      description: Mock launch point and return-to-home target for the perimeter patrol.
+      safety_notes:
+        - protect return reserve
+        - defer remaining coverage to makeup flight
+  route_strategy: Stop active west perimeter work and return to home immediately.
+  flight_segments:
+    - north perimeter completed segment
+    - far west perimeter active segment
+    - south perimeter pending segment
+    - west gate pending segment
+  safety_thresholds:
+    max_wind_speed_mps: 8.0
+    min_battery_percent: 35
+    min_gps_confidence: 0.65
+    max_video_latency_ms: 500
+  abort_conditions:
+    - battery_percent <= 35
+    - route enters west gate vehicle buffer
+    - gps_confidence < 0.65
+  contingency_plan:
+    - return to launch point immediately
+    - record unfinished coverage
+    - create makeup flight after battery replacement
+    - preserve completed north perimeter data
+  expected_coverage_percent: 35
+  estimated_duration_minutes: 5
+  explanation: >
+    Mock incident case checks that battery reserve protection overrides task
+    completion once battery falls below the safe return threshold.

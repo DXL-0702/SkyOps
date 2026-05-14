@@ -1,0 +1,109 @@
+evaluation_case:
+  case_id: eval-smoke-facade-wind-near-threshold
+  title: Facade inspection with wind near threshold smoke case
+  scenario_type: building_facade_inspection
+  raw_user_input: Inspect the east facade of Building B while keeping the route safe if wind increases.
+  environment_state:
+    source_type: simulated
+    weather_summary: Simulated overcast midday with wind close to the configured limit.
+    wind_speed_mps: 7.6
+    visibility_level: good
+    crowd_level: low
+    gps_quality: stable with minor facade reflection risk
+    gps_confidence: 0.82
+    data_confidence: 0.86
+  airspace_constraint:
+    source_type: simulated
+    is_flyable: true
+    approval_required: false
+    restricted_zones: []
+    altitude_limit_m: 100
+    compliance_risk_level: low
+    explanation: >
+      Simulated airspace is clear, but the plan must preserve margin because
+      wind is near the configured hard limit.
+  drone_state:
+    source_type: simulated
+    drone_id: simulated-drone-wind-01
+    model: DJI Matrice class simulated platform
+    battery_percent: 82
+    estimated_endurance_minutes: 30
+    return_to_home_battery_threshold: 30
+    payloads:
+      - zoom camera
+    link_quality: low
+    video_latency_ms: 140
+    available_for_mission: true
+  incident_events: []
+  expected_hard_constraints:
+    - id: hard-wind-limit
+      description: Wind speed must remain below the 8.0 m/s configured limit.
+      must_pass: true
+      rule_ref: max_wind_speed_mps
+      severity: high
+    - id: hard-wind-abort-margin
+      description: Plan must define abort behavior if wind reaches the threshold.
+      must_pass: true
+      rule_ref: abort_conditions
+      severity: high
+    - id: hard-max-altitude
+      description: Flight altitude must stay at or below the 100 m mock ceiling.
+      must_pass: true
+      rule_ref: altitude_limit_m
+      severity: high
+    - id: hard-route-boundary
+      description: Route must stay close to the east facade inspection corridor.
+      must_pass: true
+      rule_ref: mission_boundary
+      severity: high
+  expected_risks:
+    - id: expected-wind-near-threshold
+      category: weather
+      trigger_condition: wind_speed_mps >= 7.5
+      minimum_risk_level: medium
+      must_recall: true
+  expected_response_behaviors: []
+  baseline_plan:
+    expected_duration_minutes: 16
+    expected_coverage_percent: 76
+    task_split_count: 1
+    manual_intervention_count: 0
+    safety_margin_notes:
+      - keep wind abort condition explicit
+      - reduce facade pass length to preserve control margin
+  tags:
+    - smoke
+    - building_facade_inspection
+    - wind_near_threshold
+  source_type: simulated
+baseline_mission_plan:
+  mission_id: mission-smoke-facade-wind-near-threshold
+  recommended_time_window: 12:15-12:45 simulated local time
+  launch_landing_points:
+    - id: llp-building-b-east
+      name: Building B east service lane
+      description: Simulated launch point with clear line of sight to the east facade.
+      safety_notes:
+        - verify wind before takeoff
+        - keep manual abort ready
+  route_strategy: Short east facade scan with early abort if wind reaches the configured limit.
+  flight_segments:
+    - east facade lower-to-mid scan
+  safety_thresholds:
+    max_wind_speed_mps: 8.0
+    min_battery_percent: 35
+    min_gps_confidence: 0.65
+    max_video_latency_ms: 500
+  abort_conditions:
+    - wind_speed_mps >= 8.0
+    - battery_percent <= 35
+    - gps_confidence < 0.65
+  contingency_plan:
+    - pause mission
+    - return to launch point
+    - schedule makeup scan for skipped upper facade bands
+  expected_coverage_percent: 76
+  estimated_duration_minutes: 16
+  explanation: >
+    Simulated plan keeps the case small while verifying wind threshold handling
+    in evaluation fixtures.

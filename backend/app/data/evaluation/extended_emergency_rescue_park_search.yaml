@@ -1,0 +1,137 @@
+evaluation_case:
+  case_id: eval-extended-emergency-rescue-park-search
+  title: Extended emergency rescue park search support evaluation case
+  scenario_type: emergency_rescue
+  raw_user_input: Plan a safe search support route for a missing person report in the north park area.
+  environment_state:
+    source_type: mock
+    weather_summary: Mock cloudy afternoon with light wind and scattered pedestrians in the park.
+    wind_speed_mps: 3.2
+    visibility_level: fair
+    crowd_level: medium
+    gps_quality: stable over open lawn with partial tree canopy obstruction
+    gps_confidence: 0.79
+    data_confidence: 0.84
+  airspace_constraint:
+    source_type: mock
+    is_flyable: true
+    approval_required: false
+    restricted_zones:
+      - mock playground people-dense buffer
+      - mock lakeside wildlife buffer
+    altitude_limit_m: 70
+    compliance_risk_level: medium
+    explanation: >
+      Mock park airspace is flyable if the route avoids people-dense and
+      lakeside buffer areas.
+  drone_state:
+    source_type: mock
+    drone_id: mock-drone-extended-rescue-park-01
+    model: DJI Mavic enterprise class mock platform
+    battery_percent: 83
+    estimated_endurance_minutes: 26
+    return_to_home_battery_threshold: 30
+    payloads:
+      - wide camera
+      - speaker
+    link_quality: low
+    video_latency_ms: 170
+    available_for_mission: true
+  incident_events: []
+  expected_hard_constraints:
+    - id: hard-search-boundary
+      description: Search route must stay inside the north park task boundary.
+      must_pass: true
+      rule_ref: mission_boundary
+      severity: high
+    - id: hard-people-buffer-avoidance
+      description: Route must avoid playground and people-dense buffers.
+      must_pass: true
+      rule_ref: restricted_zones
+      severity: high
+    - id: hard-safe-altitude
+      description: Route must remain under the 70 m altitude ceiling.
+      must_pass: true
+      rule_ref: altitude_limit_m
+      severity: high
+    - id: hard-rth-reserve
+      description: Search support must preserve return-to-home battery reserve.
+      must_pass: true
+      rule_ref: min_battery_percent
+      severity: high
+  expected_risks:
+    - id: tree_canopy_navigation_risk
+      category: navigation
+      trigger_condition: gps_quality contains partial tree canopy obstruction
+      minimum_risk_level: medium
+      must_recall: true
+    - id: pedestrian_safety_risk
+      category: public_safety
+      trigger_condition: crowd_level == medium near park paths
+      minimum_risk_level: medium
+      must_recall: true
+    - id: rescue_boundary_uncertainty
+      category: mission_planning
+      trigger_condition: search route covers north park area with buffered no-go zones
+      minimum_risk_level: medium
+      must_recall: true
+  expected_response_behaviors:
+    - id: response-rescue-search-conservative-route
+      incident_type: emergency_rescue_search_support
+      expected_actions:
+        - generate safe search route
+        - avoid people-dense buffers
+        - preserve return-to-home reserve
+        - require human review before expanding search boundary
+      forbidden_actions:
+        - fly over playground crowd
+        - exceed search boundary for coverage
+      human_confirmation_required: true
+      makeup_flight_expected: false
+  baseline_plan:
+    expected_duration_minutes: 18
+    expected_coverage_percent: 76
+    task_split_count: 1
+    manual_intervention_count: 1
+    safety_margin_notes:
+      - avoid playground people-dense buffer
+      - keep lakeside wildlife buffer clear
+      - expand boundary only after human review
+  tags:
+    - extended_coverage
+    - emergency_rescue
+    - search_support
+  source_type: mock
+baseline_mission_plan:
+  mission_id: mission-extended-emergency-rescue-park-search
+  recommended_time_window: 15:00-15:30 simulated local time
+  launch_landing_points:
+    - id: llp-north-park-service-gate
+      name: North park service gate
+      description: Mock launch point away from the playground buffer.
+      safety_notes:
+        - keep pedestrian separation
+        - confirm search boundary with human coordinator
+  route_strategy: Low-altitude lawn-edge search route with buffered avoidance of playground and lakeside areas.
+  flight_segments:
+    - north lawn search strip
+    - east path search strip
+  safety_thresholds:
+    max_wind_speed_mps: 8.0
+    min_battery_percent: 35
+    min_gps_confidence: 0.65
+    max_video_latency_ms: 500
+  abort_conditions:
+    - crowd_level == high
+    - battery_percent <= 35
+    - gps_confidence < 0.65
+    - route enters restricted_zones
+  contingency_plan:
+    - pause search route
+    - move to service gate standby
+    - request human review for expanded search area
+  expected_coverage_percent: 76
+  estimated_duration_minutes: 18
+  explanation: >
+    Mock extended case evaluates emergency search route planning and conservative
+    boundary control for task-level rescue support.

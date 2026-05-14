@@ -1,0 +1,132 @@
+evaluation_case:
+  case_id: eval-normal-park-security-patrol
+  title: Normal industrial park security patrol planning evaluation case
+  scenario_type: industrial_park_security_patrol
+  raw_user_input: Generate a security patrol mission around the park entrances, perimeter road, and warehouse area.
+  environment_state:
+    source_type: simulated
+    weather_summary: Simulated early evening with site lighting, calm wind, and normal vehicle movement.
+    wind_speed_mps: 2.5
+    visibility_level: fair
+    crowd_level: medium
+    gps_quality: stable on perimeter road with partial obstruction near warehouses
+    gps_confidence: 0.82
+    data_confidence: 0.87
+  airspace_constraint:
+    source_type: simulated
+    is_flyable: true
+    approval_required: false
+    restricted_zones:
+      - mock canteen people-dense area
+      - mock warehouse hazardous-material buffer
+      - mock guardhouse privacy buffer
+    altitude_limit_m: 75
+    compliance_risk_level: low
+    explanation: >
+      Simulated airspace supports park patrol inside the permitted perimeter
+      while avoiding people-dense, hazardous-material, and privacy buffers.
+  drone_state:
+    source_type: simulated
+    drone_id: simulated-drone-normal-security-01
+    model: DJI Mavic enterprise class simulated platform
+    battery_percent: 89
+    estimated_endurance_minutes: 32
+    return_to_home_battery_threshold: 30
+    payloads:
+      - wide camera
+      - spotlight
+    link_quality: low
+    video_latency_ms: 170
+    available_for_mission: true
+  incident_events: []
+  expected_hard_constraints:
+    - id: hard-patrol-boundary
+      description: Keep the patrol route inside the industrial park perimeter.
+      must_pass: true
+      rule_ref: mission_boundary
+      severity: high
+    - id: hard-people-dense-area-avoidance
+      description: Avoid people-dense canteen area and guardhouse privacy buffer.
+      must_pass: true
+      rule_ref: restricted_zones
+      severity: high
+    - id: hard-sensitive-building-buffer
+      description: Respect the hazardous-material warehouse buffer.
+      must_pass: true
+      rule_ref: restricted_zones
+      severity: high
+    - id: hard-safe-altitude
+      description: Keep all patrol segments at or below the 75 m altitude ceiling.
+      must_pass: true
+      rule_ref: altitude_limit_m
+      severity: high
+    - id: hard-return-battery-reserve
+      description: Preserve return-to-home battery reserve for the perimeter route.
+      must_pass: true
+      rule_ref: min_battery_percent
+      severity: high
+  expected_risks:
+    - id: risk-pedestrian-vehicle-mix
+      category: public_safety
+      trigger_condition: crowd_level == medium and normal vehicle movement near entrances
+      minimum_risk_level: medium
+      must_recall: true
+    - id: risk-warehouse-signal-obstruction
+      category: navigation
+      trigger_condition: gps_quality contains obstruction near warehouses
+      minimum_risk_level: medium
+      must_recall: true
+    - id: risk-low-light-patrol
+      category: visibility
+      trigger_condition: visibility_level == fair during early evening operation
+      minimum_risk_level: low
+      must_recall: true
+  expected_response_behaviors: []
+  baseline_plan:
+    expected_duration_minutes: 21
+    expected_coverage_percent: 87
+    task_split_count: 2
+    manual_intervention_count: 0
+    safety_margin_notes:
+      - avoid canteen and privacy buffers
+      - keep route over perimeter road where possible
+      - preserve battery reserve for full loop return
+  tags:
+    - normal
+    - low_risk
+    - security_patrol
+    - industrial_park
+  source_type: simulated
+baseline_mission_plan:
+  mission_id: mission-normal-park-security-patrol
+  recommended_time_window: 18:30-19:05 simulated local time
+  launch_landing_points:
+    - id: llp-park-north-gate
+      name: Park north gate service bay
+      description: Simulated launch point away from the visitor entrance queue.
+      safety_notes:
+        - confirm visitor queue stays outside launch buffer
+        - keep patrol outside privacy buffer
+  route_strategy: Perimeter-road patrol with short warehouse-side pass and restricted buffer avoidance.
+  flight_segments:
+    - north and east perimeter road
+    - warehouse-side patrol corridor
+  safety_thresholds:
+    max_wind_speed_mps: 8.0
+    min_battery_percent: 35
+    min_gps_confidence: 0.65
+    max_video_latency_ms: 500
+  abort_conditions:
+    - wind_speed_mps >= 8.0
+    - battery_percent <= 35
+    - gps_confidence < 0.65
+    - route enters restricted_zones
+  contingency_plan:
+    - pause patrol over service bay
+    - return to launch point
+    - mark skipped perimeter segment for later patrol
+  expected_coverage_percent: 87
+  estimated_duration_minutes: 21
+  explanation: >
+    Simulated baseline case benchmarks normal security patrol planning and
+    operational risk handling around people, vehicles, and sensitive buffers.

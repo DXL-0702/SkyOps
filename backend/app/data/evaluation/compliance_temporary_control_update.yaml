@@ -1,0 +1,137 @@
+evaluation_case:
+  case_id: eval-compliance-temporary-control-update
+  title: Airspace compliance temporary control update evaluation case
+  scenario_type: airspace_compliance_temporary_control
+  raw_user_input: Plan a short urban block mapping route for the afternoon inspection window.
+  environment_state:
+    source_type: mock
+    weather_summary: Mock clear afternoon with light wind and steady traffic.
+    wind_speed_mps: 3.4
+    visibility_level: good
+    crowd_level: medium
+    gps_quality: partial urban canyon risk near roadside buildings
+    gps_confidence: 0.78
+    data_confidence: 0.74
+  airspace_constraint:
+    source_type: mock
+    is_flyable: true
+    approval_required: true
+    restricted_zones:
+      - mock temporary control zone active from 14:00 to 16:00
+      - mock civic plaza buffer inside target block
+    altitude_limit_m: 90
+    compliance_risk_level: high
+    explanation: >
+      Mock temporary control information was updated for the mission window and
+      now affects the planned mapping route through the target block.
+  drone_state:
+    source_type: mock
+    drone_id: mock-drone-compliance-temporary-control-01
+    model: DJI Matrice class mock platform
+    battery_percent: 86
+    estimated_endurance_minutes: 29
+    return_to_home_battery_threshold: 30
+    payloads:
+      - mapping camera
+    link_quality: medium
+    video_latency_ms: 210
+    available_for_mission: true
+  incident_events: []
+  expected_hard_constraints:
+    - id: temporary_control_zone_active
+      description: The active temporary control zone must be treated as a hard airspace constraint.
+      must_pass: true
+      rule_ref: restricted_zones
+      severity: critical
+    - id: updated_airspace_rule_must_override_stale_plan
+      description: Updated temporary control information must override any stale route plan.
+      must_pass: true
+      rule_ref: airspace_update_timestamp
+      severity: critical
+    - id: route_must_respect_temporary_control
+      description: The route must avoid the temporary control zone during its active window.
+      must_pass: true
+      rule_ref: mission_boundary
+      severity: critical
+    - id: human_confirmation_required_for_feasibility_change
+      description: Human confirmation is required if the update changes mission feasibility.
+      must_pass: true
+      rule_ref: human_review_required
+      severity: high
+  expected_risks:
+    - id: temporary_control_update_risk
+      category: compliance
+      trigger_condition: restricted_zones include active temporary control during mission window
+      minimum_risk_level: critical
+      must_recall: true
+    - id: stale_plan_conflict
+      category: mission_planning
+      trigger_condition: updated control information changes route feasibility
+      minimum_risk_level: high
+      must_recall: true
+    - id: approval_window_uncertainty
+      category: airspace
+      trigger_condition: approval_required == true for updated temporary control window
+      minimum_risk_level: high
+      must_recall: true
+  expected_response_behaviors:
+    - id: response-apply-temporary-control-update
+      incident_type: temporary_control_zone_update
+      expected_actions:
+        - update compliance assessment
+        - avoid temporary control area
+        - delay mission if route is no longer feasible
+        - explain that updated control information changed the plan
+      forbidden_actions:
+        - execute stale route
+        - enter active temporary control zone
+      human_confirmation_required: true
+      makeup_flight_expected: true
+  baseline_plan:
+    expected_duration_minutes: 10
+    expected_coverage_percent: 36
+    task_split_count: 1
+    manual_intervention_count: 1
+    safety_margin_notes:
+      - temporary control update affects target block
+      - stale route must be replaced
+      - human confirmation required for feasibility change
+      - uncovered area is mapping strip inside the active temporary control zone
+      - makeup flight trigger is temporary control window inactive and approval verified
+  tags:
+    - airspace_compliance
+    - temporary_control
+    - high_risk
+  source_type: mock
+baseline_mission_plan:
+  mission_id: mission-compliance-temporary-control-update
+  recommended_time_window: delay until outside mock temporary control window or after confirmation
+  launch_landing_points:
+    - id: llp-urban-block-west-lot
+      name: Urban block west lot
+      description: Mock launch point outside the active temporary control zone.
+      safety_notes:
+        - verify temporary control window before takeoff
+        - keep route outside civic plaza buffer
+  route_strategy: Avoid active temporary control area and defer affected mapping strips.
+  flight_segments:
+    - west block legal strip
+  safety_thresholds:
+    max_wind_speed_mps: 8.0
+    min_battery_percent: 35
+    min_gps_confidence: 0.65
+    max_video_latency_ms: 500
+  abort_conditions:
+    - temporary control zone active on planned route
+    - approval_required == true and approval is not verified
+    - route enters restricted_zones
+  contingency_plan:
+    - pause planning for affected area
+    - update compliance assessment
+    - request human confirmation
+    - schedule makeup flight after control window
+  expected_coverage_percent: 36
+  estimated_duration_minutes: 10
+  explanation: >
+    Mock case verifies that updated temporary control information takes
+    precedence over coverage and stale planning assumptions.

@@ -1,0 +1,133 @@
+evaluation_case:
+  case_id: eval-high-risk-gust-near-threshold
+  title: High-risk gust near threshold evaluation case
+  scenario_type: high_risk_weather_gust
+  raw_user_input: Generate a facade patrol route through the west service corridor if wind margin is acceptable.
+  environment_state:
+    source_type: mock
+    weather_summary: Mock average wind is acceptable, but simulated gust speed reaches 7.8 m/s near a narrow facade corridor.
+    wind_speed_mps: 6.4
+    visibility_level: good
+    crowd_level: low
+    gps_quality: stable with minor reflection near the facade corridor
+    gps_confidence: 0.83
+    data_confidence: 0.86
+  airspace_constraint:
+    source_type: mock
+    is_flyable: true
+    approval_required: false
+    restricted_zones:
+      - mock narrow service corridor obstacle buffer
+    altitude_limit_m: 90
+    compliance_risk_level: low
+    explanation: >
+      Mock airspace is flyable, but the narrow corridor and near-threshold gusts
+      require a wider route and conservative monitoring.
+  drone_state:
+    source_type: mock
+    drone_id: mock-drone-high-risk-gust-01
+    model: DJI Matrice class mock platform
+    battery_percent: 84
+    estimated_endurance_minutes: 28
+    return_to_home_battery_threshold: 30
+    payloads:
+      - zoom camera
+    link_quality: low
+    video_latency_ms: 150
+    available_for_mission: true
+  incident_events: []
+  expected_hard_constraints:
+    - id: hard-max-wind-speed
+      description: Average wind must stay below the configured 8.0 m/s wind limit.
+      must_pass: true
+      rule_ref: max_wind_speed_mps
+      severity: high
+    - id: hard-gust-monitoring
+      description: Near-threshold gusts must trigger conservative route monitoring.
+      must_pass: true
+      rule_ref: max_gust_speed_mps
+      severity: high
+    - id: hard-obstacle-standoff
+      description: Maintain increased safety distance from corridor obstacles.
+      must_pass: true
+      rule_ref: minimum_safety_distance
+      severity: high
+    - id: hard-avoid-narrow-passage
+      description: Avoid aggressive routing through the narrow facade corridor.
+      must_pass: true
+      rule_ref: mission_boundary
+      severity: high
+  expected_risks:
+    - id: gust_near_threshold
+      category: weather
+      trigger_condition: simulated gust_speed_mps >= 7.5 and max_wind_speed_mps == 8.0
+      minimum_risk_level: high
+      must_recall: true
+    - id: reduced_control_margin
+      category: flight_control
+      trigger_condition: gust speed is close to allowed threshold
+      minimum_risk_level: high
+      must_recall: true
+    - id: obstacle_proximity_risk
+      category: navigation
+      trigger_condition: route request includes narrow facade corridor
+      minimum_risk_level: medium
+      must_recall: true
+  expected_response_behaviors:
+    - id: response-cautious-gust-execution
+      incident_type: weather_gust_near_threshold
+      expected_actions:
+        - increase safety distance
+        - reduce route aggressiveness
+        - avoid narrow passages
+        - monitor wind margin
+      forbidden_actions:
+        - fly close to corridor obstacles
+      human_confirmation_required: false
+      makeup_flight_expected: false
+  baseline_plan:
+    expected_duration_minutes: 14
+    expected_coverage_percent: 58
+    task_split_count: 1
+    manual_intervention_count: 0
+    safety_margin_notes:
+      - average wind is below threshold
+      - gust margin is small
+      - avoid narrow corridor if possible
+  tags:
+    - high_risk
+    - weather
+    - gust_near_threshold
+  source_type: mock
+baseline_mission_plan:
+  mission_id: mission-high-risk-gust-near-threshold
+  recommended_time_window: 10:10-10:30 simulated local time with wind monitoring
+  launch_landing_points:
+    - id: llp-west-service-yard
+      name: West service yard
+      description: Mock launch point outside the narrow facade corridor.
+      safety_notes:
+        - verify gust margin before takeoff
+        - keep manual abort ready
+  route_strategy: Wider west-side standoff route that avoids the narrow corridor unless gusts drop.
+  flight_segments:
+    - west facade outer standoff pass
+  safety_thresholds:
+    max_wind_speed_mps: 8.0
+    min_battery_percent: 35
+    min_gps_confidence: 0.65
+    max_video_latency_ms: 500
+  abort_conditions:
+    - wind_speed_mps >= 8.0
+    - simulated_gust_speed_mps >= 8.0
+    - battery_percent <= 35
+    - gps_confidence < 0.65
+  contingency_plan:
+    - widen standoff
+    - skip narrow corridor segment
+    - return to launch point if gusts increase
+  expected_coverage_percent: 58
+  estimated_duration_minutes: 14
+  explanation: >
+    Mock high-risk case checks conservative planning when gust margin is close
+    to the wind safety threshold.

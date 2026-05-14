@@ -1,0 +1,139 @@
+evaluation_case:
+  case_id: eval-extended-pre-typhoon-construction-patrol
+  title: Extended pre-typhoon construction site safety patrol evaluation case
+  scenario_type: pre_typhoon_construction_safety_patrol
+  raw_user_input: Plan a pre-typhoon construction site patrol around cranes, scaffolding, and temporary structures.
+  environment_state:
+    source_type: simulated
+    weather_summary: Simulated pre-typhoon conditions with rising wind and gust risk near temporary structures.
+    wind_speed_mps: 7.4
+    visibility_level: fair
+    crowd_level: medium
+    gps_quality: good on perimeter with partial obstruction near cranes
+    gps_confidence: 0.78
+    data_confidence: 0.82
+  airspace_constraint:
+    source_type: simulated
+    is_flyable: true
+    approval_required: false
+    restricted_zones:
+      - simulated tower crane swing radius
+      - simulated scaffolding wind-sensitive buffer
+      - simulated worker muster area
+    altitude_limit_m: 80
+    compliance_risk_level: medium
+    explanation: >
+      Simulated construction airspace is flyable only with strict standoff from
+      cranes, scaffolding, and worker areas under rising wind.
+  drone_state:
+    source_type: simulated
+    drone_id: simulated-drone-extended-pre-typhoon-01
+    model: DJI Matrice class simulated platform
+    battery_percent: 88
+    estimated_endurance_minutes: 28
+    return_to_home_battery_threshold: 30
+    payloads:
+      - wide camera
+      - zoom camera
+    link_quality: low
+    video_latency_ms: 190
+    available_for_mission: true
+  incident_events: []
+  expected_hard_constraints:
+    - id: hard-wind-threshold-monitoring
+      description: Rising wind near threshold must gate construction patrol execution.
+      must_pass: true
+      rule_ref: max_wind_speed_mps
+      severity: high
+    - id: hard-crane-scaffolding-buffer
+      description: Route must avoid crane swing radius and scaffolding wind-sensitive buffer.
+      must_pass: true
+      rule_ref: restricted_zones
+      severity: critical
+    - id: hard-worker-safety-distance
+      description: Route must maintain safe distance from worker muster area.
+      must_pass: true
+      rule_ref: minimum_safety_distance
+      severity: high
+    - id: hard-delay-if-weather-unsafe
+      description: Delay or abort if wind reaches unsafe threshold.
+      must_pass: true
+      rule_ref: weather_takeoff_gate
+      severity: high
+  expected_risks:
+    - id: pre_typhoon_wind_margin
+      category: weather
+      trigger_condition: wind_speed_mps >= 7.0 before typhoon window
+      minimum_risk_level: high
+      must_recall: true
+    - id: temporary_structure_obstacle_risk
+      category: navigation
+      trigger_condition: restricted_zones include scaffolding wind-sensitive buffer
+      minimum_risk_level: high
+      must_recall: true
+    - id: worker_safety_risk
+      category: public_safety
+      trigger_condition: crowd_level == medium near worker muster area
+      minimum_risk_level: medium
+      must_recall: true
+  expected_response_behaviors:
+    - id: response-pre-typhoon-conservative-patrol
+      incident_type: pre_typhoon_construction_patrol
+      expected_actions:
+        - monitor wind threshold
+        - avoid crane and scaffolding buffers
+        - shorten route if gust risk increases
+        - require human review before continuation
+      forbidden_actions:
+        - fly close to crane for coverage
+        - continue if wind reaches unsafe threshold
+      human_confirmation_required: true
+      makeup_flight_expected: true
+  baseline_plan:
+    expected_duration_minutes: 12
+    expected_coverage_percent: 52
+    task_split_count: 2
+    manual_intervention_count: 1
+    safety_margin_notes:
+      - incomplete segment is scaffolding inner corridor if wind increases
+      - makeup flight trigger is wind drops below 7.0 m/s and supervisor approves continuation
+      - worker muster area buffer excluded
+  tags:
+    - extended_coverage
+    - pre_typhoon_construction_safety_patrol
+    - construction_site
+  source_type: simulated
+baseline_mission_plan:
+  mission_id: mission-extended-pre-typhoon-construction-patrol
+  recommended_time_window: 08:00-08:20 simulated local time before wind increases
+  launch_landing_points:
+    - id: llp-construction-site-east-gate
+      name: Construction site east gate
+      description: Simulated launch point outside crane swing radius.
+      safety_notes:
+        - verify wind margin before takeoff
+        - keep worker muster area buffer clear
+  route_strategy: Short perimeter-first patrol with scaffolding inner corridor deferred under gust risk.
+  flight_segments:
+    - east perimeter crane standoff segment
+    - scaffolding outer buffer segment
+  safety_thresholds:
+    max_wind_speed_mps: 8.0
+    min_battery_percent: 35
+    min_gps_confidence: 0.65
+    max_video_latency_ms: 500
+  abort_conditions:
+    - wind_speed_mps >= 8.0
+    - route enters restricted_zones
+    - crowd_level == high
+    - battery_percent <= 35
+  contingency_plan:
+    - shorten patrol
+    - return to east gate
+    - request human review if wind increases
+    - schedule makeup patrol after weather improves
+  expected_coverage_percent: 52
+  estimated_duration_minutes: 12
+  explanation: >
+    Simulated extended case evaluates pre-typhoon construction safety planning,
+    wind threshold handling, and conservative coverage decisions.

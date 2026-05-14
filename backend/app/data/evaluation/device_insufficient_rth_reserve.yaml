@@ -1,0 +1,135 @@
+evaluation_case:
+  case_id: eval-device-insufficient-rth-reserve
+  title: Device-state insufficient return-to-home reserve evaluation case
+  scenario_type: device_state_return_reserve
+  raw_user_input: Inspect the south warehouse perimeter and cover all loading bays in one route.
+  environment_state:
+    source_type: simulated
+    weather_summary: Simulated clear morning with light wind and good visibility.
+    wind_speed_mps: 3.0
+    visibility_level: good
+    crowd_level: low
+    gps_quality: stable industrial park reception
+    gps_confidence: 0.9
+    data_confidence: 0.89
+  airspace_constraint:
+    source_type: simulated
+    is_flyable: true
+    approval_required: false
+    restricted_zones:
+      - simulated loading dock vehicle buffer
+    altitude_limit_m: 75
+    compliance_risk_level: low
+    explanation: >
+      Simulated airspace is clear, but the route must be shortened because
+      battery reserve is too close to the return-to-home threshold.
+  drone_state:
+    source_type: simulated
+    drone_id: simulated-drone-device-rth-reserve-01
+    model: DJI Matrice class simulated platform
+    battery_percent: 39
+    estimated_endurance_minutes: 13
+    return_to_home_battery_threshold: 35
+    payloads:
+      - wide camera
+      - zoom camera
+    link_quality: low
+    video_latency_ms: 160
+    available_for_mission: true
+  incident_events: []
+  expected_hard_constraints:
+    - id: minimum_return_home_battery
+      description: Route must preserve at least the configured return-to-home reserve.
+      must_pass: true
+      rule_ref: min_battery_percent
+      severity: critical
+    - id: return_to_home_reserve_required
+      description: The mission must return home before battery reserve is violated.
+      must_pass: true
+      rule_ref: return_to_home_battery_threshold
+      severity: critical
+    - id: route_must_preserve_rth_margin
+      description: Route duration and distance must be shortened to preserve RTH margin.
+      must_pass: true
+      rule_ref: route_energy_budget
+      severity: high
+    - id: makeup_flight_required_for_uncovered_loading_bays
+      description: Uncovered loading bays must be marked for makeup flight instead of spending reserve.
+      must_pass: true
+      rule_ref: makeup_flight_trigger
+      severity: high
+  expected_risks:
+    - id: rth_reserve_margin_low
+      category: device
+      trigger_condition: battery_percent <= return_to_home_battery_threshold + 5
+      minimum_risk_level: high
+      must_recall: true
+    - id: reserve_violation_if_full_route
+      category: mission_planning
+      trigger_condition: requested one-route coverage would consume return reserve
+      minimum_risk_level: high
+      must_recall: true
+    - id: uncovered_loading_bays_makeup_needed
+      category: review
+      trigger_condition: full loading bay coverage cannot be completed before reserve threshold
+      minimum_risk_level: medium
+      must_recall: true
+  expected_response_behaviors:
+    - id: response-shorten-route-preserve-rth
+      incident_type: insufficient_return_to_home_reserve
+      expected_actions:
+        - shorten mission
+        - split mission
+        - return to home before reserve is violated
+        - mark west loading bays as uncovered for makeup flight
+      forbidden_actions:
+        - spend return-to-home reserve for coverage
+        - continue full route after reserve trigger
+      human_confirmation_required: false
+      makeup_flight_expected: true
+  baseline_plan:
+    expected_duration_minutes: 7
+    expected_coverage_percent: 48
+    task_split_count: 2
+    manual_intervention_count: 0
+    safety_margin_notes:
+      - preserve 35 percent return-to-home reserve
+      - uncovered areas are west loading bays and far south corner
+      - makeup flight trigger is first sortie reaches 38 percent battery or 7 minutes elapsed
+  tags:
+    - device_state
+    - return_to_home
+    - makeup_flight
+  source_type: simulated
+baseline_mission_plan:
+  mission_id: mission-device-insufficient-rth-reserve
+  recommended_time_window: 10:00-10:15 simulated local time for first shortened sortie
+  launch_landing_points:
+    - id: llp-warehouse-east-yard
+      name: Warehouse east yard
+      description: Simulated launch point closest to the first safe segment.
+      safety_notes:
+        - return before battery reserve is violated
+        - defer far loading bays to makeup flight
+  route_strategy: Short first sortie over east loading bays, then return home and schedule makeup flight.
+  flight_segments:
+    - east loading bay segment
+    - central loading bay segment
+  safety_thresholds:
+    max_wind_speed_mps: 8.0
+    min_battery_percent: 35
+    min_gps_confidence: 0.65
+    max_video_latency_ms: 500
+  abort_conditions:
+    - battery_percent <= 35
+    - first sortie elapsed time >= 7 minutes
+    - route would enter loading dock vehicle buffer
+  contingency_plan:
+    - return to home before reserve is violated
+    - mark west loading bays and far south corner as uncovered areas
+    - schedule makeup flight with recharged battery
+  expected_coverage_percent: 48
+  estimated_duration_minutes: 7
+  explanation: >
+    Simulated case verifies that return-to-home reserve is protected even when
+    full route coverage would be more efficient.

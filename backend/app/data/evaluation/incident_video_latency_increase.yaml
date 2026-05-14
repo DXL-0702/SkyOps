@@ -1,0 +1,145 @@
+evaluation_case:
+  case_id: eval-incident-video-latency-increase
+  title: Incident injection video latency increase evaluation case
+  scenario_type: incident_injection_video_latency
+  raw_user_input: Continue the low-altitude warehouse corner observation and replan if the video link degrades.
+  environment_state:
+    source_type: simulated
+    weather_summary: Simulated stable weather with video latency increasing during low-altitude observation.
+    wind_speed_mps: 2.9
+    visibility_level: fair
+    crowd_level: low
+    gps_quality: stable near warehouse corner
+    gps_confidence: 0.83
+    data_confidence: 0.84
+  airspace_constraint:
+    source_type: simulated
+    is_flyable: true
+    approval_required: false
+    restricted_zones:
+      - simulated warehouse corner obstacle buffer
+    altitude_limit_m: 70
+    compliance_risk_level: low
+    explanation: >
+      Simulated airspace remains flyable, but severe video latency makes
+      controlled low-altitude observation unsafe.
+  drone_state:
+    source_type: simulated
+    drone_id: simulated-drone-incident-latency-01
+    model: DJI Matrice class simulated platform
+    battery_percent: 76
+    estimated_endurance_minutes: 23
+    return_to_home_battery_threshold: 30
+    payloads:
+      - zoom camera
+      - wide camera
+    link_quality: high
+    video_latency_ms: 760
+    available_for_mission: true
+  incident_events:
+    - id: incident-video-latency-increase-warehouse-corner
+      mission_id: mission-incident-video-latency-increase
+      event_type: video_latency_increase
+      observed_value: video_latency_ms=760 during low-altitude corner segment
+      threshold: max_video_latency_ms=500
+      severity: high
+      source_type: simulated
+      description: Simulated video latency exceeds threshold during controlled low-altitude operation.
+  expected_hard_constraints:
+    - id: hard-max-video-latency
+      description: Video latency above 500 ms must pause or degrade close-range operation.
+      must_pass: true
+      rule_ref: max_video_latency_ms
+      severity: critical
+    - id: hard-avoid-close-range-on-latency
+      description: Close warehouse corner segment must be skipped while latency is severe.
+      must_pass: true
+      rule_ref: video_latency_increase
+      severity: high
+    - id: hard-human-takeover-if-supervision-unsafe
+      description: Human takeover is required if remote supervision is unsafe.
+      must_pass: true
+      rule_ref: manual_takeover_required
+      severity: high
+    - id: hard-makeup-for-skipped-corner
+      description: Skipped warehouse corner segment must trigger makeup flight.
+      must_pass: true
+      rule_ref: makeup_flight_trigger
+      severity: high
+  expected_risks:
+    - id: video_latency_above_threshold_during_operation
+      category: device
+      trigger_condition: incident event video_latency_increase observed_value exceeds max_video_latency_ms
+      minimum_risk_level: critical
+      must_recall: true
+    - id: remote_supervision_degraded
+      category: operations
+      trigger_condition: high video latency during low-altitude observation
+      minimum_risk_level: high
+      must_recall: true
+    - id: skipped_corner_segment_makeup_needed
+      category: review
+      trigger_condition: warehouse corner segment skipped due to video latency
+      minimum_risk_level: medium
+      must_recall: true
+  expected_response_behaviors:
+    - id: response-video-latency-pause-degrade
+      incident_type: video_latency_increase
+      expected_actions:
+        - degrade operation mode
+        - avoid close-range segments
+        - pause mission if latency is severe
+        - request human takeover
+        - trigger makeup flight for skipped corner segment
+      forbidden_actions:
+        - continue without live video confidence
+        - ignore video latency while telemetry remains active
+      human_confirmation_required: true
+      makeup_flight_expected: true
+  baseline_plan:
+    expected_duration_minutes: 6
+    expected_coverage_percent: 30
+    task_split_count: 1
+    manual_intervention_count: 1
+    safety_margin_notes:
+      - affected segment is warehouse corner close observation
+      - incomplete segment is close-range corner pass
+      - makeup flight trigger is latency returns below 500 ms and operator confirms link quality
+  tags:
+    - incident_injection
+    - video_latency_increase
+    - replan
+  source_type: simulated
+baseline_mission_plan:
+  mission_id: mission-incident-video-latency-increase
+  recommended_time_window: hold close-range segment until video link recovers
+  launch_landing_points:
+    - id: llp-warehouse-corner-yard
+      name: Warehouse corner yard
+      description: Simulated launch point with safe standby near warehouse corner.
+      safety_notes:
+        - avoid precision observation while latency is high
+        - keep manual takeover option ready
+  route_strategy: Wide-standoff observation only while close corner segment is paused.
+  flight_segments:
+    - wide-standoff completed segment
+    - close corner active segment
+  safety_thresholds:
+    max_wind_speed_mps: 8.0
+    min_battery_percent: 35
+    min_gps_confidence: 0.65
+    max_video_latency_ms: 500
+  abort_conditions:
+    - video_latency_ms > 500
+    - link_quality == high
+    - battery_percent <= 35
+  contingency_plan:
+    - pause mission progress
+    - check video transmission quality
+    - preserve collected data
+    - schedule makeup flight for close corner segment
+  expected_coverage_percent: 30
+  estimated_duration_minutes: 6
+  explanation: >
+    Simulated incident case checks that link degradation triggers pause,
+    degraded mode, or takeover rather than normal low-altitude continuation.

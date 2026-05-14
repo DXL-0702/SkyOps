@@ -1,0 +1,146 @@
+evaluation_case:
+  case_id: eval-incident-wind-speed-spike
+  title: Incident injection wind speed spike evaluation case
+  scenario_type: incident_injection_wind_speed
+  raw_user_input: Continue the facade inspection route, but replan safely if wind suddenly increases.
+  environment_state:
+    source_type: simulated
+    weather_summary: Simulated mission starts in acceptable wind, then wind spikes above the safe threshold.
+    wind_speed_mps: 8.7
+    visibility_level: good
+    crowd_level: low
+    gps_quality: stable near the inspection corridor
+    gps_confidence: 0.84
+    data_confidence: 0.86
+  airspace_constraint:
+    source_type: simulated
+    is_flyable: true
+    approval_required: false
+    restricted_zones:
+      - simulated exposed rooftop parapet buffer
+    altitude_limit_m: 90
+    compliance_risk_level: low
+    explanation: >
+      Simulated airspace is otherwise clear, but the exposed upper facade
+      segment becomes unsafe after the wind spike.
+  drone_state:
+    source_type: simulated
+    drone_id: simulated-drone-incident-wind-01
+    model: DJI Matrice class simulated platform
+    battery_percent: 78
+    estimated_endurance_minutes: 24
+    return_to_home_battery_threshold: 30
+    payloads:
+      - zoom camera
+      - wide camera
+    link_quality: low
+    video_latency_ms: 150
+    available_for_mission: true
+  incident_events:
+    - id: incident-wind-speed-spike-upper-facade
+      mission_id: mission-incident-wind-speed-spike
+      event_type: wind_speed_spike
+      observed_value: wind_speed_mps=8.7 on upper facade segment
+      threshold: max_wind_speed_mps=8.0
+      severity: critical
+      source_type: simulated
+      description: Simulated wind spike affects exposed upper facade and rooftop parapet segments.
+  expected_hard_constraints:
+    - id: hard-max-wind-speed
+      description: Wind above threshold must pause the active mission.
+      must_pass: true
+      rule_ref: max_wind_speed_mps
+      severity: critical
+    - id: hard-return-or-standby-on-wind
+      description: Return to launch or standby point when wind exceeds the safe threshold.
+      must_pass: true
+      rule_ref: wind_speed_spike
+      severity: critical
+    - id: hard-no-hover-in-exposed-wind
+      description: Do not wait in hover near exposed upper facade during wind spike.
+      must_pass: true
+      rule_ref: route_safety_risk
+      severity: high
+    - id: hard-makeup-for-interrupted-facade
+      description: Mark interrupted upper facade and rooftop parapet segments for makeup flight.
+      must_pass: true
+      rule_ref: makeup_flight_trigger
+      severity: high
+  expected_risks:
+    - id: wind_speed_spike_above_threshold
+      category: weather
+      trigger_condition: incident event wind_speed_spike observed_value exceeds max_wind_speed_mps
+      minimum_risk_level: critical
+      must_recall: true
+    - id: aircraft_stability_risk
+      category: flight_control
+      trigger_condition: wind_speed_mps=8.7 on exposed facade segment
+      minimum_risk_level: high
+      must_recall: true
+    - id: interrupted_coverage_makeup_needed
+      category: review
+      trigger_condition: upper facade and rooftop parapet segments are interrupted by wind spike
+      minimum_risk_level: medium
+      must_recall: true
+  expected_response_behaviors:
+    - id: response-wind-spike-pause-return
+      incident_type: wind_speed_spike
+      expected_actions:
+        - pause mission
+        - return_to_home
+        - preserve collected imagery and telemetry
+        - mark upper facade and rooftop parapet as uncovered
+        - require_human_review
+      forbidden_actions:
+        - continue despite unsafe wind
+        - wait in hover near target area
+      human_confirmation_required: true
+      makeup_flight_expected: true
+  baseline_plan:
+    expected_duration_minutes: 11
+    expected_coverage_percent: 46
+    task_split_count: 2
+    manual_intervention_count: 1
+    safety_margin_notes:
+      - affected segments are upper facade pass and rooftop parapet pass
+      - uncovered areas are upper facade band and rooftop parapet inspection line
+      - makeup flight trigger is wind speed returns below 8.0 m/s and human review approves continuation
+  tags:
+    - incident_injection
+    - wind_speed_spike
+    - replan
+  source_type: simulated
+baseline_mission_plan:
+  mission_id: mission-incident-wind-speed-spike
+  recommended_time_window: 09:30-10:00 simulated local time before wind spike
+  launch_landing_points:
+    - id: llp-facade-south-yard
+      name: Facade south yard
+      description: Simulated launch point with safe return path from facade route.
+      safety_notes:
+        - keep return path clear
+        - avoid exposed upper facade when wind increases
+  route_strategy: Lower-to-upper facade scan with return path through south yard.
+  flight_segments:
+    - lower facade completed segment
+    - upper facade active segment
+    - rooftop parapet pending segment
+  safety_thresholds:
+    max_wind_speed_mps: 8.0
+    min_battery_percent: 35
+    min_gps_confidence: 0.65
+    max_video_latency_ms: 500
+  abort_conditions:
+    - wind_speed_mps >= 8.0
+    - battery_percent <= 35
+    - gps_confidence < 0.65
+  contingency_plan:
+    - pause current facade scan
+    - return to launch point
+    - preserve collected data
+    - schedule makeup flight for upper facade and rooftop parapet
+  expected_coverage_percent: 46
+  estimated_duration_minutes: 11
+  explanation: >
+    Simulated incident case checks whether wind spikes trigger conservative
+    replan behavior before coverage completion.

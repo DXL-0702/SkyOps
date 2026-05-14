@@ -1,0 +1,137 @@
+evaluation_case:
+  case_id: eval-extended-park-logistics-package-delivery
+  title: Extended industrial park logistics package delivery evaluation case
+  scenario_type: park_logistics_delivery
+  raw_user_input: Plan a small package delivery from Warehouse 1 to the north maintenance office.
+  environment_state:
+    source_type: mock
+    weather_summary: Mock clear afternoon with normal vehicle flow on internal service roads.
+    wind_speed_mps: 3.8
+    visibility_level: good
+    crowd_level: low
+    gps_quality: stable industrial park reception
+    gps_confidence: 0.9
+    data_confidence: 0.88
+  airspace_constraint:
+    source_type: mock
+    is_flyable: true
+    approval_required: false
+    restricted_zones:
+      - mock forklift operating lane buffer
+      - mock maintenance office landing buffer
+    altitude_limit_m: 60
+    compliance_risk_level: low
+    explanation: >
+      Mock industrial park route is flyable if landing-zone and forklift lane
+      buffers are respected.
+  drone_state:
+    source_type: mock
+    drone_id: mock-drone-extended-logistics-package-01
+    model: DJI delivery-capable mock platform
+    battery_percent: 88
+    estimated_endurance_minutes: 25
+    return_to_home_battery_threshold: 30
+    payloads:
+      - small package payload
+      - wide camera
+    link_quality: low
+    video_latency_ms: 160
+    available_for_mission: true
+  incident_events: []
+  expected_hard_constraints:
+    - id: hard-payload-compatibility
+      description: Device payload must support small package delivery.
+      must_pass: true
+      rule_ref: payloads
+      severity: high
+    - id: hard-safe-landing-zone
+      description: Delivery point must be a safe landing or drop zone outside maintenance buffer.
+      must_pass: true
+      rule_ref: restricted_zones
+      severity: high
+    - id: hard-forklift-lane-avoidance
+      description: Route must avoid forklift operating lane buffer.
+      must_pass: true
+      rule_ref: restricted_zones
+      severity: high
+    - id: hard-rth-reserve
+      description: Delivery route must preserve battery for return.
+      must_pass: true
+      rule_ref: min_battery_percent
+      severity: high
+  expected_risks:
+    - id: landing_zone_uncertainty
+      category: operations
+      trigger_condition: delivery point has maintenance office landing buffer
+      minimum_risk_level: medium
+      must_recall: true
+    - id: internal_vehicle_lane_risk
+      category: public_safety
+      trigger_condition: restricted_zones include forklift operating lane buffer
+      minimum_risk_level: medium
+      must_recall: true
+    - id: payload_delivery_route_risk
+      category: device
+      trigger_condition: mission includes small package payload delivery
+      minimum_risk_level: medium
+      must_recall: true
+  expected_response_behaviors:
+    - id: response-logistics-delivery-safe-route
+      incident_type: park_logistics_delivery
+      expected_actions:
+        - verify payload compatibility
+        - confirm safe landing zone
+        - avoid forklift lane buffer
+        - preserve return-to-home reserve
+      forbidden_actions:
+        - drop package into unsafe buffer
+        - route through forklift lane for speed
+      human_confirmation_required: false
+      makeup_flight_expected: false
+  baseline_plan:
+    expected_duration_minutes: 12
+    expected_coverage_percent: 100
+    task_split_count: 1
+    manual_intervention_count: 0
+    safety_margin_notes:
+      - delivery zone must remain clear
+      - forklift lane buffer excluded
+      - return reserve preserved after package drop
+  tags:
+    - extended_coverage
+    - park_logistics_delivery
+    - package_delivery
+  source_type: mock
+baseline_mission_plan:
+  mission_id: mission-extended-park-logistics-package-delivery
+  recommended_time_window: 15:10-15:25 simulated local time
+  launch_landing_points:
+    - id: llp-warehouse-1-pad
+      name: Warehouse 1 logistics pad
+      description: Mock launch point for small package handoff.
+      safety_notes:
+        - verify package attachment
+        - keep forklift lane clear
+  route_strategy: Direct safe corridor from Warehouse 1 to north maintenance office with return reserve.
+  flight_segments:
+    - outbound package route
+    - return route
+  safety_thresholds:
+    max_wind_speed_mps: 8.0
+    min_battery_percent: 35
+    min_gps_confidence: 0.65
+    max_video_latency_ms: 500
+  abort_conditions:
+    - payload unavailable
+    - landing zone unsafe
+    - battery_percent <= 35
+    - route enters restricted_zones
+  contingency_plan:
+    - hold at Warehouse 1 pad
+    - request landing-zone confirmation
+    - retry only after delivery point is clear
+  expected_coverage_percent: 100
+  estimated_duration_minutes: 12
+  explanation: >
+    Mock extended case evaluates delivery route safety, payload compatibility,
+    landing-zone feasibility, and RTH reserve.

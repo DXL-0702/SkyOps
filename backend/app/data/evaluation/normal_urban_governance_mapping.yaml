@@ -1,0 +1,137 @@
+evaluation_case:
+  case_id: eval-normal-urban-governance-mapping
+  title: Normal urban governance mapping patrol planning evaluation case
+  scenario_type: urban_governance_mapping_patrol
+  raw_user_input: Create a low-altitude mapping patrol for the target urban block and generate a safe coverage route.
+  environment_state:
+    source_type: mock
+    weather_summary: Simulated clear weekday morning with steady traffic and light wind.
+    wind_speed_mps: 3.6
+    visibility_level: good
+    crowd_level: medium
+    gps_quality: partial urban canyon risk near roadside buildings
+    gps_confidence: 0.76
+    data_confidence: 0.85
+  airspace_constraint:
+    source_type: mock
+    is_flyable: true
+    approval_required: true
+    restricted_zones:
+      - mock hospital approach buffer
+      - mock school courtyard no-fly zone
+      - mock public plaza people-dense buffer
+    altitude_limit_m: 95
+    compliance_risk_level: medium
+    explanation: >
+      Mock urban airspace is flyable after approval, with coverage limited to
+      the target block and avoidance of hospital, school, and plaza buffers.
+  drone_state:
+    source_type: mock
+    drone_id: mock-drone-normal-urban-01
+    model: DJI Matrice class mock platform
+    battery_percent: 86
+    estimated_endurance_minutes: 30
+    return_to_home_battery_threshold: 30
+    payloads:
+      - wide camera
+      - mapping camera
+    link_quality: medium
+    video_latency_ms: 210
+    available_for_mission: true
+  incident_events: []
+  expected_hard_constraints:
+    - id: hard-approval-required
+      description: Require approval before executing the mock urban block mapping route.
+      must_pass: true
+      rule_ref: require_approval_when_needed
+      severity: high
+    - id: hard-coverage-boundary
+      description: Keep coverage waypoints inside the target urban block boundary.
+      must_pass: true
+      rule_ref: mission_boundary
+      severity: high
+    - id: hard-altitude-ceiling
+      description: Keep all mapping segments at or below the 95 m altitude ceiling.
+      must_pass: true
+      rule_ref: altitude_limit_m
+      severity: high
+    - id: hard-public-area-standoff
+      description: Maintain safety distance from roads, plaza, school, and hospital buffers.
+      must_pass: true
+      rule_ref: restricted_zones
+      severity: high
+    - id: hard-return-battery-reserve
+      description: Preserve return-to-home battery reserve for the coverage route.
+      must_pass: true
+      rule_ref: min_battery_percent
+      severity: high
+  expected_risks:
+    - id: risk-traffic-flow
+      category: public_safety
+      trigger_condition: weather_summary contains steady traffic and crowd_level == medium
+      minimum_risk_level: medium
+      must_recall: true
+    - id: risk-urban-obstacle-density
+      category: navigation
+      trigger_condition: gps_quality contains urban canyon risk
+      minimum_risk_level: medium
+      must_recall: true
+    - id: risk-signal-interference
+      category: device
+      trigger_condition: link_quality == medium near roadside buildings
+      minimum_risk_level: low
+      must_recall: true
+    - id: risk-restricted-public-areas
+      category: airspace
+      trigger_condition: restricted_zones include hospital, school, and public plaza buffers
+      minimum_risk_level: medium
+      must_recall: true
+  expected_response_behaviors: []
+  baseline_plan:
+    expected_duration_minutes: 24
+    expected_coverage_percent: 83
+    task_split_count: 2
+    manual_intervention_count: 1
+    safety_margin_notes:
+      - approval required before execution
+      - keep mapping route inside urban block boundary
+      - avoid hospital, school, and plaza buffers
+  tags:
+    - normal
+    - low_risk
+    - urban_governance
+    - mapping_patrol
+  source_type: mock
+baseline_mission_plan:
+  mission_id: mission-normal-urban-governance-mapping
+  recommended_time_window: 08:45-09:25 simulated local time
+  launch_landing_points:
+    - id: llp-urban-block-service-lot
+      name: Urban block service lot
+      description: Mock launch point inside the approved block boundary.
+      safety_notes:
+        - verify approval before takeoff
+        - keep launch area clear of pedestrians
+  route_strategy: Two-strip mapping coverage route with road standoff and restricted public-area avoidance.
+  flight_segments:
+    - north-south mapping strip
+    - east-west infill mapping strip
+  safety_thresholds:
+    max_wind_speed_mps: 8.0
+    min_battery_percent: 35
+    min_gps_confidence: 0.65
+    max_video_latency_ms: 500
+  abort_conditions:
+    - wind_speed_mps >= 8.0
+    - battery_percent <= 35
+    - gps_confidence < 0.65
+    - route enters restricted_zones
+  contingency_plan:
+    - pause mapping
+    - return through approved corridor
+    - mark uncovered block strips for later flight
+  expected_coverage_percent: 83
+  estimated_duration_minutes: 24
+  explanation: >
+    Mock baseline case evaluates task-level mapping coverage, approval handling,
+    public-area standoff, and risk reasoning with local mock data.

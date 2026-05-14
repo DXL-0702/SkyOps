@@ -1,0 +1,137 @@
+evaluation_case:
+  case_id: eval-extended-night-security-warehouse-patrol
+  title: Extended night security warehouse patrol evaluation case
+  scenario_type: night_security_patrol
+  raw_user_input: Generate a night security patrol around the warehouse perimeter and parking area.
+  environment_state:
+    source_type: mock
+    weather_summary: Mock night operation with low light and calm wind.
+    wind_speed_mps: 2.5
+    visibility_level: fair
+    crowd_level: low
+    gps_quality: stable near warehouse, partial signal shadow at west parking edge
+    gps_confidence: 0.74
+    data_confidence: 0.82
+  airspace_constraint:
+    source_type: mock
+    is_flyable: true
+    approval_required: false
+    restricted_zones:
+      - mock hazardous-material warehouse buffer
+      - mock west parking signal-shadow zone
+    altitude_limit_m: 70
+    compliance_risk_level: low
+    explanation: >
+      Mock warehouse patrol is flyable, but low light and parking-edge signal
+      shadow require conservative routing.
+  drone_state:
+    source_type: mock
+    drone_id: mock-drone-extended-night-security-01
+    model: DJI Mavic enterprise class mock platform
+    battery_percent: 84
+    estimated_endurance_minutes: 25
+    return_to_home_battery_threshold: 30
+    payloads:
+      - wide camera
+      - spotlight
+    link_quality: medium
+    video_latency_ms: 230
+    available_for_mission: true
+  incident_events: []
+  expected_hard_constraints:
+    - id: hard-low-light-conservative-route
+      description: Night patrol must use conservative speed and standoff under low light.
+      must_pass: true
+      rule_ref: visibility_level
+      severity: high
+    - id: hard-signal-shadow-avoidance
+      description: Route must avoid parking-edge signal-shadow zone if confidence degrades.
+      must_pass: true
+      rule_ref: min_gps_confidence
+      severity: high
+    - id: hard-hazard-buffer-avoidance
+      description: Route must avoid hazardous-material warehouse buffer.
+      must_pass: true
+      rule_ref: restricted_zones
+      severity: high
+    - id: hard-human-takeover-readiness
+      description: Human takeover readiness is required if confidence drops at night.
+      must_pass: true
+      rule_ref: manual_takeover_required
+      severity: high
+  expected_risks:
+    - id: low_light_operation_risk
+      category: visibility
+      trigger_condition: visibility_level == fair during night operation
+      minimum_risk_level: medium
+      must_recall: true
+    - id: parking_edge_signal_shadow
+      category: navigation
+      trigger_condition: gps_quality contains signal shadow at west parking edge
+      minimum_risk_level: medium
+      must_recall: true
+    - id: night_hazard_buffer_risk
+      category: compliance
+      trigger_condition: restricted_zones include hazardous-material warehouse buffer
+      minimum_risk_level: high
+      must_recall: true
+  expected_response_behaviors:
+    - id: response-night-security-conservative
+      incident_type: night_security_patrol
+      expected_actions:
+        - reduce route aggressiveness
+        - avoid hazardous buffer
+        - keep human takeover ready
+        - mark west parking edge as skipped if GPS confidence drops
+      forbidden_actions:
+        - assume night operation is automatically safe
+        - fly into signal-shadow zone without review
+      human_confirmation_required: true
+      makeup_flight_expected: true
+  baseline_plan:
+    expected_duration_minutes: 16
+    expected_coverage_percent: 68
+    task_split_count: 1
+    manual_intervention_count: 1
+    safety_margin_notes:
+      - incomplete segment is west parking edge if GPS confidence drops
+      - makeup flight trigger is daylight or stable GPS confidence above 0.65
+      - low-light route uses reduced speed
+  tags:
+    - extended_coverage
+    - night_security_patrol
+    - warehouse_security
+  source_type: mock
+baseline_mission_plan:
+  mission_id: mission-extended-night-security-warehouse-patrol
+  recommended_time_window: 21:00-21:25 simulated local time
+  launch_landing_points:
+    - id: llp-warehouse-security-pad
+      name: Warehouse security pad
+      description: Mock launch point near guard post.
+      safety_notes:
+        - keep hazardous-material buffer clear
+        - verify night visibility before launch
+  route_strategy: Conservative night perimeter patrol with west parking edge deferred if signal confidence drops.
+  flight_segments:
+    - warehouse east perimeter
+    - parking area standoff segment
+  safety_thresholds:
+    max_wind_speed_mps: 8.0
+    min_battery_percent: 35
+    min_gps_confidence: 0.65
+    max_video_latency_ms: 500
+  abort_conditions:
+    - gps_confidence < 0.65
+    - visibility_level == poor
+    - battery_percent <= 35
+    - route enters restricted_zones
+  contingency_plan:
+    - pause west parking edge segment
+    - return to guard post standby
+    - schedule makeup patrol in better visibility
+  expected_coverage_percent: 68
+  estimated_duration_minutes: 16
+  explanation: >
+    Mock extended case evaluates night security planning with low-light, GPS,
+    and human takeover constraints.
