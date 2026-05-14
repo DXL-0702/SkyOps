@@ -7,6 +7,13 @@ from app.core.evaluation.contracts import (
     get_metric_contract,
     list_metric_contracts,
 )
+from app.core.evaluation.runner import (
+    DETERMINISTIC_EVALUATION_GENERATED_AT,
+    EvaluationRunnerError,
+    run_all_evaluation_cases,
+    run_evaluation_case,
+    run_evaluation_case_fixture,
+)
 from app.core.evaluation.scoring import (
     score_evaluation_case,
     score_explainability,
@@ -22,8 +29,13 @@ __all__ = [
     "EvaluationMetricContract",
     "EvaluationMetricRole",
     "EvaluationScoringPolicy",
+    "DETERMINISTIC_EVALUATION_GENERATED_AT",
+    "EvaluationRunnerError",
     "get_metric_contract",
     "list_metric_contracts",
+    "run_all_evaluation_cases",
+    "run_evaluation_case",
+    "run_evaluation_case_fixture",
     "score_evaluation_case",
     "score_explainability",
     "score_hard_constraints",
