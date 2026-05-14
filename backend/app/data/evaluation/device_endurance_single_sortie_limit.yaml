@@ -1,0 +1,142 @@
+evaluation_case:
+  case_id: eval-device-endurance-single-sortie-limit
+  title: Device-state endurance single-sortie limit evaluation case
+  scenario_type: device_state_endurance_limit
+  raw_user_input: Map the full industrial park perimeter and internal service roads in one continuous flight.
+  environment_state:
+    source_type: mock
+    weather_summary: Mock clear midday with light wind and good visibility.
+    wind_speed_mps: 3.3
+    visibility_level: good
+    crowd_level: low
+    gps_quality: stable open industrial park reception
+    gps_confidence: 0.91
+    data_confidence: 0.9
+  airspace_constraint:
+    source_type: mock
+    is_flyable: true
+    approval_required: false
+    restricted_zones:
+      - mock transformer yard buffer
+      - mock fuel storage buffer
+    altitude_limit_m: 85
+    compliance_risk_level: low
+    explanation: >
+      Mock airspace is flyable, but the requested coverage route exceeds the
+      device endurance for a single sortie.
+  drone_state:
+    source_type: mock
+    drone_id: mock-drone-device-endurance-01
+    model: DJI Mavic enterprise class mock platform
+    battery_percent: 92
+    estimated_endurance_minutes: 18
+    return_to_home_battery_threshold: 30
+    payloads:
+      - mapping camera
+      - wide camera
+    link_quality: low
+    video_latency_ms: 140
+    available_for_mission: true
+  incident_events: []
+  expected_hard_constraints:
+    - id: max_flight_time
+      description: A single sortie must not exceed the device endurance limit.
+      must_pass: true
+      rule_ref: estimated_endurance_minutes
+      severity: high
+    - id: max_route_distance
+      description: Route length must fit within endurance and return reserve for each sortie.
+      must_pass: true
+      rule_ref: route_energy_budget
+      severity: high
+    - id: endurance_limit
+      description: The requested full park route cannot be completed as one continuous flight.
+      must_pass: true
+      rule_ref: estimated_endurance_minutes
+      severity: high
+    - id: mission_split_required
+      description: Mission must be split into multiple sorties with reserve preserved each time.
+      must_pass: true
+      rule_ref: task_split_count
+      severity: high
+    - id: makeup_flight_required_for_uncovered_perimeter
+      description: Uncovered west perimeter and internal service roads must trigger a second sortie.
+      must_pass: true
+      rule_ref: makeup_flight_trigger
+      severity: high
+  expected_risks:
+    - id: endurance_insufficient_for_single_sortie
+      category: device
+      trigger_condition: requested route duration > estimated_endurance_minutes
+      minimum_risk_level: high
+      must_recall: true
+    - id: return_reserve_risk_on_long_route
+      category: device
+      trigger_condition: single continuous flight would reduce RTH reserve margin
+      minimum_risk_level: high
+      must_recall: true
+    - id: uncovered_segments_after_first_sortie
+      category: review
+      trigger_condition: west perimeter and internal service roads deferred to second sortie
+      minimum_risk_level: medium
+      must_recall: true
+  expected_response_behaviors:
+    - id: response-split-endurance-limited-mission
+      incident_type: endurance_limit
+      expected_actions:
+        - split mission into multiple sorties
+        - define second sortie trigger after first route segment
+        - identify west perimeter and internal service roads as uncovered
+        - preserve return-to-home reserve for each sortie
+      forbidden_actions:
+        - fly full park route in one sortie
+        - spend reserve to finish all coverage
+      human_confirmation_required: false
+      makeup_flight_expected: true
+  baseline_plan:
+    expected_duration_minutes: 16
+    expected_coverage_percent: 57
+    task_split_count: 2
+    manual_intervention_count: 0
+    safety_margin_notes:
+      - first sortie covers east and north perimeter only
+      - uncovered areas are west perimeter, south service road, internal service roads
+      - makeup flight trigger is first sortie reaches 16 minutes or 40 percent battery
+  tags:
+    - device_state
+    - endurance
+    - mission_split
+    - makeup_flight
+  source_type: mock
+baseline_mission_plan:
+  mission_id: mission-device-endurance-single-sortie-limit
+  recommended_time_window: 12:00-12:20 simulated local time for sortie one
+  launch_landing_points:
+    - id: llp-industrial-park-east-yard
+      name: Industrial park east yard
+      description: Mock launch point near the first sortie coverage area.
+      safety_notes:
+        - preserve return reserve for each sortie
+        - avoid transformer and fuel storage buffers
+  route_strategy: Split park mapping into two sorties; first sortie covers east and north perimeter.
+  flight_segments:
+    - east perimeter mapping segment
+    - north perimeter mapping segment
+  safety_thresholds:
+    max_wind_speed_mps: 8.0
+    min_battery_percent: 35
+    min_gps_confidence: 0.65
+    max_video_latency_ms: 500
+  abort_conditions:
+    - estimated sortie duration > 18 minutes
+    - battery_percent <= 35
+    - route enters restricted_zones
+  contingency_plan:
+    - return home after sortie one
+    - mark west perimeter, south service road, and internal service roads as uncovered areas
+    - launch second sortie after battery replacement
+  expected_coverage_percent: 57
+  estimated_duration_minutes: 16
+  explanation: >
+    Mock case verifies that endurance limits trigger mission splitting and
+    makeup flight planning instead of a single efficiency-first route.

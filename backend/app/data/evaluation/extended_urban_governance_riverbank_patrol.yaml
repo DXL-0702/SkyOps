@@ -1,0 +1,135 @@
+evaluation_case:
+  case_id: eval-extended-urban-governance-riverbank
+  title: Extended urban governance riverbank patrol evaluation case
+  scenario_type: urban_governance
+  raw_user_input: Plan a low-altitude riverbank governance patrol covering the public walkway and service road.
+  environment_state:
+    source_type: mock
+    weather_summary: Mock clear morning with steady pedestrian and bicycle traffic along the riverbank.
+    wind_speed_mps: 3.7
+    visibility_level: good
+    crowd_level: medium
+    gps_quality: stable with partial obstruction near bridge columns
+    gps_confidence: 0.8
+    data_confidence: 0.86
+  airspace_constraint:
+    source_type: mock
+    is_flyable: true
+    approval_required: false
+    restricted_zones:
+      - mock bridge column obstacle buffer
+      - mock riverside crowd buffer
+    altitude_limit_m: 65
+    compliance_risk_level: medium
+    explanation: >
+      Mock riverbank corridor is flyable if the route avoids bridge obstacle
+      buffers and crowd areas.
+  drone_state:
+    source_type: mock
+    drone_id: mock-drone-extended-riverbank-01
+    model: DJI Mavic enterprise class mock platform
+    battery_percent: 84
+    estimated_endurance_minutes: 27
+    return_to_home_battery_threshold: 30
+    payloads:
+      - wide camera
+    link_quality: low
+    video_latency_ms: 170
+    available_for_mission: true
+  incident_events: []
+  expected_hard_constraints:
+    - id: hard-riverbank-boundary
+      description: Patrol route must stay inside the approved riverbank corridor.
+      must_pass: true
+      rule_ref: mission_boundary
+      severity: high
+    - id: hard-crowd-buffer
+      description: Route must keep safe distance from riverside pedestrians and cyclists.
+      must_pass: true
+      rule_ref: restricted_zones
+      severity: high
+    - id: hard-bridge-obstacle-buffer
+      description: Route must avoid bridge column obstacle buffer.
+      must_pass: true
+      rule_ref: restricted_zones
+      severity: high
+    - id: hard-altitude-ceiling
+      description: Route must stay below the 65 m altitude ceiling.
+      must_pass: true
+      rule_ref: altitude_limit_m
+      severity: high
+  expected_risks:
+    - id: riverbank_pedestrian_density
+      category: public_safety
+      trigger_condition: crowd_level == medium on public walkway
+      minimum_risk_level: medium
+      must_recall: true
+    - id: bridge_obstacle_navigation
+      category: navigation
+      trigger_condition: gps_quality contains obstruction near bridge columns
+      minimum_risk_level: medium
+      must_recall: true
+    - id: corridor_boundary_risk
+      category: mission_planning
+      trigger_condition: riverbank route constrained by walkway and service road boundary
+      minimum_risk_level: medium
+      must_recall: true
+  expected_response_behaviors:
+    - id: response-riverbank-governance-safe-route
+      incident_type: urban_governance_riverbank_patrol
+      expected_actions:
+        - keep route inside riverbank boundary
+        - avoid crowd buffer
+        - increase standoff near bridge columns
+        - explain coverage gaps if buffers reduce route
+      forbidden_actions:
+        - overfly crowded walkway
+        - pass close to bridge columns
+      human_confirmation_required: false
+      makeup_flight_expected: false
+  baseline_plan:
+    expected_duration_minutes: 17
+    expected_coverage_percent: 80
+    task_split_count: 1
+    manual_intervention_count: 0
+    safety_margin_notes:
+      - route follows service road side of riverbank
+      - bridge column buffer reduces direct corridor coverage
+      - crowd buffer has priority over patrol completeness
+  tags:
+    - extended_coverage
+    - urban_governance
+    - riverbank_patrol
+  source_type: mock
+baseline_mission_plan:
+  mission_id: mission-extended-urban-governance-riverbank
+  recommended_time_window: 08:30-09:00 simulated local time
+  launch_landing_points:
+    - id: llp-riverbank-service-road
+      name: Riverbank service road pad
+      description: Mock launch point away from pedestrian walkway.
+      safety_notes:
+        - keep cyclists outside launch buffer
+        - avoid bridge column buffer
+  route_strategy: Service-road-side patrol with standoff near bridge columns and crowd areas.
+  flight_segments:
+    - north riverbank corridor
+    - bridge approach bypass segment
+  safety_thresholds:
+    max_wind_speed_mps: 8.0
+    min_battery_percent: 35
+    min_gps_confidence: 0.65
+    max_video_latency_ms: 500
+  abort_conditions:
+    - crowd_level == high
+    - gps_confidence < 0.65
+    - route enters restricted_zones
+  contingency_plan:
+    - widen standoff near bridge
+    - skip crowd-heavy walkway segment
+    - record coverage gap for review
+  expected_coverage_percent: 80
+  estimated_duration_minutes: 17
+  explanation: >
+    Mock extended case evaluates explainable urban governance coverage under
+    crowd, obstacle, and corridor constraints.

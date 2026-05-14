@@ -1,0 +1,130 @@
+evaluation_case:
+  case_id: eval-normal-highrise-facade
+  title: Normal high-rise facade mission planning evaluation case
+  scenario_type: highrise_facade_inspection
+  raw_user_input: Inspect the east facade of Building A and generate a safe low-altitude mission plan.
+  environment_state:
+    source_type: mock
+    weather_summary: Simulated clear morning with mild wind around a high-rise facade.
+    wind_speed_mps: 4.6
+    visibility_level: good
+    crowd_level: medium
+    gps_quality: partial multipath risk near tall glass facade
+    gps_confidence: 0.78
+    data_confidence: 0.86
+  airspace_constraint:
+    source_type: mock
+    is_flyable: true
+    approval_required: false
+    restricted_zones:
+      - mock rooftop equipment no-fly buffer
+      - mock public walkway standoff zone at building base
+    altitude_limit_m: 110
+    compliance_risk_level: low
+    explanation: >
+      Mock airspace permits facade inspection within the east-side geofence
+      while avoiding rooftop equipment and public walkway buffers.
+  drone_state:
+    source_type: mock
+    drone_id: mock-drone-normal-facade-01
+    model: DJI Matrice class mock platform
+    battery_percent: 84
+    estimated_endurance_minutes: 31
+    return_to_home_battery_threshold: 30
+    payloads:
+      - zoom camera
+      - wide camera
+    link_quality: low
+    video_latency_ms: 160
+    available_for_mission: true
+  incident_events: []
+  expected_hard_constraints:
+    - id: hard-altitude-ceiling
+      description: Keep the route at or below the 110 m altitude ceiling.
+      must_pass: true
+      rule_ref: altitude_limit_m
+      severity: high
+    - id: hard-building-standoff
+      description: Maintain safe distance from the facade and rooftop equipment.
+      must_pass: true
+      rule_ref: minimum_safety_distance
+      severity: high
+    - id: hard-mission-boundary
+      description: Keep all waypoints inside the east facade mission geofence.
+      must_pass: true
+      rule_ref: mission_boundary
+      severity: high
+    - id: hard-public-walkway-avoidance
+      description: Avoid the mock public walkway standoff zone at the building base.
+      must_pass: true
+      rule_ref: restricted_zones
+      severity: high
+    - id: hard-return-battery-reserve
+      description: Preserve return-to-home battery reserve throughout the route.
+      must_pass: true
+      rule_ref: min_battery_percent
+      severity: high
+  expected_risks:
+    - id: risk-facade-wind-effect
+      category: weather
+      trigger_condition: wind_speed_mps >= 4.0 near high-rise facade
+      minimum_risk_level: medium
+      must_recall: true
+    - id: risk-gps-multipath
+      category: navigation
+      trigger_condition: gps_quality contains multipath risk
+      minimum_risk_level: medium
+      must_recall: true
+    - id: risk-building-base-activity
+      category: public_safety
+      trigger_condition: crowd_level == medium near building base
+      minimum_risk_level: medium
+      must_recall: true
+  expected_response_behaviors: []
+  baseline_plan:
+    expected_duration_minutes: 20
+    expected_coverage_percent: 86
+    task_split_count: 1
+    manual_intervention_count: 0
+    safety_margin_notes:
+      - preserve standoff from glass facade
+      - keep battery reserve above return threshold
+      - avoid public walkway buffer
+  tags:
+    - normal
+    - low_risk
+    - highrise_facade_inspection
+  source_type: mock
+baseline_mission_plan:
+  mission_id: mission-normal-highrise-facade
+  recommended_time_window: 09:20-09:50 simulated local time
+  launch_landing_points:
+    - id: llp-building-a-service-yard
+      name: Building A service yard
+      description: Mock launch point with clear separation from the public walkway.
+      safety_notes:
+        - verify walkway buffer before takeoff
+        - maintain visual line of sight along east facade
+  route_strategy: East facade vertical scan inside the geofence with conservative standoff.
+  flight_segments:
+    - east facade lower band
+    - east facade upper band
+  safety_thresholds:
+    max_wind_speed_mps: 8.0
+    min_battery_percent: 35
+    min_gps_confidence: 0.65
+    max_video_latency_ms: 500
+  abort_conditions:
+    - wind_speed_mps >= 8.0
+    - battery_percent <= 35
+    - gps_confidence < 0.65
+    - route enters restricted_zones
+  contingency_plan:
+    - pause mission
+    - hold position within geofence if safe
+    - return to launch point
+  expected_coverage_percent: 86
+  estimated_duration_minutes: 20
+  explanation: >
+    Mock baseline case benchmarks route planning, standoff, geofence, and
+    operational risk reasoning for a normal facade inspection.

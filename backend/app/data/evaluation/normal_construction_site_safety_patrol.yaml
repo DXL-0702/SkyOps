@@ -1,0 +1,131 @@
+evaluation_case:
+  case_id: eval-normal-construction-safety-patrol
+  title: Normal construction site safety patrol planning evaluation case
+  scenario_type: construction_site_safety_patrol
+  raw_user_input: Patrol the construction site perimeter and key work zones with a safe low-altitude route.
+  environment_state:
+    source_type: mock
+    weather_summary: Simulated dry afternoon with light dust from normal site activity.
+    wind_speed_mps: 3.8
+    visibility_level: fair
+    crowd_level: medium
+    gps_quality: good on the perimeter with partial obstruction near cranes
+    gps_confidence: 0.8
+    data_confidence: 0.84
+  airspace_constraint:
+    source_type: mock
+    is_flyable: true
+    approval_required: false
+    restricted_zones:
+      - mock tower crane swing radius
+      - mock material hoist buffer
+      - mock worker muster area
+    altitude_limit_m: 85
+    compliance_risk_level: low
+    explanation: >
+      Mock site airspace is flyable inside the construction boundary while
+      avoiding crane, hoist, and worker gathering buffers.
+  drone_state:
+    source_type: mock
+    drone_id: mock-drone-normal-construction-01
+    model: DJI Matrice class mock platform
+    battery_percent: 87
+    estimated_endurance_minutes: 29
+    return_to_home_battery_threshold: 30
+    payloads:
+      - wide camera
+      - zoom camera
+    link_quality: low
+    video_latency_ms: 190
+    available_for_mission: true
+  incident_events: []
+  expected_hard_constraints:
+    - id: hard-construction-boundary
+      description: Keep patrol waypoints inside the permitted construction site boundary.
+      must_pass: true
+      rule_ref: mission_boundary
+      severity: high
+    - id: hard-crane-hoist-avoidance
+      description: Avoid crane swing radius and material hoist buffers.
+      must_pass: true
+      rule_ref: restricted_zones
+      severity: high
+    - id: hard-worker-safety-distance
+      description: Maintain safe distance from workers and muster areas.
+      must_pass: true
+      rule_ref: minimum_safety_distance
+      severity: high
+    - id: hard-altitude-ceiling
+      description: Keep the patrol at or below the 85 m site altitude ceiling.
+      must_pass: true
+      rule_ref: altitude_limit_m
+      severity: high
+    - id: hard-return-battery-reserve
+      description: Preserve return-to-home battery reserve during perimeter coverage.
+      must_pass: true
+      rule_ref: min_battery_percent
+      severity: high
+  expected_risks:
+    - id: risk-moving-machinery
+      category: operations
+      trigger_condition: construction site includes active machinery lanes
+      minimum_risk_level: medium
+      must_recall: true
+    - id: risk-temporary-obstacles
+      category: navigation
+      trigger_condition: restricted_zones include temporary crane and hoist buffers
+      minimum_risk_level: medium
+      must_recall: true
+    - id: risk-dust-visibility
+      category: visibility
+      trigger_condition: visibility_level == fair due to light dust
+      minimum_risk_level: low
+      must_recall: true
+  expected_response_behaviors: []
+  baseline_plan:
+    expected_duration_minutes: 19
+    expected_coverage_percent: 84
+    task_split_count: 2
+    manual_intervention_count: 0
+    safety_margin_notes:
+      - avoid crane and hoist buffers
+      - increase worker standoff near active zones
+      - keep route inside construction boundary
+  tags:
+    - normal
+    - low_risk
+    - construction_site_safety_patrol
+  source_type: mock
+baseline_mission_plan:
+  mission_id: mission-normal-construction-safety-patrol
+  recommended_time_window: 14:00-14:30 simulated local time
+  launch_landing_points:
+    - id: llp-site-gate-buffer
+      name: Site gate buffer launch point
+      description: Mock launch point outside the active machinery lane.
+      safety_notes:
+        - verify crane buffer status
+        - keep worker standoff before takeoff
+  route_strategy: Perimeter-first patrol with short passes over permitted work-zone corridors.
+  flight_segments:
+    - site perimeter loop
+    - central work-zone corridor
+  safety_thresholds:
+    max_wind_speed_mps: 8.0
+    min_battery_percent: 35
+    min_gps_confidence: 0.65
+    max_video_latency_ms: 500
+  abort_conditions:
+    - wind_speed_mps >= 8.0
+    - battery_percent <= 35
+    - gps_confidence < 0.65
+    - route enters restricted_zones
+  contingency_plan:
+    - pause patrol
+    - route back along perimeter corridor
+    - return to launch point
+  expected_coverage_percent: 84
+  estimated_duration_minutes: 19
+  explanation: >
+    Mock baseline case evaluates site patrol planning around normal operational
+    hazards without introducing emergency incidents.

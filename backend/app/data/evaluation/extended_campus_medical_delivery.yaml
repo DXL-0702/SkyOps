@@ -1,0 +1,136 @@
+evaluation_case:
+  case_id: eval-extended-campus-medical-delivery
+  title: Extended campus medical supply delivery evaluation case
+  scenario_type: park_logistics_delivery
+  raw_user_input: Plan a medical supply delivery from the campus clinic to the sports field safe point.
+  environment_state:
+    source_type: simulated
+    weather_summary: Simulated calm afternoon with students moving near the sports field.
+    wind_speed_mps: 2.9
+    visibility_level: good
+    crowd_level: medium
+    gps_quality: stable open campus reception
+    gps_confidence: 0.89
+    data_confidence: 0.87
+  airspace_constraint:
+    source_type: simulated
+    is_flyable: true
+    approval_required: true
+    restricted_zones:
+      - simulated classroom privacy buffer
+      - simulated sports field crowd buffer
+    altitude_limit_m: 55
+    compliance_risk_level: medium
+    explanation: >
+      Simulated campus delivery requires approval and must avoid classroom and
+      sports field crowd buffers.
+  drone_state:
+    source_type: simulated
+    drone_id: simulated-drone-extended-medical-delivery-01
+    model: DJI delivery-capable simulated platform
+    battery_percent: 85
+    estimated_endurance_minutes: 23
+    return_to_home_battery_threshold: 30
+    payloads:
+      - small medical payload
+      - wide camera
+    link_quality: low
+    video_latency_ms: 170
+    available_for_mission: true
+  incident_events: []
+  expected_hard_constraints:
+    - id: hard-approval-required
+      description: Campus medical delivery requires approval verification before execution.
+      must_pass: true
+      rule_ref: require_approval_when_needed
+      severity: high
+    - id: hard-medical-payload-supported
+      description: Device payload must support the small medical supply package.
+      must_pass: true
+      rule_ref: payloads
+      severity: high
+    - id: hard-crowd-buffer-avoidance
+      description: Delivery route must avoid sports field crowd buffer.
+      must_pass: true
+      rule_ref: restricted_zones
+      severity: high
+    - id: hard-safe-drop-zone
+      description: Delivery point must be verified before drop or landing.
+      must_pass: true
+      rule_ref: landing_zone_feasibility
+      severity: high
+  expected_risks:
+    - id: student_crowd_delivery_risk
+      category: public_safety
+      trigger_condition: crowd_level == medium near sports field
+      minimum_risk_level: medium
+      must_recall: true
+    - id: approval_required_for_campus_delivery
+      category: compliance
+      trigger_condition: approval_required == true
+      minimum_risk_level: high
+      must_recall: true
+    - id: delivery_point_safety_uncertainty
+      category: operations
+      trigger_condition: safe point is near sports field crowd buffer
+      minimum_risk_level: medium
+      must_recall: true
+  expected_response_behaviors:
+    - id: response-campus-medical-delivery-review
+      incident_type: campus_medical_delivery
+      expected_actions:
+        - verify approval before execution
+        - confirm delivery point is clear
+        - avoid classroom privacy buffer
+        - require human review if crowd buffer expands
+      forbidden_actions:
+        - assume approval
+        - deliver over crowd
+      human_confirmation_required: true
+      makeup_flight_expected: false
+  baseline_plan:
+    expected_duration_minutes: 10
+    expected_coverage_percent: 100
+    task_split_count: 1
+    manual_intervention_count: 1
+    safety_margin_notes:
+      - approval verification required
+      - sports field safe point must be clear
+      - classroom privacy buffer avoided
+  tags:
+    - extended_coverage
+    - park_logistics_delivery
+    - medical_delivery
+  source_type: simulated
+baseline_mission_plan:
+  mission_id: mission-extended-campus-medical-delivery
+  recommended_time_window: 16:40-16:55 simulated local time after approval verification
+  launch_landing_points:
+    - id: llp-campus-clinic-pad
+      name: Campus clinic pad
+      description: Simulated launch point for medical supply handoff.
+      safety_notes:
+        - verify approval and package attachment
+        - confirm sports field drop zone is clear
+  route_strategy: Approved campus delivery corridor avoiding classroom and crowd buffers.
+  flight_segments:
+    - clinic to sports field safe point
+    - return to clinic pad
+  safety_thresholds:
+    max_wind_speed_mps: 8.0
+    min_battery_percent: 35
+    min_gps_confidence: 0.65
+    max_video_latency_ms: 500
+  abort_conditions:
+    - approval_required == true and approval is not verified
+    - crowd_level == high at delivery point
+    - battery_percent <= 35
+  contingency_plan:
+    - hold at clinic pad
+    - request human review of delivery point
+    - defer delivery until safe point is clear
+  expected_coverage_percent: 100
+  estimated_duration_minutes: 10
+  explanation: >
+    Simulated extended case evaluates campus delivery planning with payload,
+    approval, crowd, and landing-zone constraints.

@@ -1,0 +1,135 @@
+evaluation_case:
+  case_id: eval-extended-fire-safety-smoke-perimeter
+  title: Extended smoke-prone industrial perimeter patrol evaluation case
+  scenario_type: fire_safety_patrol
+  raw_user_input: Generate a perimeter patrol for the smoke-prone industrial block with conservative visibility handling.
+  environment_state:
+    source_type: simulated
+    weather_summary: Simulated light smoke drift from industrial activity with moderate wind.
+    wind_speed_mps: 5.6
+    visibility_level: fair
+    crowd_level: low
+    gps_quality: stable in open industrial lanes
+    gps_confidence: 0.88
+    data_confidence: 0.82
+  airspace_constraint:
+    source_type: simulated
+    is_flyable: true
+    approval_required: false
+    restricted_zones:
+      - simulated heat-source standoff zone
+      - simulated emergency vehicle corridor
+    altitude_limit_m: 80
+    compliance_risk_level: medium
+    explanation: >
+      Simulated perimeter is flyable with safe standoff from heat-source and
+      emergency vehicle buffers.
+  drone_state:
+    source_type: simulated
+    drone_id: simulated-drone-extended-smoke-patrol-01
+    model: DJI Matrice class simulated platform
+    battery_percent: 82
+    estimated_endurance_minutes: 25
+    return_to_home_battery_threshold: 30
+    payloads:
+      - wide camera
+    link_quality: low
+    video_latency_ms: 190
+    available_for_mission: true
+  incident_events: []
+  expected_hard_constraints:
+    - id: hard-smoke-standoff
+      description: Patrol must keep distance from heat-source standoff zone.
+      must_pass: true
+      rule_ref: restricted_zones
+      severity: high
+    - id: hard-emergency-corridor-clear
+      description: Route must not block emergency vehicle corridor.
+      must_pass: true
+      rule_ref: restricted_zones
+      severity: high
+    - id: hard-visibility-degradation-gate
+      description: Visibility degradation must trigger pause or route shortening.
+      must_pass: true
+      rule_ref: visibility_level
+      severity: high
+    - id: hard-wind-smoke-margin
+      description: Wind and smoke drift must be considered before route continuation.
+      must_pass: true
+      rule_ref: max_wind_speed_mps
+      severity: high
+  expected_risks:
+    - id: smoke_visibility_degradation
+      category: visibility
+      trigger_condition: visibility_level == fair with smoke drift
+      minimum_risk_level: medium
+      must_recall: true
+    - id: emergency_corridor_conflict
+      category: public_safety
+      trigger_condition: restricted_zones include emergency vehicle corridor
+      minimum_risk_level: high
+      must_recall: true
+    - id: wind_smoke_drift_risk
+      category: weather
+      trigger_condition: wind_speed_mps >= 5.5 and smoke drift present
+      minimum_risk_level: medium
+      must_recall: true
+  expected_response_behaviors:
+    - id: response-smoke-perimeter-conservative
+      incident_type: smoke_prone_perimeter_patrol
+      expected_actions:
+        - keep emergency corridor clear
+        - widen standoff from heat-source area
+        - shorten route if visibility degrades
+        - request human review if smoke thickens
+      forbidden_actions:
+        - fly through smoke for coverage
+        - block emergency corridor
+      human_confirmation_required: true
+      makeup_flight_expected: true
+  baseline_plan:
+    expected_duration_minutes: 13
+    expected_coverage_percent: 62
+    task_split_count: 2
+    manual_intervention_count: 1
+    safety_margin_notes:
+      - incomplete segment is downwind industrial lane if smoke thickens
+      - makeup flight trigger is visibility returns to good and emergency corridor is clear
+      - keep heat-source standoff
+  tags:
+    - extended_coverage
+    - fire_safety_patrol
+    - smoke_prone_perimeter
+  source_type: simulated
+baseline_mission_plan:
+  mission_id: mission-extended-fire-safety-smoke-perimeter
+  recommended_time_window: 13:20-13:45 simulated local time
+  launch_landing_points:
+    - id: llp-industrial-fire-safety-pad
+      name: Industrial fire safety pad
+      description: Simulated launch point outside the emergency vehicle corridor.
+      safety_notes:
+        - keep emergency corridor open
+        - avoid downwind smoke lane if visibility drops
+  route_strategy: Upwind perimeter patrol first, with downwind lane deferred if smoke worsens.
+  flight_segments:
+    - upwind perimeter segment
+    - downwind industrial lane segment
+  safety_thresholds:
+    max_wind_speed_mps: 8.0
+    min_battery_percent: 35
+    min_gps_confidence: 0.65
+    max_video_latency_ms: 500
+  abort_conditions:
+    - visibility_level == poor
+    - wind_speed_mps >= 8.0
+    - route enters restricted_zones
+  contingency_plan:
+    - pause downwind segment
+    - return to safety pad
+    - schedule makeup flight after smoke clears
+  expected_coverage_percent: 62
+  estimated_duration_minutes: 13
+  explanation: >
+    Simulated extended case evaluates smoke and emergency-corridor constraints
+    through route planning and operational risk reasoning.

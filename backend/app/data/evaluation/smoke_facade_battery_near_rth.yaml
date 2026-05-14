@@ -1,0 +1,109 @@
+evaluation_case:
+  case_id: eval-smoke-facade-battery-near-rth
+  title: Facade inspection with battery near return threshold smoke case
+  scenario_type: building_facade_inspection
+  raw_user_input: Perform a short west facade inspection and return home before the battery reserve is used.
+  environment_state:
+    source_type: mock
+    weather_summary: Simulated calm afternoon with clear visibility.
+    wind_speed_mps: 2.8
+    visibility_level: good
+    crowd_level: low
+    gps_quality: good reception from the west service yard
+    gps_confidence: 0.88
+    data_confidence: 0.88
+  airspace_constraint:
+    source_type: mock
+    is_flyable: true
+    approval_required: false
+    restricted_zones: []
+    altitude_limit_m: 80
+    compliance_risk_level: low
+    explanation: >
+      Mock airspace is clear with a low altitude ceiling suitable for a short
+      facade inspection.
+  drone_state:
+    source_type: mock
+    drone_id: mock-drone-battery-01
+    model: DJI Matrice class mock platform
+    battery_percent: 38
+    estimated_endurance_minutes: 12
+    return_to_home_battery_threshold: 35
+    payloads:
+      - zoom camera
+    link_quality: low
+    video_latency_ms: 130
+    available_for_mission: true
+  incident_events: []
+  expected_hard_constraints:
+    - id: hard-min-return-battery
+      description: Mission must preserve at least the 35 percent return-to-home battery reserve.
+      must_pass: true
+      rule_ref: min_battery_percent
+      severity: high
+    - id: hard-short-route-only
+      description: Route must stay short enough to return before battery reaches reserve.
+      must_pass: true
+      rule_ref: route_energy_budget
+      severity: high
+    - id: hard-max-altitude
+      description: Flight altitude must stay at or below the 80 m mock ceiling.
+      must_pass: true
+      rule_ref: altitude_limit_m
+      severity: high
+    - id: hard-return-contingency
+      description: Plan must include immediate return behavior if battery reaches reserve.
+      must_pass: true
+      rule_ref: abort_conditions
+      severity: high
+  expected_risks:
+    - id: expected-low-battery-margin
+      category: device
+      trigger_condition: battery_percent <= return_to_home_battery_threshold + 5
+      minimum_risk_level: high
+      must_recall: true
+  expected_response_behaviors: []
+  baseline_plan:
+    expected_duration_minutes: 6
+    expected_coverage_percent: 42
+    task_split_count: 1
+    manual_intervention_count: 0
+    safety_margin_notes:
+      - preserve 35 percent return battery reserve
+      - prefer partial coverage over reserve consumption
+  tags:
+    - smoke
+    - building_facade_inspection
+    - battery_near_rth_threshold
+  source_type: mock
+baseline_mission_plan:
+  mission_id: mission-smoke-facade-battery-near-rth
+  recommended_time_window: 15:00-15:10 simulated local time
+  launch_landing_points:
+    - id: llp-building-c-west
+      name: Building C west service yard
+      description: Mock launch point beside the shortest safe return path.
+      safety_notes:
+        - verify battery before takeoff
+        - keep route close to launch point
+  route_strategy: Very short west facade scan that stops before reserve battery is consumed.
+  flight_segments:
+    - west facade lower band quick scan
+  safety_thresholds:
+    max_wind_speed_mps: 8.0
+    min_battery_percent: 35
+    min_gps_confidence: 0.65
+    max_video_latency_ms: 500
+  abort_conditions:
+    - battery_percent <= 35
+    - wind_speed_mps >= 8.0
+    - gps_confidence < 0.65
+  contingency_plan:
+    - stop inspection immediately
+    - return to launch point
+    - generate makeup flight plan for remaining facade sections
+  expected_coverage_percent: 42
+  estimated_duration_minutes: 6
+  explanation: >
+    Mock plan verifies that smoke evaluation data can represent a valid but
+    battery-constrained mission.
