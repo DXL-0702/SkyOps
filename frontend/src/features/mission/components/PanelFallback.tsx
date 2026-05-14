@@ -33,18 +33,15 @@ export function PanelFallback({ title, state, message, locale = "en" }: PanelFal
         )}
       >
         <p className="text-sm font-semibold text-white">
-          {t(
-            locale,
-            isLoading ? "Mission decision loop is running." : "Mission data unavailable.",
-          )}
+          {t(locale, isLoading ? "Generating plan..." : "Unable to generate plan.")}
         </p>
         <p className={cn(isLoading ? textStyles.subtle : "text-xs leading-5 text-red-100/80", "mt-2")}>
           {t(
             locale,
             message ??
               (isLoading
-                ? "SkyOps is parsing the task, checking constraints, simulating risks, and preparing an explainable plan."
-                : "No flight recommendation should be used until the failed state is reviewed."),
+                ? "Checking task, constraints, and risks."
+                : "Please retry or keep this task under manual review."),
           )}
         </p>
 

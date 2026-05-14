@@ -154,12 +154,12 @@ export function HumanExplanationPanel({
     return (
       <PanelFallback
         locale={locale}
-        title="Human Explanation"
+        title="Decision Evidence"
         state={missionCycle.status}
         message={
           missionCycle.status === "failed"
             ? missionCycle.message
-            : t(locale, "Waiting for facts, inferences, recommended actions, and human confirmation items.")
+            : t(locale, "Generate a plan to view decision evidence.")
         }
       />
     );
@@ -172,7 +172,7 @@ export function HumanExplanationPanel({
     <section className={panelStyles.base}>
       <PanelTitle
         icon={ShieldAlert}
-        title={t(locale, "Human Explanation")}
+        title={t(locale, "Decision Evidence")}
         meta={t(locale, "Decision Basis")}
       />
 

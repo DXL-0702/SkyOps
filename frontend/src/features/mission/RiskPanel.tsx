@@ -268,13 +268,13 @@ export function RiskPanel({
   if (missionCycle.status !== "ready") {
     return (
       <PanelFallback
-        title="Risk Stack"
+        title="Risk Explanation"
         locale={locale}
         state={missionCycle.status}
         message={
           missionCycle.status === "failed"
             ? missionCycle.message
-            : t(locale, "Waiting for risk simulation results from the mission decision loop.")
+            : t(locale, "Generate a plan to view risk explanation.")
         }
       />
     );
@@ -290,7 +290,7 @@ export function RiskPanel({
 
   return (
     <aside className={panelStyles.base}>
-      <PanelTitle icon={AlertTriangle} title={t(locale, "Risk Stack")} meta={t(locale, "Explainable")} />
+      <PanelTitle icon={AlertTriangle} title={t(locale, "Risk Explanation")} meta={t(locale, "Explainable")} />
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap gap-2">

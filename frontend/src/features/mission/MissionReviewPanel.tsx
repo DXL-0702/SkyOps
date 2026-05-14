@@ -118,7 +118,18 @@ export function MissionReviewPanel({
   missionCycle: MissionCycleState;
 }) {
   if (missionCycle.status !== "ready") {
-    return <PanelFallback locale={locale} title="Mission Review" state={missionCycle.status} />;
+    return (
+      <PanelFallback
+        locale={locale}
+        title="Review Report"
+        state={missionCycle.status}
+        message={
+          missionCycle.status === "failed"
+            ? missionCycle.message
+            : t(locale, "Run review to view mission results.")
+        }
+      />
+    );
   }
 
   const review = missionCycle.review.mission_review;
@@ -171,7 +182,7 @@ export function MissionReviewPanel({
 
   return (
     <section className={panelStyles.base}>
-      <PanelTitle icon={CheckCircle2} title={t(locale, "Mission Review")} meta={review.mission_id} />
+      <PanelTitle icon={CheckCircle2} title={t(locale, "Review Report")} meta={review.mission_id} />
 
       <div className="mt-4 flex flex-wrap gap-2">
         <DataSourceBadge
