@@ -1,4 +1,3 @@
-import { CheckCircle2, Circle } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { API_BASE_URL } from "../../api/client";
@@ -30,117 +29,10 @@ import { SafetyThresholdPanel } from "./SafetyThresholdPanel";
 import { SandboxMapPanel } from "./SandboxMapPanel";
 import { StatusStrip } from "./StatusStrip";
 import { DataSourceBadge } from "./components/DataSourceBadge";
-import { formatCheckEndpoint, missionConsoleCopy, t, type Locale } from "./i18n";
+import { formatCheckEndpoint, missionConsoleCopy, type Locale } from "./i18n";
 import { incidentPresets } from "./incidentPresets";
 import type { HealthState, MissionCycleState } from "./types";
 import { badgeStyles, buttonStyles, cn, layoutStyles, textStyles } from "./uiTokens";
-
-const demoFlowSteps: Array<{
-  viewId: ConsoleViewId;
-  label: string;
-  description: string;
-}> = [
-  {
-    viewId: "task",
-    label: "Mission Task",
-    description: "Enter the natural-language mission.",
-  },
-  {
-    viewId: "plan",
-    label: "Plan",
-    description: "Review route, launch point, and safety thresholds.",
-  },
-  {
-    viewId: "risk",
-    label: "Risk Explanation",
-    description: "Inspect risks, evidence, and decision basis.",
-  },
-  {
-    viewId: "incident",
-    label: "Incident Injection",
-    description: "Trigger a simulated exception and replan.",
-  },
-  {
-    viewId: "review",
-    label: "Review Report",
-    description: "Close the loop with quality, gaps, and makeup flight needs.",
-  },
-];
-
-function DemoFlowStrip({
-  activeViewId,
-  locale,
-  onViewChange,
-}: {
-  activeViewId: ConsoleViewId;
-  locale: Locale;
-  onViewChange: (viewId: ConsoleViewId) => void;
-}) {
-  return (
-    <section
-      aria-label={t(locale, "Competition demo flow")}
-      className="border border-zinc-800 bg-zinc-900/70 p-4"
-    >
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className={textStyles.eyebrow}>{t(locale, "Competition Demo")}</p>
-          <h2 className="mt-1.5 text-lg font-semibold text-white">
-            {t(locale, "Task-level autonomy in five steps")}
-          </h2>
-          <p className={cn(textStyles.subtle, "mt-1.5 max-w-3xl")}>
-            {t(
-              locale,
-              "Use this flow to show mission planning, risk simulation, incident replanning, and review without turning the product into image inspection.",
-            )}
-          </p>
-        </div>
-        <span className={cn(badgeStyles.base, badgeStyles.neutral)}>
-          {t(locale, "Not image inspection")}
-        </span>
-      </div>
-
-      <div className="mt-3 grid gap-2 md:grid-cols-5">
-        {demoFlowSteps.map((step, index) => {
-          const isActive = activeViewId === step.viewId;
-          const Icon = isActive ? CheckCircle2 : Circle;
-
-          return (
-            <button
-              aria-current={isActive ? "step" : undefined}
-              className={cn(
-                buttonStyles.base,
-                "h-auto min-h-20 w-full border p-3 text-left",
-                isActive
-                  ? "border-teal-300 bg-teal-300/10 text-teal-50"
-                  : "border-zinc-800 bg-zinc-950/70 text-zinc-400 hover:border-zinc-600 hover:text-zinc-100",
-              )}
-              key={step.viewId}
-              onClick={() => onViewChange(step.viewId)}
-              type="button"
-            >
-              <div className="flex min-w-0 items-start gap-2">
-                <Icon
-                  aria-hidden="true"
-                  className={isActive ? "mt-0.5 shrink-0 text-teal-200" : "mt-0.5 shrink-0 text-zinc-500"}
-                  size={15}
-                />
-                <div className="min-w-0">
-                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">
-                    {t(locale, "Step")} {index + 1}
-                  </p>
-                  <p className="mt-1 break-words text-sm font-semibold text-white">
-                    {t(locale, step.label)}
-                  </p>
-                  <p className={cn(textStyles.muted, "mt-1 leading-4")}>{t(locale, step.description)}</p>
-                </div>
-              </div>
-            </button>
-          );
-        })}
-      </div>
-    </section>
-  );
-}
 
 function LanguageToggle({
   locale,
@@ -430,12 +322,6 @@ export function MissionConsole() {
         </header>
 
         <StatusStrip copy={copy.status} health={health} locale={locale} missionCycle={missionCycle} />
-
-        <DemoFlowStrip
-          activeViewId={activeViewId}
-          locale={locale}
-          onViewChange={setActiveViewId}
-        />
 
         <section className={layoutStyles.workspaceGrid}>
           <MissionFlowSidebar

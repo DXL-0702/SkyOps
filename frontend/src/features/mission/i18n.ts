@@ -28,18 +28,6 @@ const zhText: Record<string, string> = {
   Endpoint: "接口地址",
   "Vite proxy -> 127.0.0.1:8000": "Vite 代理 -> 127.0.0.1:8000",
   "Mission console sections": "任务控制台分区",
-  "Competition demo flow": "竞赛演示流程",
-  "Competition Demo": "竞赛演示",
-  "Task-level autonomy in five steps": "五步展示任务级自治",
-  "Use this flow to show mission planning, risk simulation, incident replanning, and review without turning the product into image inspection.":
-    "使用该流程展示任务规划、风险推演、异常重规划和复盘，不把产品做成图像巡检工具。",
-  "Not image inspection": "不是图像巡检",
-  "Step": "步骤",
-  "Enter the natural-language mission.": "输入自然语言任务。",
-  "Review route, launch point, and safety thresholds.": "查看航线、起降点和安全阈值。",
-  "Inspect risks, evidence, and decision basis.": "检查风险、证据和决策依据。",
-  "Trigger a simulated exception and replan.": "注入模拟异常并重规划。",
-  "Close the loop with quality, gaps, and makeup flight needs.": "用质量、缺口和补飞需求形成闭环。",
 
   "Mission Task": "任务输入",
   "Mission Task Source": "任务来源",
@@ -262,6 +250,7 @@ const zhText: Record<string, string> = {
   "No replan actions available": "无可用重规划动作",
   "The mock response returned no ordered action list. Keep this decision in manual review before execution.":
     "模拟响应未返回有序动作列表。执行前请保持人工复核。",
+  Step: "步骤",
   "Alternatives Considered": "已评估备选方案",
   "Rejected Alternatives": "已拒绝备选方案",
   "Not Recommended": "不推荐",
