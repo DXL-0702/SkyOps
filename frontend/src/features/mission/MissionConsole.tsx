@@ -146,7 +146,7 @@ export function MissionConsole() {
     };
   }, []);
 
-  async function runAllDemoFlow(incidentEvent: IncidentEvent = selectedIncident) {
+  async function runMissionCycle(incidentEvent: IncidentEvent = selectedIncident): Promise<boolean> {
     setSelectedIncident(incidentEvent);
     setMissionCycle({ status: "loading" });
     setIsIncidentUpdating(false);
@@ -167,6 +167,7 @@ export function MissionConsole() {
       });
 
       setMissionCycle({ status: "ready", plan, replan, review, incidentEvent });
+      return true;
     } catch (error: unknown) {
       console.error("Mission decision loop failed.", error);
       setMissionCycle({
@@ -175,18 +176,27 @@ export function MissionConsole() {
         possibleCauses: missionFailurePossibleCauses,
         suggestedActions: missionFailureSuggestedActions,
       });
+      return false;
     }
   }
 
   useEffect(() => {
-    void runAllDemoFlow(incidentPresets[0].event);
+    void runMissionCycle(incidentPresets[0].event);
     // Initial mock mission cycle only.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  async function handleGenerateMissionPlan() {
+    const isReady = await runMissionCycle();
+
+    if (isReady) {
+      setActiveViewId("plan");
+    }
+  }
+
   async function handleIncidentSelect(incidentEvent: IncidentEvent) {
     if (missionCycle.status !== "ready") {
-      await runAllDemoFlow(incidentEvent);
+      await runMissionCycle(incidentEvent);
       return;
     }
 
@@ -240,7 +250,7 @@ export function MissionConsole() {
             missionCycle={missionCycle}
             taskInput={taskInput}
             isIncidentUpdating={isIncidentUpdating}
-            onRun={() => void runAllDemoFlow()}
+            onRun={() => void handleGenerateMissionPlan()}
             onTaskInputChange={setTaskInput}
           />
         </section>

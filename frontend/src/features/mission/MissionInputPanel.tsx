@@ -201,7 +201,7 @@ export function MissionInputPanel({
         type="button"
       >
         <GitBranch aria-hidden="true" size={17} />
-        {t(locale, isRunning ? "Generating plan..." : "Run Demo Flow")}
+        {t(locale, isRunning ? "Generating plan..." : "Generate Mission Plan")}
       </button>
 
       <MissionCycleStatusCard locale={locale} missionCycle={missionCycle} onRun={onRun} />
