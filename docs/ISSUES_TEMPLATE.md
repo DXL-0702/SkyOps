@@ -255,7 +255,7 @@ Phase 3 推荐最终形成：
 
 ### Issue P1-S-026: Add Evaluation Smoke Cases
 
-**Status:** Backlog
+**Status:** Done
 
 **Priority:** P1
 
@@ -288,13 +288,19 @@ Phase 3 推荐最终形成：
 - 所有 smoke cases 通过 schema 校验。
 - `uv run pytest` 通过。
 
+**Implementation Notes:**
+
+- 已新增 3 个建筑外立面 smoke cases，覆盖正常任务、风速接近阈值、电量接近返航阈值。
+- 已在 evaluation loader 测试中加入 smoke case 存在性和基础字段校验。
+- 数据来源保持 `mock`/`simulated`，不接入真实无人机或真实外部 API。
+
 ---
 
 ## Phase 3.1：评测场景数据集
 
 ### Issue P1-M-027: Add Normal Operation Evaluation Cases
 
-**Status:** Backlog
+**Status:** Done
 
 **Priority:** P1
 
@@ -324,11 +330,17 @@ Phase 3 推荐最终形成：
 - 不出现缺陷识别模型输出作为核心评测目标。
 - `uv run pytest` 通过。
 
+**Implementation Notes:**
+
+- 已新增 5 个正常低风险任务 case，覆盖建筑外立面、园区光伏、工地安全、园区安防和城市治理/测绘类任务。
+- 每个 case 均包含期望硬约束、期望风险点和 baseline plan。
+- 已通过测试守门，确保评测目标保持在任务规划、安全约束和运营决策层。
+
 ---
 
 ### Issue P1-M-028: Add Weather GPS And Crowd Risk Evaluation Cases
 
-**Status:** Backlog
+**Status:** Done
 
 **Priority:** P1
 
@@ -357,11 +369,17 @@ Phase 3 推荐最终形成：
 - case 中硬约束和风险点可被评分器引用。
 - `uv run pytest` 通过。
 
+**Implementation Notes:**
+
+- 已新增 5 个天气、GPS 和人流相关高风险 case。
+- 覆盖风速超阈值、阵风接近阈值、GPS 置信度下降、建筑峡谷导航风险和人流聚集低空悬停风险。
+- 测试已校验这些 case 均包含 `expected_risks` 和安全保守的响应行为。
+
 ---
 
 ### Issue P1-M-029: Add Airspace And Compliance Evaluation Cases
 
-**Status:** Backlog
+**Status:** Done
 
 **Priority:** P1
 
@@ -390,11 +408,17 @@ Phase 3 推荐最终形成：
 - 合规风险必须可解释。
 - `uv run pytest` 通过。
 
+**Implementation Notes:**
+
+- 已新增 5 个空域合规 case，覆盖禁飞区、限飞审批、临时管控、高度限制冲突和信息不足人工复核。
+- 已在测试中加入禁用危险期望动作校验，避免出现绕过禁飞区、默认审批通过或执行过期航线等错误方向。
+- case 继续保持 mock/simulated 数据来源，并为后续硬约束评分器提供可引用约束 id。
+
 ---
 
 ### Issue P1-M-030: Add Drone Battery Payload And Link Evaluation Cases
 
-**Status:** Backlog
+**Status:** Done
 
 **Priority:** P1
 
@@ -423,11 +447,17 @@ Phase 3 推荐最终形成：
 - 需要补飞的 case 必须明确未覆盖区域或补飞触发条件。
 - `uv run pytest` 通过。
 
+**Implementation Notes:**
+
+- 已新增 5 个设备状态 case，覆盖电量不足、返航余量不足、续航限制、图传延迟和载荷能力不足。
+- 需要补飞或任务拆分的 case 已明确未覆盖区域、补飞触发条件或人工确认要求。
+- 测试已校验设备安全约束优先于覆盖率和效率目标。
+
 ---
 
 ### Issue P1-M-031: Add Incident Injection Evaluation Cases
 
-**Status:** Backlog
+**Status:** Done
 
 **Priority:** P1
 
@@ -456,11 +486,17 @@ Phase 3 推荐最终形成：
 - 期望动作必须安全保守。
 - `uv run pytest` 通过。
 
+**Implementation Notes:**
+
+- 已新增 5 个异常注入 case，覆盖风速突增、GPS 置信度下降、图传延迟增加、电量跌破返航阈值和人群聚集。
+- 每个 case 都包含 `incident_events` 与 `expected_response_behaviors`，用于后续异常处置评分。
+- 测试已校验异常期望动作包含暂停、返航/待命、保留数据、补飞或人工复核等保守动作。
+
 ---
 
 ### Issue P2-M-032: Add Multi-Domain Expansion Evaluation Cases
 
-**Status:** Backlog
+**Status:** Done
 
 **Priority:** P2
 
@@ -489,6 +525,12 @@ Phase 3 推荐最终形成：
 - 总评测集规模达到 30-50 个 case。
 - 至少覆盖 4 类低空作业业务场景。
 - 所有 case 可重复运行并通过 schema 校验。
+
+**Implementation Notes:**
+
+- 已新增 10 个扩展业务 case，总评测集规模达到 39 个 case。
+- 扩展覆盖应急救援、消防巡查、城市治理、园区物流配送、夜间安防巡逻和台风前工地安全巡查。
+- 已新增全局评测集 guardrail 测试，持续校验 30-50 个 case 规模、mock/simulated 来源、baseline plan、业务覆盖和非 CV 缺陷识别方向。
 
 ---
 
