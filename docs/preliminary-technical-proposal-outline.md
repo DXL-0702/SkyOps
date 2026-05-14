@@ -2,7 +2,7 @@
 
 > 本文档是初赛技术方案的施工图，不是最终提交版。
 >
-> 当前版本只基于仓库中已经完成或正在开发的内容组织材料。Phase 3 剩余评分器与 Phase 4-lite mock provider / LLM 角色说明完成后，应再次更新本 outline，再扩写为最终 PDF 技术方案。
+> 当前版本只基于仓库中已经完成或正在开发的内容组织材料。Phase 3 评测报告、Demo 截图和最终测试结果完成后，应再次更新本 outline，再扩写为最终 PDF 技术方案。
 
 ## 0. 写作原则
 
@@ -63,11 +63,12 @@ Phase 4-lite 当前已完成：
 - LLM contract 基础安全边界测试。
 - MockLLMProvider。
 - Mock provider 基础输出稳定性测试。
+- LLM adapter contract regression tests。
+- 技术方案中的 LLM 角色说明。
 
 待 Phase 4-lite 后续补充：
 
-- Mock provider 与真实 provider 替换边界测试。
-- 技术方案中的 LLM 角色说明。
+- Demo 脚本中的 20-30 秒 LLM 安全边界讲述。
 
 ## 1. 项目背景与问题定义
 
@@ -479,62 +480,115 @@ def test_phase_3_evaluation_dataset_has_task_autonomy_guardrails() -> None:
 
 ## 9. Phase 4-lite：LLM 接口边界
 
-### 9.1 当前写法
+### 9.1 技术方案口径
 
-当前技术方案不要写“已接入真实 LLM”。
-
-应写：
+当前技术方案应明确写成：
 
 ```text
-当前版本优先完成可验证的任务自治闭环：任务解析、约束建模、硬规则评估、任务规划、异常重规划、复盘报告和评测合约。由于低空作业涉及安全与合规，系统不将 LLM 作为硬安全判断的唯一依据。
+SkyOps Agent 已预留 LLM adapter contract，并使用 MockLLMProvider 验证任务解析、约束补齐、解释生成和复盘摘要等辅助能力。初赛 Demo 不接入真实 LLM API；低空作业中的硬安全判断仍由显式规则、合规约束、评测系统和人工复核共同约束。
 ```
 
-### 9.2 当前已完成
+不要写成：
 
-已完成：
+```text
+系统已接入真实大模型并由大模型自动决定是否飞行。
+```
 
-- `LLMProvider` adapter contract。
-- `TaskUnderstandingDraft`、`ConstraintQuestionDraft`、`ExplanationDraft`、`ReviewNarrativeDraft`。
-- `LLMUsagePolicy`，禁止 LLM 批准飞行、覆盖硬约束、绕过人工复核或修改安全阈值。
-- `LLMFailureMode`，覆盖超时、无效 JSON、安全边界冲突、缺少字段和 provider 不可用。
-- `docs/llm-safety-boundary.md`。
-- `backend/tests/test_llm_contracts.py` 基础安全边界测试。
-- `MockLLMProvider`，用于初赛 Demo 和测试展示 LLM 接口已预留但不调用真实模型。
-- `backend/tests/test_mock_llm_provider.py` 基础输出稳定性测试。
-
-建议最终方案引用：
-
-`backend/app/integrations/llm/contracts.py`
-
-`backend/app/integrations/llm/mock_provider.py`
-
-### 9.3 Phase 4-lite 后续补充
-
-待完成后补：
-
-- Mock provider 与未来真实 provider 替换边界测试。
-
-建议核心表达：
+核心安全声明：
 
 ```text
 LLM can suggest, but cannot approve flight.
 ```
 
-### 9.4 LLM 能做什么
+### 9.2 三层智能边界
 
-- 自然语言任务理解。
-- 缺失约束补全建议。
-- 风险解释生成。
-- 复盘报告润色。
-- 人机交互体验增强。
+Phase 4-lite 用于说明 SkyOps Agent 具备未来接入真实 LLM 的清晰边界，而不是把安全责任交给 LLM。
 
-### 9.5 LLM 不能做什么
+建议最终方案使用三层结构说明：
 
-- 不能绕过禁飞区。
-- 不能忽略审批。
-- 不能压低电量、风速、GPS、人流安全阈值。
-- 不能替代人工安全责任人。
-- 不能单独决定任务是否可飞。
+| 层级 | 职责 | 当前实现 | 安全边界 |
+| --- | --- | --- | --- |
+| Deterministic Safety Layer | 风速、电量、GPS、图传、人流、空域等硬约束判断 | `backend/app/core/rules/engine.py`、evaluation scoring | 阻断不安全或不合规方案，不能被 LLM 覆盖 |
+| Agent Reasoning Layer | 任务理解、多源约束推理、任务规划、异常重规划、闭环复盘 | `mission_planner.py`、`incident_replanner.py`、`mission_reviewer.py`、evaluation runner | 生成结构化方案、风险、补飞与复盘，接受规则和评测约束 |
+| LLM Assistance Layer | 自然语言解析、主动澄清、解释生成、复盘摘要润色 | `LLMProvider` contract、`MockLLMProvider` | 只输出 draft / suggestion / explanation，不批准飞行 |
+
+这三层关系的表达重点：
+
+- LLM 增强交互和解释，不替代安全规则。
+- 规则与评测约束安全决策，不依赖 LLM 自由文本。
+- 人工安全责任人和法规审批不能被系统绕过。
+
+### 9.3 当前已实现证据
+
+已完成：
+
+- `backend/app/integrations/llm/contracts.py`
+  - `LLMProvider` adapter contract。
+  - `TaskUnderstandingDraft`、`ConstraintQuestionDraft`、`ExplanationDraft`、`ReviewNarrativeDraft`。
+  - `LLMUsagePolicy`，禁止 LLM 批准飞行、覆盖硬约束、绕过人工复核或修改安全阈值。
+  - `LLMFailureMode`，覆盖超时、无效 JSON、安全边界冲突、缺少字段和 provider 不可用。
+- `backend/app/integrations/llm/mock_provider.py`
+  - `MockLLMProvider`，用于初赛 Demo 和测试展示 LLM 接口已预留但不调用真实模型。
+  - 所有输出均标记 `source_type=mock`、`provider=mock`、`deterministic=true`。
+- `docs/llm-safety-boundary.md`
+  - 明确 “LLM can suggest, but cannot approve flight.”。
+- `backend/tests/test_llm_contracts.py`
+  - 覆盖基础安全边界、输出标记和 provider protocol。
+- `backend/tests/test_mock_llm_provider.py`
+  - 覆盖 mock provider 稳定输出、缺失字段、解释草稿和复盘摘要草稿。
+- `backend/tests/test_llm_adapter_contract_regression.py`
+  - 覆盖 LLM 输出不能覆盖硬约束、无效输出触发 fallback、人机复核和敏感配置不泄漏。
+
+### 9.4 为什么初赛 Demo 不接真实 LLM
+
+初赛阶段选择 `MockLLMProvider`，不是因为系统没有 LLM 扩展能力，而是因为低空作业场景需要优先证明安全边界和可复现性。
+
+建议最终方案写成：
+
+```text
+初赛 Demo 使用 MockLLMProvider，是为了保证演示结果可复现、避免 API key 和网络依赖，并防止评委误解为系统将飞行许可、禁飞区、风速中止、电量返航、人流安全等硬安全判断交给不稳定的自由文本输出。
+```
+
+具体原因：
+
+- 保证演示可复现：同一输入得到稳定结构化草稿。
+- 避免外部依赖：不要求网络、API key 或真实 provider 可用。
+- 避免安全误解：LLM 只做辅助表达，硬安全判断仍由显式规则和评测系统控制。
+- 方便后续替换：真实 LLM provider 只需遵守同一 adapter contract。
+
+### 9.5 LLM 能做什么
+
+- 从自然语言中生成任务理解草稿。
+- 主动建议补齐关键约束，例如作业边界、时间窗口、是否允许拆分补飞、是否启用保守航线。
+- 将确定性规则和任务方案转换为用户可理解的解释草稿。
+- 将复盘结果整理为更自然的总结文本。
+- 改善人机交互体验，使用户像对专业低空调度员说话，而不是填写复杂工业表单。
+
+### 9.6 LLM 不能做什么
+
+- 不能批准飞行。
+- 不能绕过禁飞区或审批要求。
+- 不能覆盖风速、电量、GPS、图传、人流、空域等硬约束规则。
+- 不能压低安全阈值来提高覆盖率或效率。
+- 不能替代人工安全责任人或法规审批。
+- 不能在信息不足时给出冒险执行建议。
+
+### 9.7 未来真实 LLM 接入方式
+
+后续可新增真实 provider，例如 OpenAI、通义、智谱或本地模型 provider，但必须满足：
+
+- 实现同一 `LLMProvider` adapter contract。
+- 输出仍为 `draft`、`suggestion` 或 `explanation`。
+- 所有输出必须经过确定性规则校验。
+- 安全边界冲突必须触发 fallback 和人工复核。
+- 不保存或提交 API key。
+- 不把 LLM 放入硬安全规则执行链路。
+
+最终技术方案可强调：
+
+```text
+SkyOps Agent 的 Agent 能力不是依赖一个大模型直接给结论，而是由确定性安全层、任务推理层和 LLM 辅助层共同组成。LLM 负责更自然的理解与表达，安全与合规由显式规则、评测系统和人工复核约束。
+```
 
 ## 10. Demo 展示流程
 
@@ -629,7 +683,7 @@ LLM can suggest, but cannot approve flight.
 优先完成：
 
 1. Phase 3 评分器和 runner。
-2. Phase 4-lite mock provider 与 LLM contract tests。
+2. Phase 4-lite mock provider、LLM contract tests 与 LLM adapter regression tests。
 3. Demo 流程收口。
 4. 技术方案最终版。
 5. Demo 视频或演示说明。
@@ -660,9 +714,9 @@ Phase 4-lite 后续完成后补：
 - [x] LLM adapter contract 代码片段。
 - [x] LLM 安全边界文档。
 - [x] MockLLMProvider 代码片段。
-- [ ] LLM 安全边界测试代码片段。
-- [ ] “为什么初赛不接真实 LLM”说明。
-- [ ] “LLM can suggest, but cannot approve flight.” 安全声明。
+- [x] LLM 安全边界测试代码片段。
+- [x] “为什么初赛不接真实 LLM”说明。
+- [x] “LLM can suggest, but cannot approve flight.” 安全声明。
 
 Demo 完成后补：
 

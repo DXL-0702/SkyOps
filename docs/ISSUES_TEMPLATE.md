@@ -1185,7 +1185,7 @@ Phase 4-lite 必须坚持：
 
 ### Issue P2-S-049: Document LLM Role In Technical Proposal
 
-**Status:** Backlog
+**Status:** Done
 
 **Priority:** P2
 
@@ -1195,11 +1195,11 @@ Phase 4-lite 必须坚持：
 
 **Depends On:** P0-L-046, P1-M-047
 
-**Goal:** 为初赛技术方案准备 LLM 角色说明，解释为什么当前 Demo 不接真实 LLM，但已经具备 Agent/LLM 扩展能力。
+**Goal:** 更新 `docs/preliminary-technical-proposal-outline.md` 的 Phase 4-lite 相关内容，解释为什么当前 Demo 不接真实 LLM，但已经具备 Agent/LLM 扩展能力。
 
 **Scope:**
 
-- 写清楚三层智能架构：
+- 在 `docs/preliminary-technical-proposal-outline.md` 的 Phase 4-lite 小节中写清楚三层智能架构：
   - Deterministic Safety Layer：显式硬约束、安全规则、合规规则、阈值判断。
   - Agent Reasoning Layer：任务理解、多源约束推理、风险推演、任务规划、异常重规划、闭环复盘。
   - LLM Assistance Layer：自然语言解析、主动澄清、解释生成、复盘报告润色。
@@ -1207,8 +1207,9 @@ Phase 4-lite 必须坚持：
   - 保证可复现。
   - 避免 API key 和网络依赖。
   - 避免把安全判断交给不稳定输出。
-- 写清楚未来可接入真实 LLM 的位置和限制。
+- 写清楚未来真实 LLM provider 的接入位置和限制。
 - 写清楚 “LLM 增强交互和解释，规则与评测约束安全决策”。
+- 更新 outline 中 Phase 4-lite 相关待补清单。
 
 **Acceptance Criteria:**
 
@@ -1216,6 +1217,14 @@ Phase 4-lite 必须坚持：
 - 不夸大真实 LLM 接入状态。
 - 不承诺系统可以替代法规审批或人工安全责任人。
 - 文案不把 SkyOps Agent 说成传统无人机缺陷识别工具。
+
+**Implementation Notes:**
+
+- 已更新 `docs/preliminary-technical-proposal-outline.md` 第 9 节 Phase 4-lite 内容。
+- 已补充三层智能边界：Deterministic Safety Layer、Agent Reasoning Layer、LLM Assistance Layer。
+- 已说明初赛 Demo 使用 `MockLLMProvider` 的原因：可复现、无 API key/网络依赖、不把硬安全判断交给 LLM。
+- 已说明未来真实 LLM provider 必须遵守同一 adapter contract，输出仍是 draft/suggestion/explanation。
+- 已补充 “LLM can suggest, but cannot approve flight.” 安全声明，并更新 outline 中 Phase 4-lite 待补清单。
 
 ---
 
