@@ -98,7 +98,7 @@ function ReplanActionsTimeline({
   if (!actions || actions.length === 0) {
     return (
       <div>
-        <SectionLabel label={t(locale, "Replan Actions Timeline")} />
+        <SectionLabel label={t(locale, "Action Timeline")} />
         <EmptyState
           className="mt-3"
           icon={ListChecks}
@@ -114,7 +114,7 @@ function ReplanActionsTimeline({
 
   return (
     <div>
-      <SectionLabel label={t(locale, "Replan Actions Timeline")} />
+      <SectionLabel label={t(locale, "Action Timeline")} />
       <ol aria-label={t(locale, "Replan action sequence")} className="mt-3 grid gap-0">
         {actions.map((action, index) => {
           const isLastStep = index === actions.length - 1;
@@ -214,7 +214,18 @@ export function IncidentReplanPanel({
   missionCycle: MissionCycleState;
 }) {
   if (missionCycle.status !== "ready") {
-    return <PanelFallback locale={locale} title="Incident Replanning" state={missionCycle.status} />;
+    return (
+      <PanelFallback
+        locale={locale}
+        title="Replan Decision"
+        state={missionCycle.status}
+        message={
+          missionCycle.status === "failed"
+            ? missionCycle.message
+            : t(locale, "Inject an incident to view replanning.")
+        }
+      />
+    );
   }
 
   const decision = missionCycle.replan.replan_decision;
@@ -224,7 +235,7 @@ export function IncidentReplanPanel({
     <section className={panelStyles.base}>
       <PanelTitle
         icon={GitBranch}
-        title={t(locale, "Incident Replanning")}
+        title={t(locale, "Replan Decision")}
         meta={decision.incident_id}
       />
 

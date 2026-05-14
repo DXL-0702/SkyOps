@@ -29,16 +29,40 @@ const zhText: Record<string, string> = {
   "Vite proxy -> 127.0.0.1:8000": "Vite 代理 -> 127.0.0.1:8000",
   "Mission console sections": "任务控制台分区",
 
+  "Competition Demo": "竞赛演示",
+  "Task-level autonomy for low-altitude inspection missions": "面向低空巡检任务的任务级自治",
+  "Plan missions, simulate risks, trigger replanning, and review makeup flight needs.":
+    "生成任务方案、推演风险、触发重规划并复盘补飞需求。",
+  "Positioning note": "定位说明",
+  "This demo focuses on mission planning and risk response, not image inspection.":
+    "本演示聚焦任务规划和风险响应，不是图像巡检。",
+  "1-2 Minute Demo Flow": "1-2 分钟演示流程",
+  "Task-level autonomy sequence": "任务级自治流程",
+  "Planning, risk, review": "规划、风险、复盘",
+  "Task Input": "任务输入",
+  "Enter the mission request.": "输入任务需求。",
+  "Generate an executable plan.": "生成可执行方案。",
+  "Review constraints and risk evidence.": "查看约束与风险证据。",
+  "Trigger a simulated exception.": "触发模拟异常。",
+  "Inspect the response sequence.": "查看响应顺序。",
+  "Close the loop with review output.": "用复盘结果闭环。",
+
   "Mission Intake": "任务输入",
   "Natural language": "自然语言",
+  "Run Demo Flow": "运行演示",
   "Run All Demo Flow": "运行完整演示流程",
   "Demo Flow Running": "演示流程运行中",
+  "Generating plan...": "正在生成方案...",
   "Decision loop ready": "决策闭环已就绪",
+  "Plan ready": "方案已生成",
   "Explainable plan": "可解释方案",
+  "Plan, risk explanation, incident response, and review report are generated from mock mission data.":
+    "任务方案、风险解释、异常响应和复盘报告均由模拟任务数据生成。",
   "Plan, risk stack, incident response, and review summary are generated from mock mission data.":
     "任务方案、风险栈、异常处置和复盘摘要均由模拟任务数据生成。",
   "Mission decision loop running": "任务决策闭环运行中",
   "In progress": "进行中",
+  "Checking task, constraints, and risks.": "正在检查任务、约束和风险。",
   "SkyOps is turning the natural-language task into a constrained low-altitude operation plan.":
     "SkyOps 正在将自然语言任务转化为带约束的低空作业方案。",
   "Task parsing": "任务解析",
@@ -46,9 +70,12 @@ const zhText: Record<string, string> = {
   "Risk simulation": "风险推演",
   "Replan and review": "重规划与复盘",
   "Mission decision loop unavailable": "任务决策闭环不可用",
+  "Unable to generate plan.": "无法生成方案。",
   "Possible Causes": "可能原因",
   "Suggested Actions": "建议动作",
+  Retry: "重试",
   "Retry Mission Loop": "重试任务闭环",
+  "Incident Injection": "异常注入",
   "Incident Control": "异常控制",
   "Replan trigger": "重规划触发",
   "Event Control Panel": "事件控制面板",
@@ -60,6 +87,7 @@ const zhText: Record<string, string> = {
   "Observed Value": "观测值",
   Threshold: "阈值",
   "Incident update unavailable": "异常更新不可用",
+  "Unable to replan.": "无法重规划。",
   "Active Incident": "当前异常",
   "Mission Task Input": "任务描述",
 
@@ -109,6 +137,7 @@ const zhText: Record<string, string> = {
   UNAVAILABLE: "不可用",
   "Link Quality": "链路质量",
 
+  "Risk Explanation": "风险解释",
   "Risk Stack": "风险栈",
   Explainable: "可解释",
   "Risk Assessment": "风险评估",
@@ -215,7 +244,9 @@ const zhText: Record<string, string> = {
     "GPS 置信度低于导航阈值时中止，或切换到保守安全距离航线。",
   "Abort or pause close-range work if video latency exceeds the maximum safe monitoring threshold.":
     "图传延迟超过安全监控上限时，中止或暂停近距离作业。",
+  "Generate a plan to view risk explanation.": "生成任务方案后查看风险解释。",
 
+  "Replan Decision": "重规划决策",
   "Incident Replanning": "异常重规划",
   "Replan Result": "重规划结果",
   "Decision Summary": "决策摘要",
@@ -229,6 +260,7 @@ const zhText: Record<string, string> = {
   "No affected segment listed": "未列出受影响航段",
   "The current mock replan result did not provide route segments. Keep the active segment under manual review.":
     "当前模拟重规划结果未提供航段信息。请将当前活动航段保留在人工复核中。",
+  "Action Timeline": "动作时间线",
   "Replan Actions Timeline": "重规划动作时间线",
   "Replan action sequence": "重规划动作序列",
   "No replan actions available": "无可用重规划动作",
@@ -248,6 +280,7 @@ const zhText: Record<string, string> = {
     "当前展示的是确定性重规划规则选中的决策及其已拒绝备选方案。",
   "No rejected alternatives were returned by the mock replan rule, so the selected decision should remain reviewable.":
     "模拟重规划规则未返回已拒绝备选方案，因此该决策仍应保持可复核。",
+  "Inject an incident to view replanning.": "注入异常后查看重规划。",
 
   "Mission Review": "任务复盘",
   Mission: "任务",
@@ -288,10 +321,12 @@ const zhText: Record<string, string> = {
     "本次模拟任务复盘未注入异常。",
   "No makeup flight is required by the current mock review.":
     "当前模拟复盘无需补飞。",
+  "Run review to view mission results.": "运行复盘后查看任务结果。",
   Nominal: "正常",
   Review: "复核",
   Attention: "注意",
 
+  "Decision Evidence": "决策证据",
   "Human Explanation": "决策解释",
   "Decision Basis": "决策依据",
   Inputs: "输入",
@@ -313,6 +348,7 @@ const zhText: Record<string, string> = {
     "必须保留给人工安全或合规复核的事项。",
   "Waiting for facts, inferences, recommended actions, and human confirmation items.":
     "正在等待事实输入、模型推理、建议动作和人工确认项。",
+  "Generate a plan to view decision evidence.": "生成任务方案后查看决策证据。",
 
   "Mission decision loop is running.": "任务决策闭环运行中。",
   "Mission data unavailable.": "任务数据不可用。",
@@ -320,6 +356,7 @@ const zhText: Record<string, string> = {
     "SkyOps 正在解析任务、检查约束、推演风险并生成可解释方案。",
   "No flight recommendation should be used until the failed state is reviewed.":
     "失败状态完成复核前，不应使用任何飞行建议。",
+  "Please retry or keep this task under manual review.": "请重试，或将该任务保持在人工复核中。",
   "Task understanding": "任务理解",
   "Constraint check": "约束检查",
   "Plan assembly": "方案组装",
@@ -757,7 +794,7 @@ export const missionConsoleCopy: Record<Locale, MissionConsoleCopy> = {
   en: {
     appBadge: "SkyOps Agent",
     dataBadge: "Demo Data",
-    pageTitle: "Low-Altitude Operations Console",
+    pageTitle: "Task-level Autonomy Console",
     languageLabel: "Interface language",
     backendFallback: "Vite proxy -> 127.0.0.1:8000",
     status: {
@@ -767,9 +804,9 @@ export const missionConsoleCopy: Record<Locale, MissionConsoleCopy> = {
       dataMode: "Data Mode",
       dataModeValue: "Mock / simulated",
       loop: "Loop",
-      loopReady: "Decision loop ready",
-      loopFailed: "Decision loop failed",
-      loopRunning: "Decision loop running",
+      loopReady: "Plan ready",
+      loopFailed: "Plan unavailable",
+      loopRunning: "Generating plan...",
     },
     workspace: {
       flowTitle: "Mission Flow",
@@ -780,7 +817,7 @@ export const missionConsoleCopy: Record<Locale, MissionConsoleCopy> = {
       riskFocus: "Risk Focus",
       pendingIncident: "Pending decision loop",
       fallbackObject: "Shenzhen high-rise demo",
-      pendingRisk: "Risk stack pending",
+      pendingRisk: "Risk explanation pending",
       highPriorityRisks: (count: number) => `${count} high-priority risks`,
       viewStatus: {
         manualReview: "Manual Review",
@@ -793,8 +830,8 @@ export const missionConsoleCopy: Record<Locale, MissionConsoleCopy> = {
         task: {
           label: "Task",
           eyebrow: "Step 01",
-          title: "Task Intake",
-          description: "Start from natural-language task input and run the demo decision loop.",
+          title: "Mission Task",
+          description: "Enter a natural-language mission task and run the demo flow.",
         },
         plan: {
           label: "Plan",
@@ -806,23 +843,20 @@ export const missionConsoleCopy: Record<Locale, MissionConsoleCopy> = {
         risk: {
           label: "Risk",
           eyebrow: "Step 03",
-          title: "Risk Reasoning",
-          description:
-            "Inspect sorted risks, decision impacts, evidence, and explainable human-facing rationale.",
+          title: "Risk Explanation",
+          description: "Review constraints, risk evidence, and decision impact.",
         },
         incident: {
           label: "Incident",
           eyebrow: "Step 04",
-          title: "Incident Replanning",
-          description:
-            "Inject a simulated incident and inspect the resulting pause, return, reroute, or review decision.",
+          title: "Incident Injection",
+          description: "Inject a simulated incident and inspect the replan decision.",
         },
         review: {
           label: "Review",
           eyebrow: "Step 05",
-          title: "Mission Review",
-          description:
-            "Close the loop with completion, data quality, risk logs, makeup flight advice, and review actions.",
+          title: "Review Report",
+          description: "Close the loop with completion, data quality, risk logs, and makeup flight needs.",
         },
       },
     },
