@@ -980,9 +980,9 @@ Phase 3 推荐最终形成：
 
 ---
 
-### Issue P2-S-045: Update Demo Script With Evaluation Story
+### Issue P2-S-045: Update Technical Proposal With Evaluation Story
 
-**Status:** Backlog
+**Status:** Done
 
 **Priority:** P2
 
@@ -992,20 +992,28 @@ Phase 3 推荐最终形成：
 
 **Depends On:** P1-M-040, P2-M-042
 
-**Goal:** 更新比赛演示脚本，把 Phase 3 评测能力讲清楚。
+**Goal:** 更新 `docs/preliminary-technical-proposal-outline.md`，把 Phase 3 评测能力讲清楚。
 
 **Scope:**
 
-- 说明单任务 Demo 展示 Agent 如何决策。
 - 说明评测集展示 Agent 能力如何量化。
 - 解释硬约束通过率、风险召回率、异常处置得分和可解释性得分。
-- 保持文案简洁，不写成技术论文。
+- 说明 evaluation runner、report JSON 和前端评测摘要面板的工程意义。
+- 保持文案简洁，方便后续扩写成最终技术方案。
 
 **Acceptance Criteria:**
 
-- 演示脚本可在 2-3 分钟内讲完。
+- outline 中 Phase 3 内容与当前实现状态一致。
 - 不承诺真实飞行许可或替代人工安全责任人。
 - 保持产品定位：低空作业任务自治与风险推演。
+- 不再把本任务写成单独 Demo 脚本交付物。
+
+**Implementation Notes:**
+
+- 已更新 `docs/preliminary-technical-proposal-outline.md` 第 8 节 Phase 3 内容。
+- 已补充 evaluation runner、evaluation report JSON 和 Evaluation Summary Panel 的技术方案写法。
+- 已明确评测对象是任务级自治决策能力，不是无人机硬件或 CV 缺陷识别准确率。
+- 已说明 report 使用 mock/simulated 数据、failed cases 和 failure reasons 支撑复盘改进。
 
 ---
 
@@ -1228,9 +1236,9 @@ Phase 4-lite 必须坚持：
 
 ---
 
-### Issue P2-S-050: Update Demo Script With LLM Boundary Story
+### Issue P2-S-050: Update Technical Proposal With LLM Boundary Story
 
-**Status:** Backlog
+**Status:** Done
 
 **Priority:** P2
 
@@ -1240,54 +1248,54 @@ Phase 4-lite 必须坚持：
 
 **Depends On:** P2-S-045, P2-S-049
 
-**Goal:** 更新比赛演示脚本，把 LLM 接口预留和安全边界讲成一句评委能听懂的话。
+**Goal:** 更新 `docs/preliminary-technical-proposal-outline.md`，把 LLM 接口预留和安全边界讲清楚。
 
 **Scope:**
 
-- 在 Demo 脚本中补充：
-  - 当前演示使用 deterministic rules 和 mock data 保证稳定。
+- 在技术方案中补充：
+  - 当前系统使用 deterministic rules 和 mock data 保证稳定。
   - LLM adapter 已预留，用于任务解析、约束补齐和解释生成。
   - 硬安全规则不会交给 LLM 单独决定。
   - 未来可替换真实 LLM provider。
-- 控制在 20-30 秒讲述长度。
+- 不单独维护 Demo 脚本；相关说明统一进入技术方案。
 
 **Acceptance Criteria:**
 
-- 讲述简洁，不像技术论文。
+- 文字简洁，不像技术论文。
 - 不让评委误以为系统已经接入真实 LLM。
 - 不让评委误以为 LLM 可以批准飞行。
 
+**Implementation Notes:**
+
+- 已在 `docs/preliminary-technical-proposal-outline.md` 第 9 节保留并统一 Phase 4-lite LLM 边界说明。
+- 已明确三层智能边界：Deterministic Safety Layer、Agent Reasoning Layer、LLM Assistance Layer。
+- 已明确 `MockLLMProvider` 的作用是保证可复现、无 API key/网络依赖，并防止把硬安全判断交给 LLM。
+- 已保留 “LLM can suggest, but cannot approve flight.” 作为安全声明。
+
 ---
 
-## 建议分配顺序
+## 当前剩余任务建议
 
-### 组长优先完成
+### 初赛提交前建议保留
 
-1. P0-L-024: Define EvaluationCase And EvaluationResult Schema
-2. P0-M-025: Create Evaluation Dataset Loader
-3. P0-L-033: Define Evaluation Metric Contracts And Scoring Priority
-4. P1-L-039: Implement Evaluation Runner
-5. P0-L-046: Define LLM Adapter Contract And Safety Boundary
-6. P2-L-038: Implement Plan Efficiency Metric
-7. P2-M-042: Add Evaluation Summary Panel
+1. P1-L-018: Demo Flow Polish For Competition Presentation
+   - 当前作为前端演示体验保留项，不再要求单独撰写 Demo 叙事脚本。
+   - 只在最终技术方案需要截图或界面证据时处理。
+2. P2-S-023: Copywriting Polish
+   - 用于提交前统一页面中英文文案和产品口径。
+   - 可交给组员处理，但组长需要最终审查。
 
-### 组员 A 可优先完成
+### 可暂缓到初赛后
 
-1. P2-S-023: Copywriting Polish
-2. P1-S-026: Add Evaluation Smoke Cases
-3. P1-M-027: Add Normal Operation Evaluation Cases
-4. P1-M-028: Add Weather GPS And Crowd Risk Evaluation Cases
-5. P1-M-047: Implement Mock LLM Provider
-6. P2-S-044: Document Evaluation Dataset Authoring Guide
+1. P2-M-041: Add Evaluation CLI Entry
+   - 方便本地运行评测，但当前不是初赛技术方案刚需。
+2. P2-S-044: Document Evaluation Dataset Authoring Guide
+   - 方便后续继续扩充评测集，更适合复赛或长期维护阶段。
 
-### 组员 B 可优先完成
+### 已完成但需在最终技术方案中使用
 
-1. P1-M-029: Add Airspace And Compliance Evaluation Cases
-2. P1-M-030: Add Drone Battery Payload And Link Evaluation Cases
-3. P1-M-031: Add Incident Injection Evaluation Cases
-4. P1-M-035: Implement Risk Recall Metric
-5. P1-M-036: Implement Incident Response Score
-6. P1-M-048: Add LLM Adapter Contract Tests
+1. P2-S-045: Update Technical Proposal With Evaluation Story
+2. P2-S-050: Update Technical Proposal With LLM Boundary Story
 
 ### 暂不建议分配给组员的任务
 

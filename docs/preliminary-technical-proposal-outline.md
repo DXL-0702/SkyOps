@@ -2,7 +2,7 @@
 
 > 本文档是初赛技术方案的施工图，不是最终提交版。
 >
-> 当前版本只基于仓库中已经完成或正在开发的内容组织材料。Phase 3 评测报告、Demo 截图和最终测试结果完成后，应再次更新本 outline，再扩写为最终 PDF 技术方案。
+> 当前版本只基于仓库中已经完成的工程内容组织材料。后续不再单独维护 Demo 叙事脚本，本 outline 是初赛技术方案的唯一材料入口；最终提交前只需要补充最新测试结果、界面截图和必要代码片段，再扩写为 PDF 技术方案。
 
 ## 0. 写作原则
 
@@ -47,14 +47,8 @@
 - 异常注入与重规划。
 - 任务复盘与补飞建议。
 - Mission Operations Console 前端 Demo。
-- Phase 3 评测数据模型、数据集、loader、指标合约。
-
-待 Phase 3 完成后补充：
-
-- 具体评分器实现。
-- Evaluation runner。
-- Evaluation report JSON。
-- 评测结果汇总截图或表格。
+- Phase 3 评测数据模型、数据集、loader、指标合约、评分器、runner、report JSON 和前端评测摘要面板。
+- Phase 3 regression tests，用于约束评测数据、评分器、runner、report 的稳定性。
 
 Phase 4-lite 当前已完成：
 
@@ -66,9 +60,11 @@ Phase 4-lite 当前已完成：
 - LLM adapter contract regression tests。
 - 技术方案中的 LLM 角色说明。
 
-待 Phase 4-lite 后续补充：
+当前不写：
 
-- Demo 脚本中的 20-30 秒 LLM 安全边界讲述。
+- 不写“已接入真实 LLM API”。
+- 不写“系统可替代法规审批或人工安全责任人”。
+- 不写“Demo 脚本/演示叙事”作为独立交付物；相关说明统一收进本技术方案。
 
 ## 1. 项目背景与问题定义
 
@@ -392,9 +388,6 @@ case "wind_speed_spike":
 - 39 个 mock/simulated evaluation cases。
 - Phase 3 指标合约与安全优先级。
 - 评测数据集 guardrail 测试。
-
-待 Phase 3 完成后补充：
-
 - Hard Constraint Pass Rate scorer。
 - Risk Recall scorer。
 - Incident Response Score scorer。
@@ -402,6 +395,15 @@ case "wind_speed_spike":
 - Plan Efficiency scorer。
 - Evaluation runner。
 - Evaluation report JSON。
+- Evaluation regression tests。
+- 前端 Evaluation Summary Panel。
+
+初赛技术方案应强调：
+
+- 评测对象是任务级自治决策能力，不是无人机硬件能力或 CV 缺陷识别准确率。
+- 评测数据来自本地 mock/simulated dataset，不依赖真实天气、地图、空域、无人机、GPS、图传或人群接口。
+- 硬约束是 blocking safety gate，方案效率不能抵消安全失败。
+- failed cases 和 failure reasons 会进入 report，支持复盘和改进。
 
 ### 8.3 建议引用代码一：评测合约
 
@@ -477,6 +479,100 @@ def test_phase_3_evaluation_dataset_has_task_autonomy_guardrails() -> None:
 - case 必须覆盖低空作业场景。
 - 禁止滑向 CV 缺陷识别。
 - 禁止危险动作进入期望输出。
+
+### 8.5 建议引用代码三：评测 runner
+
+文件：
+
+`backend/app/core/evaluation/runner.py`
+
+建议引用：
+
+```python
+def run_evaluation_case_fixture(fixture: EvaluationCaseFixture) -> EvaluationResult:
+    planning_result = build_mission_planning_result(
+        scenario=_build_runner_scenario(fixture),
+        raw_user_input=fixture.evaluation_case.raw_user_input,
+    )
+    replan_decisions = [
+        build_replan_decision(
+            incident_event=incident_event,
+            mission_plan=planning_result.mission_plan,
+        )
+        for incident_event in fixture.evaluation_case.incident_events
+    ]
+    mission_review = build_mission_review(
+        mission_plan=planning_result.mission_plan,
+        incident_events=fixture.evaluation_case.incident_events,
+        replan_decisions=replan_decisions,
+    )
+    result = score_evaluation_case(
+        evaluation_case=fixture.evaluation_case,
+        mission_plan=planning_result.mission_plan,
+        risks=planning_result.risks,
+        human_explanation=planning_result.human_explanation,
+        replan_decisions=replan_decisions,
+        mission_review=mission_review,
+    )
+    return result.model_copy(update={"generated_at": DETERMINISTIC_EVALUATION_GENERATED_AT})
+```
+
+说明重点：
+
+- 每个 case 会经过任务规划、异常重规划、任务复盘和评分。
+- runner 使用固定 timestamp，保证回归结果可复现。
+- 评测链路复用现有任务决策模块，而不是另写一套孤立测试逻辑。
+
+### 8.6 建议引用代码四：评测 report JSON
+
+文件：
+
+`backend/app/core/evaluation/report.py`
+
+建议引用：
+
+```python
+def build_evaluation_report(
+    *,
+    results: Sequence[EvaluationResult],
+    cases: Sequence[EvaluationCase] | Mapping[str, EvaluationCase] | None = None,
+) -> dict[str, Any]:
+    case_results = [
+        _brief_case_result(result=result, evaluation_case=case_lookup.get(result.case_id))
+        for result in sorted_results
+    ]
+    failed_cases = [
+        {
+            "case_id": case_result["case_id"],
+            "case_name": case_result["case_name"],
+            "category": case_result["category"],
+            "failure_reasons": case_result["failure_reasons"],
+        }
+        for case_result in case_results
+        if not case_result["passed"]
+    ]
+
+    return {
+        "report_type": REPORT_TYPE,
+        "data_origin": DATA_ORIGIN,
+        "uses_real_api": False,
+        "case_count": case_count,
+        "passed_count": passed_count,
+        "failed_count": case_count - passed_count,
+        "hard_constraint_pass_rate": _average_metric(case_results, "hard_constraint_pass_rate"),
+        "risk_recall_avg": _average_metric(case_results, "risk_recall"),
+        "incident_response_avg": _average_metric(case_results, "incident_response_score"),
+        "explainability_avg": _average_metric(case_results, "explainability_score"),
+        "case_results": case_results,
+        "failed_cases": failed_cases,
+    }
+```
+
+说明重点：
+
+- report 明确标记 `mock/simulated` 与 `uses_real_api: False`。
+- report 同时面向前端展示、技术方案数据表和后续回归分析。
+- 失败用例不被隐藏，而是作为系统改进依据。
 
 ## 9. Phase 4-lite：LLM 接口边界
 
@@ -590,25 +686,20 @@ Phase 4-lite 用于说明 SkyOps Agent 具备未来接入真实 LLM 的清晰边
 SkyOps Agent 的 Agent 能力不是依赖一个大模型直接给结论，而是由确定性安全层、任务推理层和 LLM 辅助层共同组成。LLM 负责更自然的理解与表达，安全与合规由显式规则、评测系统和人工复核约束。
 ```
 
-## 10. Demo 展示流程
+## 10. 初赛技术方案中的界面证据
 
-### 10.1 推荐 Demo 主线
+### 10.1 写作口径
 
-建议初赛 Demo 视频或现场演示使用一条主线：
+当前不单独维护 Demo 叙事脚本。初赛技术方案中只需要把前端界面作为“工程证据”使用，证明系统已经具备可操作的任务级自治工作台。
+
+界面证据建议按功能面板组织：
 
 ```text
-1. 用户输入自然语言任务：
-   “明天上午巡检南山区一栋 180 米高办公楼外立面，尽量减少对行人的影响。”
-2. 系统生成任务方案：
-   时间窗口、起降点、航线策略、安全阈值、中止条件。
-3. 系统展示风险解释：
-   风速、GPS、人流、空域、电量、图传等。
-4. 注入异常事件：
-   风速突增或 GPS 置信度下降。
-5. 系统自动重规划：
-   暂停、返航/待命、保留数据、补飞、人工复核。
-6. 生成任务复盘：
-   完成度、未覆盖区域、风险记录、补飞建议、下次优化建议。
+1. 任务方案：时间窗口、起降点、航线策略、安全阈值、中止条件。
+2. 风险解释：风速、GPS、人流、空域、电量、图传等风险依据。
+3. 异常重规划：暂停、返航/待命、保留数据、补飞、人工复核。
+4. 任务复盘：完成度、未覆盖区域、风险记录、补飞建议、下次优化建议。
+5. 评测摘要：硬约束通过率、风险召回、异常响应、可解释性和 failed cases。
 ```
 
 ### 10.2 截图建议
@@ -620,12 +711,25 @@ SkyOps Agent 的 Agent 能力不是依赖一个大模型直接给结论，而是
 - 风险解释 / 风险图表。
 - 异常重规划面板。
 - 复盘与补飞建议面板。
+- Evaluation Summary Panel。
 
 截图应避免：
 
 - 只展示 landing page。
 - 长篇说明文字太多。
 - 让页面看起来像传统巡检缺陷报告工具。
+
+### 10.3 前端证据写法
+
+技术方案中建议把截图和工程能力绑定，而不是把截图写成演示流程：
+
+| 截图 | 证明内容 |
+| --- | --- |
+| Mission Operations Console 总览 | 系统不是聊天机器人，而是任务运营工作台 |
+| 任务方案面板 | 输出结构化时间窗口、航线策略、安全阈值和中止条件 |
+| 风险面板 | 多源约束和风险推演可解释 |
+| 异常重规划面板 | 异常发生后能给出保守处置和补飞建议 |
+| Evaluation Summary Panel | Agent 决策能力可量化、可回归、可复盘 |
 
 ## 11. 安全与合规边界
 
@@ -653,15 +757,22 @@ SkyOps Agent 的 Agent 能力不是依赖一个大模型直接给结论，而是
 - Ruff lint。
 - evaluation loader tests。
 - evaluation contract tests。
+- evaluation scoring tests。
+- evaluation runner tests。
+- evaluation report tests。
+- evaluation regression tests。
 - hard constraint rule tests。
 - mission plan contract tests。
 - incident replanner tests。
 - mission reviewer tests。
+- LLM contract tests。
+- MockLLMProvider tests。
+- LLM adapter contract regression tests。
 
 如果最终提交前测试结果稳定，可以写：
 
 ```text
-当前后端测试覆盖任务规划、硬约束、异常重规划、复盘和评测合约等核心模块。
+当前后端测试覆盖任务规划、硬约束、异常重规划、复盘、评测数据集、评测评分器、评测报告和 LLM adapter 安全边界等核心模块。
 ```
 
 注意：
@@ -669,24 +780,25 @@ SkyOps Agent 的 Agent 能力不是依赖一个大模型直接给结论，而是
 - 不要写虚假的覆盖率百分比，除非实际生成 coverage report。
 - 可以写测试数量，但最终方案前应以最新 `uv run pytest` 输出为准。
 
-### 12.2 待 Phase 3 完成后补充
+### 12.2 最终提交前需要补充的测试材料
 
-- Evaluation runner 运行结果。
-- 每个指标的得分示例。
-- 总评测报告 JSON。
-- 失败 case 的解释示例。
+- 最新 `uv run pytest` 输出。
+- 最新 `npm run build` 输出。
+- Evaluation report JSON 摘要。
+- 评测指标结果表。
+- 1-2 个失败 case 的 failure reasons 示例。
 
 ## 13. 后续路线
 
 ### 13.1 初赛前
 
-优先完成：
+当前核心工程能力已经完成，初赛前优先做材料收口：
 
-1. Phase 3 评分器和 runner。
-2. Phase 4-lite mock provider、LLM contract tests 与 LLM adapter regression tests。
-3. Demo 流程收口。
-4. 技术方案最终版。
-5. Demo 视频或演示说明。
+1. 把本 outline 扩写成最终技术方案。
+2. 补充最新测试命令输出和评测 report 摘要。
+3. 补充前端界面截图，作为工程实现证据。
+4. 精简文案，确保不把产品写成缺陷识别工具或真实飞控系统。
+5. 明确 mock/simulated 数据、MockLLMProvider 和安全合规边界。
 
 ### 13.2 初赛后
 
@@ -701,15 +813,16 @@ SkyOps Agent 的 Agent 能力不是依赖一个大模型直接给结论，而是
 
 ## 14. 最终技术方案待补清单
 
-Phase 3 完成后补：
+Phase 3 材料整理：
 
-- [ ] 评分器代码片段。
-- [ ] Evaluation runner 代码片段。
-- [ ] Evaluation report JSON 示例。
+- [x] 评分器代码片段候选。
+- [x] Evaluation runner 代码片段候选。
+- [x] Evaluation report JSON 结构说明。
 - [ ] 最新测试结果。
 - [ ] 评测指标结果表。
+- [ ] 失败 case failure reasons 示例。
 
-Phase 4-lite 后续完成后补：
+Phase 4-lite 材料整理：
 
 - [x] LLM adapter contract 代码片段。
 - [x] LLM 安全边界文档。
@@ -718,13 +831,13 @@ Phase 4-lite 后续完成后补：
 - [x] “为什么初赛不接真实 LLM”说明。
 - [x] “LLM can suggest, but cannot approve flight.” 安全声明。
 
-Demo 完成后补：
+前端界面证据：
 
 - [ ] 前端总览截图。
 - [ ] 风险面板截图。
 - [ ] 异常重规划截图。
 - [ ] 复盘报告截图。
-- [ ] 2-3 分钟 Demo 讲解稿。
+- [ ] 评测摘要面板截图。
 
 ## 15. 建议最终方案标题
 
