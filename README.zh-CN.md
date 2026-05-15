@@ -17,42 +17,43 @@
   ·
   <a href="#项目概览">项目概览</a>
   ·
-  <a href="#mvp-场景">MVP</a>
+  <a href="#已实现能力">核心能力</a>
   ·
-  <a href="#开发路线">路线图</a>
+  <a href="#评测体系">评测体系</a>
   ·
-  <a href="#安全与合规">安全边界</a>
+  <a href="#安全边界">安全边界</a>
 </p>
 
 <p align="center">
   <img alt="Backend" src="https://img.shields.io/badge/backend-FastAPI-009688?style=flat-square" />
-  <img alt="Python" src="https://img.shields.io/badge/python-3.11%2B-3776AB?style=flat-square&logo=python&logoColor=white" />
-  <img alt="Pydantic" src="https://img.shields.io/badge/models-Pydantic-E92063?style=flat-square" />
+  <img alt="Python" src="https://img.shields.io/badge/python-3.11%2F3.12-3776AB?style=flat-square&logo=python&logoColor=white" />
+  <img alt="Pydantic" src="https://img.shields.io/badge/models-Pydantic%20v2-E92063?style=flat-square" />
   <img alt="Frontend" src="https://img.shields.io/badge/frontend-React%20%2B%20Vite-61DAFB?style=flat-square&logo=react&logoColor=111111" />
   <img alt="Styling" src="https://img.shields.io/badge/styling-Tailwind%20CSS-38BDF8?style=flat-square&logo=tailwindcss&logoColor=white" />
-  <img alt="Status" src="https://img.shields.io/badge/status-planning%20%2F%20scaffold-64748B?style=flat-square" />
+  <img alt="Evaluation" src="https://img.shields.io/badge/evaluation-39%20mock%20cases-14B8A6?style=flat-square" />
+  <img alt="Status" src="https://img.shields.io/badge/status-MVP%20%2B%20evaluation%20ready-0F172A?style=flat-square" />
 </p>
 
 ---
 
 ## 项目概览
 
-**SkyOps Agent** 是一个面向深圳低空经济与无人机产业场景的低空作业任务自治与风险推演智能体。
+**SkyOps Agent** 是面向深圳低空经济场景的低空作业任务自治与风险推演智能体。
 
-它不是无人机缺陷识别系统，不是裂缝识别工具，不是光伏热斑检测工具，也不是无人机底层飞控系统。SkyOps Agent 关注的是作业需求与执行系统之间的智能决策层：
+它不是无人机缺陷识别系统，不是裂缝识别工具，不是光伏热斑检测工具，也不是无人机底层飞控系统。它的产品本体是作业需求与执行系统之间的**任务级自治决策层**。
 
-| 它不回答 | 它回答 |
+| 它不主要回答 | 它回答 |
 | --- | --- |
 | 无人机会不会飞？ | 当前约束下，这个任务该不该飞？ |
-| 图像里有没有缺陷？ | 什么时间窗口、航线、起降点和任务拆分方式最安全？ |
-| 无人机能否执行底层飞控命令？ | 风速、GPS、电量、空域、人流风险变化时怎么办？ |
+| 图像里有没有缺陷？ | 什么时间窗口、起降点、航线策略和任务拆分方式最安全？ |
+| 无人机能否执行底层飞控命令？ | 风速、GPS、电量、空域、图传和人流风险变化时怎么办？ |
 | 巡检后能否生成报告？ | 如何形成可解释、可复盘、可持续优化的任务闭环？ |
 
-第一个 MVP 场景是：**深圳某高层建筑外立面巡检任务自治与风险推演**。巡检只是第一个 Demo 场景，产品能力可以扩展到园区安防、工地巡查、园区光伏、应急救援、消防巡查、低空测绘、城市治理、物流配送等低空作业任务。
+当前首个场景是：**深圳某高层建筑外立面巡检任务自治与风险推演**。巡检只是第一个 Demo 场景，任务自治能力可以扩展到园区光伏巡检、工地安全巡查、园区安防、应急救援、消防巡查、低空测绘、城市治理和物流配送等低空作业任务。
 
 ## 核心定位
 
-SkyOps Agent 位于低空系统的中间决策层：
+SkyOps Agent 位于低空作业体系的中间层：
 
 ```text
 城市级低空监管 / 空域管理 / UTM 平台
@@ -62,93 +63,109 @@ SkyOps Agent：任务自治与风险推演层
 无人机 / 机库 / 飞控 / 载荷 / 巡检平台
 ```
 
-它不替代政府低空监管平台，也不替代 DJI 等厂商飞控系统。它的职责是在任务需求和执行系统之间形成可解释、可约束、可复盘的智能决策。
+它不替代政府低空监管平台、UTM 系统、DJI 等厂商飞控系统或人工安全责任人。它的职责是把任务意图转化为结构化、保守、可解释的低空作业方案。
 
-## 核心能力
+## 已实现能力
 
-| 能力 | 含义 |
+| 能力 | 当前实现 |
 | --- | --- |
-| 主动感知 | 主动补齐任务所需约束，而不是让用户填写大量表单。 |
-| 多源约束推理 | 综合天气、风速、光照、人流、空域、GPS、电量、载荷、图传、安全、法规和业务优先级。 |
-| 风险推演 | 在任务执行前和执行中进行 what-if 分析。 |
-| 自主规划 | 生成飞行时间窗口、起降点、航线策略、任务拆分、安全阈值和中止条件。 |
-| 异常重构 | 遇到风速突变、GPS 异常、临时限飞、电量不足、人流聚集等事件时主动重规划。 |
-| 闭环复盘 | 生成任务复盘、风险记录、数据质量评分、补飞计划和下次优化建议。 |
-| 可解释决策 | 关键决策必须包含依据、权衡、替代方案和需要人工确认的事项。 |
+| 任务规划 | 基于任务、环境、空域、设备、风险和解释字段的确定性编排。 |
+| 硬安全规则 | 显式检查风速、电量余量、GPS 置信度、图传延迟、人流等级和空域可飞性。 |
+| 风险推理 | 规则风险和场景风险均以结构化 `RiskItem` 保留证据、缓解措施和人工确认要求。 |
+| 异常重规划 | 覆盖风速突增、GPS 下降、图传延迟、电量不足、人群聚集、临时空域限制和未知异常。 |
+| 任务复盘 | 生成完成度、数据质量评分、风险触发记录、未覆盖区域、补飞计划、人工复核清单和下次优化建议。 |
+| 前端控制台 | React + Vite + Tailwind 任务运营台，支持规划、风险、异常注入、重规划、复盘、语言切换和主题切换。 |
+| 评测体系 | 39 个 mock/simulated 评测用例、指标合约、评分器、确定性 runner、report JSON 和前端评测摘要面板。 |
+| LLM 边界 | Phase 4-lite LLM adapter contract 与确定性 `MockLLMProvider`；当前不调用真实 LLM API。 |
 
 ## 架构设计
 
-| Agent | 职责 |
+```text
+Frontend Mission Operations Console
+        |
+FastAPI Mission API
+        |
+Mission Orchestrator
+        |
+Rules / Replanner / Reviewer / Evaluation / LLM Adapter
+        |
+Mock Scenarios + Evaluation Dataset
+```
+
+| 模块 | 路径 | 作用 |
+| --- | --- | --- |
+| Mission API | `backend/app/api/routes/mission.py` | 任务规划、异常重规划和任务复盘接口。 |
+| 任务规划 | `backend/app/core/orchestration/mission_planner.py` | 汇总任务、环境、空域、设备和硬约束。 |
+| 安全规则 | `backend/app/core/rules/engine.py` | 确定性安全与合规检查。 |
+| 异常重规划 | `backend/app/core/orchestration/incident_replanner.py` | 将运行中异常转化为保守动作。 |
+| 任务复盘 | `backend/app/core/orchestration/mission_reviewer.py` | 生成复盘、未覆盖区域、补飞计划和后续优化。 |
+| 评测系统 | `backend/app/core/evaluation/` | 指标合约、评分器、runner、report JSON 和回归测试。 |
+| Mock 数据 | `backend/app/data/` | 场景数据与评测 fixtures，均使用 mock/simulated 数据。 |
+| LLM 接口 | `backend/app/integrations/llm/` | LLM provider contract、安全策略和 MockLLMProvider。 |
+| 前端控制台 | `frontend/src/features/mission/` | 任务运营可视化界面。 |
+| 评测面板 | `frontend/src/features/evaluation/` | 评测摘要和失败用例展示。 |
+
+## 评测体系
+
+SkyOps Agent 必须可测试、可量化，而不是只讲概念。当前评测对象不是无人机硬件，也不是 CV 缺陷识别模型，而是 Agent 在复杂约束下的任务决策能力。
+
+当前本地 mock/simulated 评测摘要：
+
+| 字段 | 当前结果 |
+| --- | ---: |
+| case_count | 39 |
+| passed_count | 28 |
+| failed_count | 11 |
+| hard_constraint_pass_rate | 0.963 |
+| risk_recall_avg | 1.000 |
+| incident_response_avg | 0.359 |
+| explainability_avg | 0.9882 |
+
+这些数字不是生产认证结果，也不是对真实飞行能力的承诺，而是本地 mock/simulated 评测集下的可复现结果。failed cases 会被保留，用于暴露当前规则、异常响应和基准方案的薄弱点。
+
+| 指标 | 检查内容 |
 | --- | --- |
-| 任务理解 Agent | 从自然语言中抽取作业对象、区域、目标、时间要求、精度要求、风险偏好和特殊限制。 |
-| 环境感知 Agent | 整合天气、风速、降雨、能见度、光照、人流、建筑环境、GPS 风险和反光风险。 |
-| 空域合规 Agent | 检查禁飞区、限飞区、临时管控区、审批条件、高度限制和合规风险。 |
-| 设备状态 Agent | 评估无人机、电池、载荷、相机、热成像、变焦、图传质量和任务续航。 |
-| 任务规划 Agent | 生成推荐执行时间、起降点、航线策略、安全距离、拍摄间距、任务拆分、备用方案和中止条件。 |
-| 风险推演 Agent | 构建 what-if 风险树，并将触发条件映射到缓解动作和重规划建议。 |
-| 异常处置 Agent | 将执行中异常转化为暂停、返航、绕行、备用航线、降级任务、补飞或人工接管决策。 |
-| 报告复盘 Agent | 生成任务方案、风险报告、异常记录、补飞计划、数据质量评分和下次优化建议。 |
+| Hard Constraint Pass Rate / 硬约束通过率 | 禁飞状态、审批门槛、风速、电量余量、GPS 置信度、人流安全和航线级硬约束。 |
+| Risk Recall / 风险召回率 | 是否识别 GPS 下降、风速上升、人流高峰、临时限制、低能见度和图传延迟等预期风险。 |
+| Incident Response Score / 异常处置得分 | 异常后是否暂停、返航、启用保守航线、保存数据、生成补飞计划、解释原因并要求人工复核。 |
+| Explainability Score / 可解释性得分 | 关键决策是否包含事实、推理、建议动作和人工确认事项。 |
+| Plan Efficiency / 方案效率 | 在不抵消安全失败的前提下评估覆盖率、拆分次数、补飞负载和人工介入。 |
+
+## LLM 边界
+
+SkyOps Agent 当前包含 Phase 4-lite LLM 接口预览，但**不调用真实 LLM API**。
+
+LLM 层只做辅助：
+
+```text
+LLM can suggest, but cannot approve flight.
+```
+
+| 层级 | 职责 | 边界 |
+| --- | --- | --- |
+| Deterministic Safety Layer / 确定性安全层 | 风速、电量、GPS、图传、人流和空域规则。 | 阻断不安全方案，不能被 LLM 覆盖。 |
+| Agent Reasoning Layer / 任务推理层 | 任务规划、风险推理、异常重规划、复盘和评测。 | 生成结构化决策，并受规则和测试约束。 |
+| LLM Assistance Layer / LLM 辅助层 | 任务解析草稿、缺失约束建议、解释生成和复盘润色。 | 只输出 draft / suggestion / explanation。 |
+
+未来可以在同一 adapter contract 下接入真实 provider，但仍不得批准飞行、绕过人工复核、覆盖硬约束、修改安全阈值或隐藏不确定性。
 
 ## 技术栈
-
-SkyOps Agent 采用轻量的前后端分离 monorepo，重点服务于仿真、解释和评测。
 
 | 层级 | 技术 |
 | --- | --- |
 | 后端 | Python 3.11/3.12, FastAPI |
 | 数据模型 | Pydantic v2 |
 | 测试 | pytest |
-| 格式化 / Lint | Ruff |
+| Lint | Ruff |
 | 配置 | python-dotenv, PyYAML |
 | 前端 | React, TypeScript, Vite |
 | 样式 | Tailwind CSS |
 | 图标 | lucide-react |
 | 图表 | Recharts |
-| 仿真数据 | JSON / YAML mock 数据集 |
-| Agent 编排 | Phase 1 使用项目内确定性 orchestrator |
-
-LLM 可用于自然语言任务理解、缺失信息补全建议、解释生成和报告润色。禁飞区、超风速、低电量、GPS 置信度不足、人流密集、返航电量不足等硬安全约束必须由显式规则代码判断，不能只依赖 LLM 自由文本输出。
-
-## 计划目录结构
-
-```text
-backend/
-  app/
-    main.py
-    api/
-    agents/
-    core/
-      models/
-      rules/
-      evaluation/
-      orchestration/
-      explanation/
-    data/
-      mock/
-      scenarios/
-      fixtures/
-    integrations/
-  tests/
-
-frontend/
-  src/
-    api/
-    components/
-    pages/
-    features/
-      mission/
-      risk/
-      incident/
-      review/
-      evaluation/
-
-docs/
-.github/
-```
+| 数据 | YAML / JSON mock 和 simulated 数据集 |
+| 编排 | 项目内确定性 orchestrator |
 
 ## 快速开始
-
-项目已完成 Phase 1 后端仿真闭环。后端工程基线使用 Python 3.12 和 `uv`。
 
 安装本地工具：
 
@@ -169,13 +186,21 @@ uv sync
 uv run uvicorn app.main:app --reload
 ```
 
-检查健康接口：
+启动前端：
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+检查后端健康接口：
 
 ```bash
 curl http://127.0.0.1:8000/health
 ```
 
-检查 Phase 1 mock 任务规划合约：
+运行一次 mock 任务规划：
 
 ```bash
 curl -X POST http://127.0.0.1:8000/missions/plan \
@@ -186,135 +211,51 @@ curl -X POST http://127.0.0.1:8000/missions/plan \
   }'
 ```
 
-检查 mock 异常重规划合约：
+运行测试和构建：
 
 ```bash
-curl -X POST http://127.0.0.1:8000/missions/replan \
-  -H "Content-Type: application/json" \
-  -d '{
-    "scenario_id": "shenzhen_nanshan_highrise_demo",
-    "incident_event": {
-      "id": "incident-wind-001",
-      "mission_id": "mission-shenzhen-nanshan-highrise-demo",
-      "event_type": "wind_speed_spike",
-      "observed_value": "9.4 m/s",
-      "threshold": "8.0 m/s",
-      "severity": "high",
-      "source_type": "mock",
-      "description": "Simulated sudden wind increase near the upper facade."
-    }
-  }'
-```
-
-检查 mock 任务复盘合约：
-
-```bash
-curl -X POST http://127.0.0.1:8000/missions/review \
-  -H "Content-Type: application/json" \
-  -d '{
-    "scenario_id": "shenzhen_nanshan_highrise_demo",
-    "incident_events": [
-      {
-        "id": "incident-gps-001",
-        "mission_id": "mission-shenzhen-nanshan-highrise-demo",
-        "event_type": "gps_confidence_drop",
-        "observed_value": "0.41",
-        "threshold": "0.65",
-        "severity": "high",
-        "source_type": "mock",
-        "description": "Simulated GPS confidence drop near the facade."
-      }
-    ]
-  }'
-```
-
-这些 Phase 1 接口构成确定性的 mock 后端闭环：任务规划、异常重规划、任务复盘。它们尚未接入真实无人机、真实空域系统、真实天气 API 或真实飞控；环境、空域、设备状态、异常和复盘数据均为 mock 或 simulated 数据。
-
-运行测试和 lint：
-
-```bash
+cd backend
 uv run pytest
 uv run ruff check .
 ```
 
-启动前端 scaffold：
-
 ```bash
 cd frontend
-npm install
-npm run dev
-```
-
-构建前端：
-
-```bash
 npm run build
 ```
 
-仓库 CI 会在推送到 `main` 或向 `main` 发起 PR 时运行后端测试、后端 Ruff 检查和前端生产构建。
-
-## MVP 场景
-
-> 深圳某高层建筑外立面巡检任务自治与风险推演。
+近期本地验证：
 
 ```text
-自然语言任务
-  -> 任务理解
-  -> mock 天气 / 人流 / 空域 / 设备状态
-  -> 时间窗口 + 起降点 + 航线策略 + 安全阈值
-  -> 异常事件注入
-  -> 重规划决策
-  -> 任务复盘 + 补飞计划
+Backend pytest: 105 passed
+Frontend build: passed
 ```
 
-示例任务：
+## 安全边界
 
-> 明天上午巡检南山区一栋 180 米高办公楼外立面，重点排查幕墙裂缝和脱落风险，要求尽量减少对行人的影响。
+SkyOps Agent 是低空作业任务决策辅助系统，不是规避监管工具、飞控系统或人工安全责任人的替代品。
 
-示例异常：
+当前实现边界：
 
-- 风速突然升高。
-- GPS 置信度下降。
-- 图传延迟增加。
-- 临时限飞区更新。
-- 电量不足。
-- 目标区域出现人群聚集。
+- 使用 mock/simulated 数据。
+- 不接入真实无人机、机库、UTM、真实空域系统、真实天气 API 或真实人流数据。
+- 不控制真实起飞、降落或航线执行。
+- 不调用真实 LLM API。
+- 不批准飞行，也不绕过法规审批。
 
-## 开发路线
-
-| 阶段 | 目标 | 重点工作 |
-| --- | --- | --- |
-| Phase 0 | 项目基线 | Monorepo、FastAPI 后端、React + Vite + Tailwind 前端、Ruff、pytest、CI。 |
-| Phase 1 | 仿真 MVP | Pydantic 模型、mock 数据、显式安全规则、确定性编排、任务方案、异常重规划、复盘报告。 |
-| Phase 2 | 可视化 Demo | 低空运营调度台、航线与风险可视化、异常注入、重规划展示、复盘面板。 |
-| Phase 3 | 评测集与指标 | 30-50 个仿真场景、硬约束通过率、风险召回率、异常处置得分、可解释性得分。 |
-| Phase 4 | 可扩展接口 | 天气、地图、无人机、机库、UTM、巡检结果 adapter，并保留 mock fallback。 |
-
-## 评测指标
-
-| 指标 | 检查内容 |
-| --- | --- |
-| Hard Constraint Pass Rate / 硬约束通过率 | 禁飞区、风速、电量、返航余量、人流密集、审批要求等硬约束。 |
-| Risk Recall / 风险识别召回率 | GPS 遮挡、风速上升、人流高峰、临时限飞、强反光、低能见度、图传延迟等风险。 |
-| Plan Efficiency / 方案效率 | 飞行时间、任务拆分次数、覆盖率、补飞面积、人工介入次数和安全余量。 |
-| Incident Response Score / 异常处置得分 | 暂停、返航、绕行、数据保存、补飞计划、风险解释和人工接管。 |
-| Explainability Score / 可解释性得分 | 关键决策是否说明依据、权衡、替代方案和人工确认需求。 |
-
-## 安全与合规
-
-SkyOps Agent 是低空作业任务决策辅助系统，不是规避监管工具。
-
-系统不得建议绕过禁飞区、忽略审批、压低安全余量，或在人流密集区域冒险飞行。当数据不足或风险不确定时，系统应明确输出：
+当信息不足或风险不确定时，系统应输出：
 
 ```text
 当前信息不足，建议人工复核/暂停执行/启用保守方案。
 ```
 
-所有安全规则必须显式、可配置、可测试。mock 数据不得伪装成真实数据。
+## 路线图
 
-## 当前状态
-
-项目已完成 Phase 1 后端仿真闭环：mock 任务规划、确定性异常重规划、任务复盘、显式安全规则和后端测试均已就绪。下一步重点是 Phase 2：开发调用这些后端合约的低空作业可视化 Demo。
+| 阶段 | 重点 |
+| --- | --- |
+| 已完成 | 后端仿真闭环、显式安全规则、异常重规划、任务复盘、前端任务运营台、评测数据集、评测 runner/report、LLM adapter 边界。 |
+| 初赛准备 | 打磨技术方案材料、截图、页面文案和可展示的界面证据。 |
+| 后续扩展 | 真实天气/地图/UTM/无人机 adapter、任务历史存储、更大评测集，以及在既有安全 contract 下接入真实 LLM provider。 |
 
 ## 许可证
 
