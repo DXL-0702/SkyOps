@@ -29,13 +29,6 @@ build/
 .idea/
 .vscode/
 
-# Markdown
-AGENTS.md
-process.md
-docs/ISSUES_TEMPLATE.md
-docs/preliminary-technical-proposal-outline.md
-docs/preliminary-technical-proposal.md
-docs/DemoScript.md
-docs/preliminary-technical-proposal.pdf
+
 
  
