@@ -24,28 +24,33 @@ type MetricCopy = {
   helper: string;
 };
 
+const MAX_DISPLAYED_FAILED_CASES = 5;
+
 const copy = {
   zh: {
     title: "评测摘要",
     meta: "任务级能力",
     sourceLabel: "数据集",
-    badge: "Mock / Simulated Evaluation",
+    badge: "模拟评测",
     note:
-      "基于本地 mock/simulated 评测用例生成，展示任务规划、硬约束、风险召回、异常响应和可解释性表现。",
-    noRealApi: "不接入真实天气、地图、空域、无人机或人群 API。",
+      "基于本地模拟评测用例生成，展示任务规划、硬约束、风险召回、异常响应和可解释性表现。",
+    noRealApi: "未接入真实天气、地图、空域、无人机、GPS、图传或人群接口。",
     passed: "通过",
     failed: "失败",
     failedCases: "失败用例",
-    caseId: "Case ID",
+    caseId: "用例 ID",
     caseName: "用例名称",
     category: "类别",
     reason: "失败原因",
-    noFailedCases: "该 mock report 中没有失败用例。",
-    showingTopCases: "当前仅展示前几条失败用例，完整结果仍保留在 report 数据中。",
+    noFailedCases: "该模拟评测报告中没有失败用例。",
+    missingFailedCaseDetails: "报告标记了失败用例，但当前摘要没有提供失败明细。",
+    fallbackCaseName: "未命名评测用例",
+    fallbackCategory: "未知类别",
+    fallbackReason: "未提供失败原因。",
     metrics: {
       overallPassRate: {
         label: "整体通过率",
-        helper: "通过所有评测检查的 case 比例。",
+        helper: "通过所有评测检查的用例比例。",
       },
       hardConstraintPassRate: {
         label: "硬约束通过率",
@@ -53,7 +58,7 @@ const copy = {
       },
       riskRecall: {
         label: "风险召回",
-        helper: "Agent 识别预期风险的能力。",
+        helper: "智能体识别预期风险的能力。",
       },
       incidentResponse: {
         label: "异常响应",
@@ -81,7 +86,11 @@ const copy = {
     category: "Category",
     reason: "Failure Reason",
     noFailedCases: "No failed cases in this mock report.",
-    showingTopCases: "Only the first failed cases are shown here; the report data keeps the full list.",
+    missingFailedCaseDetails:
+      "The report marks failed cases, but this summary does not include failure details.",
+    fallbackCaseName: "Untitled evaluation case",
+    fallbackCategory: "unknown",
+    fallbackReason: "No reason provided.",
     metrics: {
       overallPassRate: {
         label: "Overall Pass Rate",
@@ -106,6 +115,17 @@ const copy = {
     },
   },
 } as const;
+
+function getShowingTopCasesMessage(locale: Locale, displayedCount: number, totalCount: number) {
+  if (locale === "zh") {
+    return `当前展示 ${displayedCount} / ${totalCount} 条失败用例，完整结果保留在评测报告数据中。`;
+  }
+
+  return (
+    `Showing ${displayedCount} of ${totalCount} failed cases. `
+    + "The full result is preserved in the evaluation report data."
+  );
+}
 
 function normalizePercent(value: number): number {
   if (!Number.isFinite(value)) {
@@ -152,23 +172,42 @@ function MetricCard({ metric, value }: { metric: MetricCopy; value: number }) {
   );
 }
 
-function firstFailureReason(failedCase: EvaluationFailedCase): string {
-  return failedCase.failure_reasons?.find((reason) => reason.trim()) ?? "No reason provided.";
+function firstNonEmpty(values?: string[]): string | undefined {
+  return values?.find((value) => value.trim());
+}
+
+function getFailedCaseView(failedCase: EvaluationFailedCase, locale: Locale) {
+  const localized = failedCase.localized?.[locale];
+  const tableCopy = copy[locale];
+
+  return {
+    caseId: failedCase.case_id ?? "unknown-case",
+    caseName: localized?.case_name ?? failedCase.case_name ?? tableCopy.fallbackCaseName,
+    category: localized?.category ?? failedCase.category ?? tableCopy.fallbackCategory,
+    reason:
+      firstNonEmpty(localized?.failure_reasons)
+      ?? firstNonEmpty(failedCase.failure_reasons)
+      ?? tableCopy.fallbackReason,
+  };
 }
 
 function FailedCaseTable({
   failedCases,
   locale,
+  totalFailedCount,
 }: {
   failedCases: EvaluationFailedCase[];
   locale: Locale;
+  totalFailedCount: number;
 }) {
   const tableCopy = copy[locale];
 
   if (failedCases.length === 0) {
     return (
       <div className={cn(panelStyles.surfacePadded, "mt-3")}>
-        <p className={textStyles.body}>{tableCopy.noFailedCases}</p>
+        <p className={textStyles.body}>
+          {totalFailedCount > 0 ? tableCopy.missingFailedCaseDetails : tableCopy.noFailedCases}
+        </p>
       </div>
     );
   }
@@ -188,38 +227,42 @@ function FailedCaseTable({
         <span role="columnheader">{tableCopy.reason}</span>
       </div>
 
-      {failedCases.map((failedCase) => (
-        <div
-          className="grid gap-2 border border-zinc-800 bg-zinc-950/70 px-3 py-3 text-sm text-zinc-300 md:grid-cols-[1.25fr_1.45fr_1fr_2fr] md:gap-3"
-          key={failedCase.case_id ?? failedCase.case_name}
-          role="row"
-        >
-          <span className="min-w-0 break-words font-semibold text-zinc-100" role="cell">
-            <span className={cn(textStyles.label, "mb-1 block md:hidden")}>
-              {tableCopy.caseId}
+      {failedCases.map((failedCase, index) => {
+        const failedCaseView = getFailedCaseView(failedCase, locale);
+
+        return (
+          <div
+            className="grid gap-2 border border-zinc-800 bg-zinc-950/70 px-3 py-3 text-sm text-zinc-300 md:grid-cols-[1.25fr_1.45fr_1fr_2fr] md:gap-3"
+            key={failedCase.case_id ?? `${failedCaseView.caseName}-${index}`}
+            role="row"
+          >
+            <span className="min-w-0 break-words font-semibold text-zinc-100" role="cell">
+              <span className={cn(textStyles.label, "mb-1 block md:hidden")}>
+                {tableCopy.caseId}
+              </span>
+              {failedCaseView.caseId}
             </span>
-            {failedCase.case_id ?? "unknown-case"}
-          </span>
-          <span className="min-w-0 break-words" role="cell">
-            <span className={cn(textStyles.label, "mb-1 block md:hidden")}>
-              {tableCopy.caseName}
+            <span className="min-w-0 break-words" role="cell">
+              <span className={cn(textStyles.label, "mb-1 block md:hidden")}>
+                {tableCopy.caseName}
+              </span>
+              {failedCaseView.caseName}
             </span>
-            {failedCase.case_name ?? "Untitled evaluation case"}
-          </span>
-          <span className="min-w-0 break-words" role="cell">
-            <span className={cn(textStyles.label, "mb-1 block md:hidden")}>
-              {tableCopy.category}
+            <span className="min-w-0 break-words" role="cell">
+              <span className={cn(textStyles.label, "mb-1 block md:hidden")}>
+                {tableCopy.category}
+              </span>
+              {failedCaseView.category}
             </span>
-            {failedCase.category ?? "unknown"}
-          </span>
-          <span className="min-w-0 break-words text-red-100" role="cell">
-            <span className={cn(textStyles.label, "mb-1 block md:hidden")}>
-              {tableCopy.reason}
+            <span className="min-w-0 break-words text-red-100" role="cell">
+              <span className={cn(textStyles.label, "mb-1 block md:hidden")}>
+                {tableCopy.reason}
+              </span>
+              {failedCaseView.reason}
             </span>
-            {firstFailureReason(failedCase)}
-          </span>
-        </div>
-      ))}
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -230,7 +273,8 @@ export function EvaluationSummaryPanel({
 }: EvaluationSummaryPanelProps) {
   const panelCopy = copy[locale];
   const failedCases = report.failed_cases ?? [];
-  const displayedFailedCases = failedCases.slice(0, 5);
+  const totalFailedCount = Math.max(report.failed_count, failedCases.length);
+  const displayedFailedCases = failedCases.slice(0, MAX_DISPLAYED_FAILED_CASES);
 
   return (
     <section className={panelStyles.base}>
@@ -261,7 +305,10 @@ export function EvaluationSummaryPanel({
       </div>
 
       <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
-        <MetricCard metric={panelCopy.metrics.overallPassRate} value={getOverallPassRate(report)} />
+        <MetricCard
+          metric={panelCopy.metrics.overallPassRate}
+          value={getOverallPassRate(report)}
+        />
         <MetricCard
           metric={panelCopy.metrics.hardConstraintPassRate}
           value={report.hard_constraint_pass_rate}
@@ -284,9 +331,15 @@ export function EvaluationSummaryPanel({
             {report.failed_count} / {report.case_count}
           </span>
         </div>
-        <FailedCaseTable failedCases={displayedFailedCases} locale={locale} />
-        {failedCases.length > displayedFailedCases.length ? (
-          <p className={cn(textStyles.subtle, "mt-3")}>{panelCopy.showingTopCases}</p>
+        <FailedCaseTable
+          failedCases={displayedFailedCases}
+          locale={locale}
+          totalFailedCount={totalFailedCount}
+        />
+        {totalFailedCount > displayedFailedCases.length ? (
+          <p className={cn(textStyles.subtle, "mt-3")}>
+            {getShowingTopCasesMessage(locale, displayedFailedCases.length, totalFailedCount)}
+          </p>
         ) : null}
       </div>
     </section>

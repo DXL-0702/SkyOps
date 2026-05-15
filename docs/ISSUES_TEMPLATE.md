@@ -814,7 +814,7 @@ Phase 3 推荐最终形成：
 
 ### Issue P1-M-040: Generate Evaluation Report JSON
 
-**Status:** Backlog
+**Status:** Done
 
 **Priority:** P1
 
@@ -885,7 +885,7 @@ Phase 3 推荐最终形成：
 
 ### Issue P2-M-042: Add Evaluation Summary Panel
 
-**Status:** Backlog
+**Status:** Done
 
 **Priority:** P2
 
@@ -922,7 +922,7 @@ Phase 3 推荐最终形成：
 
 ### Issue P1-M-043: Add Evaluation Regression Tests
 
-**Status:** Backlog
+**Status:** Done
 
 **Priority:** P1
 
