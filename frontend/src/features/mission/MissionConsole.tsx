@@ -10,6 +10,7 @@ import {
   createMissionReview,
   createReplanDecision,
 } from "../../api/mission";
+import { EvaluationSummaryPanel } from "../evaluation/EvaluationSummaryPanel";
 import { BackendStatus } from "./BackendStatus";
 import { EnvironmentDronePanel } from "./EnvironmentDronePanel";
 import { HumanExplanationPanel } from "./HumanExplanationPanel";
@@ -351,6 +352,8 @@ export function MissionConsole() {
             {renderActiveView()}
           </div>
         </section>
+
+        <EvaluationSummaryPanel locale={locale} />
       </section>
     </main>
   );
