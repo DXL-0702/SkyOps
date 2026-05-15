@@ -7,6 +7,14 @@ from app.core.evaluation.contracts import (
     get_metric_contract,
     list_metric_contracts,
 )
+from app.core.evaluation.report import (
+    DATA_ORIGIN,
+    REPORT_NOTE,
+    REPORT_TYPE,
+    build_evaluation_report,
+    evaluation_report_to_json,
+    generate_evaluation_report,
+)
 from app.core.evaluation.runner import (
     DETERMINISTIC_EVALUATION_GENERATED_AT,
     EvaluationRunnerError,
@@ -31,6 +39,12 @@ __all__ = [
     "EvaluationScoringPolicy",
     "DETERMINISTIC_EVALUATION_GENERATED_AT",
     "EvaluationRunnerError",
+    "DATA_ORIGIN",
+    "REPORT_NOTE",
+    "REPORT_TYPE",
+    "build_evaluation_report",
+    "evaluation_report_to_json",
+    "generate_evaluation_report",
     "get_metric_contract",
     "list_metric_contracts",
     "run_all_evaluation_cases",
