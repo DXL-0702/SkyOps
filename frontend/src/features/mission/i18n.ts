@@ -425,6 +425,17 @@ const zhText: Record<string, string> = {
     "模拟空域数据表明，仅在完成审批并采用保守高度剖面时可以执行飞行。",
   "Mock plan prioritizes approval, pedestrian separation, GPS confidence, and safe return margin over full single-flight coverage.":
     "模拟方案优先考虑审批、行人隔离、GPS 置信度和安全返航余量，而不是追求单次飞行全覆盖。",
+  "Hard constraint evaluation passed: true.": "硬约束评估通过：是。",
+  "Hard constraint evaluation passed: false.": "硬约束评估通过：否。",
+  "Wind speed is below threshold.": "风速低于安全阈值。",
+  "Battery margin is sufficient.": "电量余量充足。",
+  "Battery margin is below the configured safe threshold.": "电量余量低于已配置的安全阈值。",
+  "GPS confidence is acceptable.": "GPS 置信度处于可接受范围。",
+  "Video latency is acceptable.": "图传延迟处于可接受范围。",
+  "Video latency exceeds the configured safe threshold.": "图传延迟超过已配置的安全阈值。",
+  "Crowd level does not block the mission.": "当前人流等级不会阻断任务。",
+  "Airspace is marked flyable by the current constraint data.":
+    "当前约束数据将该空域标记为可飞。",
 
   wind_speed_spike: "风速突增",
   gps_confidence_drop: "GPS 置信度下降",
