@@ -52,6 +52,35 @@ function MissionCycleStatusCard({
   missionCycle: MissionCycleState;
   onRun: () => void;
 }) {
+  if (missionCycle.status === "idle") {
+    return (
+      <div className={cn(stateStyles.emptySurface, "mt-4")} aria-live="polite">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="text-sm font-semibold text-white">
+            {t(locale, "Waiting for task input")}
+          </p>
+          <span className={cn(badgeStyles.base, badgeStyles.neutral)}>
+            {t(locale, "Not generated")}
+          </span>
+        </div>
+        <p className={cn(textStyles.subtle, "mt-2")}>
+          {t(
+            locale,
+            "Edit the mission command, then generate a mock decision loop from the configured scenario.",
+          )}
+        </p>
+        <div className="mt-4 grid gap-2 sm:grid-cols-2">
+          {missionPipeline.map((step) => (
+            <div className={stateStyles.pipelineItem} key={step}>
+              <Clock3 aria-hidden="true" className="shrink-0 text-zinc-400" size={14} />
+              <span>{t(locale, step)}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   if (missionCycle.status === "ready") {
     return (
       <div className={cn(stateStyles.readySurface, "mt-4")}>
@@ -218,7 +247,7 @@ export function IncidentControlPanel({
   onIncidentSelect,
 }: IncidentControlPanelProps) {
   const isRunning = missionCycle.status === "loading";
-  const controlsDisabled = isRunning || isIncidentUpdating;
+  const controlsDisabled = missionCycle.status !== "ready" || isIncidentUpdating;
 
   return (
     <section className={panelStyles.base}>

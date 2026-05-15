@@ -2,6 +2,7 @@ export type Locale = "zh" | "en";
 
 const zhText: Record<string, string> = {
   loading: "加载中",
+  idle: "待生成",
   online: "在线",
   offline: "离线",
   ready: "已就绪",
@@ -33,6 +34,15 @@ const zhText: Record<string, string> = {
   "Mission Task Source": "任务来源",
   "Natural language": "自然语言",
   "Generate Mission Plan": "生成任务方案",
+  "Waiting for task input": "等待任务输入",
+  "Not generated": "未生成",
+  "Mission plan not generated yet.": "任务方案尚未生成。",
+  "Enter a mission task and generate a mock decision loop to view this panel.":
+    "输入任务指令并生成模拟决策闭环后查看该面板。",
+  "Waiting for task input and generate action.": "等待任务输入和生成动作。",
+  "Mock scenario data will be used after generation.": "生成后将使用模拟场景数据。",
+  "Edit the mission command, then generate a mock decision loop from the configured scenario.":
+    "编辑任务指令，然后基于已配置场景生成模拟决策闭环。",
   "Decision loop ready": "决策闭环已就绪",
   "Plan ready": "方案已生成",
   "Explainable plan": "可解释方案",
@@ -657,6 +667,7 @@ export type MissionConsoleCopy = {
     dataMode: string;
     dataModeValue: string;
     loop: string;
+    loopIdle: string;
     loopReady: string;
     loopFailed: string;
     loopRunning: string;
@@ -728,6 +739,7 @@ export const missionConsoleCopy: Record<Locale, MissionConsoleCopy> = {
       dataMode: "数据模式",
       dataModeValue: "模拟 / 仿真",
       loop: "决策闭环",
+      loopIdle: "等待任务输入",
       loopReady: "决策闭环已就绪",
       loopFailed: "决策闭环失败",
       loopRunning: "决策闭环运行中",
@@ -797,6 +809,7 @@ export const missionConsoleCopy: Record<Locale, MissionConsoleCopy> = {
       dataMode: "Data Mode",
       dataModeValue: "Mock / simulated",
       loop: "Loop",
+      loopIdle: "Waiting for task input",
       loopReady: "Decision loop ready",
       loopFailed: "Decision loop failed",
       loopRunning: "Decision loop running",

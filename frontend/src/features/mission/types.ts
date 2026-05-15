@@ -14,6 +14,7 @@ export type HealthState =
   | { status: "offline"; message: string };
 
 export type MissionCycleState =
+  | { status: "idle" }
   | { status: "loading" }
   | {
       status: "ready";

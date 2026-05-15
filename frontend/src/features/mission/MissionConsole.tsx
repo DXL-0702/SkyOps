@@ -96,7 +96,7 @@ export function MissionConsole() {
   const [health, setHealth] = useState<HealthState>({ status: "loading" });
   const [taskInput, setTaskInput] = useState(DEFAULT_TASK_INPUT);
   const [selectedIncident, setSelectedIncident] = useState(incidentPresets[0].event);
-  const [missionCycle, setMissionCycle] = useState<MissionCycleState>({ status: "loading" });
+  const [missionCycle, setMissionCycle] = useState<MissionCycleState>({ status: "idle" });
   const [activeViewId, setActiveViewId] = useState<ConsoleViewId>("task");
   const [isIncidentUpdating, setIsIncidentUpdating] = useState(false);
   const [incidentUpdateError, setIncidentUpdateError] = useState<string | null>(null);
@@ -181,12 +181,6 @@ export function MissionConsole() {
     }
   }
 
-  useEffect(() => {
-    void runMissionCycle(incidentPresets[0].event);
-    // Initial mock mission cycle only.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   async function handleGenerateMissionPlan() {
     const isReady = await runMissionCycle();
 
@@ -197,7 +191,6 @@ export function MissionConsole() {
 
   async function handleIncidentSelect(incidentEvent: IncidentEvent) {
     if (missionCycle.status !== "ready") {
-      await runMissionCycle(incidentEvent);
       return;
     }
 

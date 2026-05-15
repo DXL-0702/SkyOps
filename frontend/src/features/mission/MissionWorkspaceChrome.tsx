@@ -38,6 +38,10 @@ function getActiveViewStatus(
     return copy.viewStatus.manualReview;
   }
 
+  if (missionCycle.status === "idle") {
+    return viewId === "task" ? copy.viewStatus.ready : copy.viewStatus.waiting;
+  }
+
   if (missionCycle.status === "loading") {
     return viewId === "task" ? copy.viewStatus.running : copy.viewStatus.waiting;
   }
@@ -185,7 +189,9 @@ export function ActiveViewHeader({
               ? badgeStyles.danger
               : missionCycle.status === "loading"
                 ? badgeStyles.warning
-                : badgeStyles.success,
+                : missionCycle.status === "idle"
+                  ? badgeStyles.neutral
+                  : badgeStyles.success,
           )}
         >
           {t(locale, missionCycle.status)}

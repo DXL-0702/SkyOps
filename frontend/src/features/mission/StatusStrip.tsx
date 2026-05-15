@@ -20,7 +20,9 @@ export function StatusStrip({ health, missionCycle, copy, locale }: StatusStripP
       ? copy.loopReady
       : missionCycle.status === "failed"
         ? copy.loopFailed
-        : copy.loopRunning;
+        : missionCycle.status === "loading"
+          ? copy.loopRunning
+          : copy.loopIdle;
 
   return (
     <section className={layoutStyles.statusGrid}>
